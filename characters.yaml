@@ -1,0 +1,7 @@
+region:
+  realm0:
+    - characterA0
+    - characterB0
+  realm1:
+    - characterA1
+    - characterB1
