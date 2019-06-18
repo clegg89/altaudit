@@ -133,3 +133,50 @@ def test_get_races_Valid(fake_api):
     result = get_races(fake_api)
     assert fake_api.last_region == 'us'
     assert result == expected_result
+
+def test_get_basic_info_Valid():
+    classes = {
+            1 : 'Warrior',
+            2 : 'Paladin',
+            3 : 'Hunter',
+            4 : 'Rogue',
+            5 : 'Priest',
+            6 : 'Death Knight',
+            7 : 'Shaman',
+            8 : 'Mage',
+            9 : 'Warlock',
+            10 : 'Monk',
+            11 : 'Druid',
+            12 : 'Demon Hunter'}
+    races = {
+            1 : {'side': 'alliance', 'name': 'Human'},
+            2 : {'side': 'horde', 'name': 'Orc'},
+            3 : {'side': 'alliance', 'name': 'Dwarf'},
+            4 : {'side': 'alliance', 'name': 'Night Elf'},
+            5 : {'side': 'horde', 'name': 'Undead'},
+            6 : {'side': 'horde', 'name': 'Tauren'},
+            7 : {'side': 'alliance', 'name': 'Gnome'},
+            8 : {'side': 'horde', 'name': 'Troll'},
+            9 : {'side': 'horde', 'name': 'Goblin'},
+            10 : {'side': 'horde', 'name': 'Blood Elf'},
+            11 : {'side': 'alliance', 'name': 'Draenei'},
+            22 : {'side': 'alliance', 'name': 'Worgen'},
+            24 : {'side': 'neutral', 'name': 'Pandaren'},
+            25 : {'side': 'alliance', 'name': 'Pandaren'},
+            26 : {'side': 'horde', 'name': 'Pandaren'},
+            27 : {'side': 'horde', 'name': 'Nightborne'},
+            28 : {'side': 'horde', 'name': 'Highmountain Tauren'},
+            29 : {'side': 'alliance', 'name': 'Void Elf'},
+            30 : {'side': 'alliance', 'name': 'Lightforged Draenei'},
+            31 : {'side': 'horde', 'name': 'Zandalari Troll'},
+            32 : {'side': 'alliance', 'name': 'Kul Tiran'},
+            34 : {'side': 'alliance', 'name': 'Dark Iron Dwarf'},
+            36 : {'side': 'horde', 'name': "Mag'har Orc"}}
+    fake_data =
+{'lastModified': 1560826495000, 'name': 'Clegg', 'realm': "Kil'jaeden", 'battlegroup': 'Bloodlust', 'class': 9, 'race': 5, 'gender': 0, 'level': 120, 'achievementPoints': 14510, 'thumbnail': 'kiljaeden/96/184987488-avatar.jpg', 'calcClass': 'V', 'faction': 1, 'totalHonorableKills': 9523}
+    (klass, level, faction, gender, race) = get_basic_info(classes, races, fake_data)
+    assert klass == 'Warlock'
+    assert faction == 'Horde'
+    assert level == 120
+    assert gender == 'Male'
+    assert race == 'Undead'
