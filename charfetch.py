@@ -54,17 +54,26 @@ def get_char_profile(character, api, **filters):
     except:
         pass
 
+def _fetch_and_stored(fname, fetcher, now):
+    fetch = {}
+    fetch['data'] = fetcher()
+    fetch['timestamp'] = now
+    with open(fname, 'wb') as tf:
+        pickle.dump(fetch, tf, pickle.HIGHEST_PROTOCOL)
+
+    return fetch['data']
+
 def load_or_fetch(fname, fetcher, now):
-    with open(fname, 'rb') as tf:
-        return pickle.load(tf)['data']
-    # stored = pickle.load(stream)
+    try :
+        with open(fname, 'rb') as tf:
+            stored = pickle.load(tf)
+    except FileNotFoundError:
+        return _fetch_and_stored(fname, fetcher, now)
 
-    # if now - stored['timestamp'] >= datetime.timedelta(days=1):
-    #     fetch = fetcher()
-    #     fetch['timestamp'] = now
-    #     return fetch
+    if now - stored['timestamp'] >= datetime.timedelta(days=1):
+        return _fetch_and_stored(fname, fetcher, now)
 
-    # return stored
+    return stored['data']
 
 """
 def serialize_character(character):
@@ -99,5 +108,4 @@ if __name__ == "__main__":
     api = WowApi(tokens['client_id'], tokens['client_secret'])
     output = []
     for character in characters:
-        print(get_char_profile(character, api, locale='en_US', fields='talents,items,statistics,professions,reputation,audit')['lastModified'])
-        # output.append(get_all_info(api))
+        # output.append(get_all_info(character, api))

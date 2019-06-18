@@ -163,19 +163,48 @@ def test_load_or_fetch_Use_Stored():
     assert result == expected_result
     assert stored == expected_stored
 
-"""
 def test_load_or_fetch_Fetch():
+    test_file = 'test.pkl'
     stored_time = datetime.datetime.now()
     load_time = stored_time + datetime.timedelta(days=1)
-    stored = { 'timestamp' : stored_time, 'a' : 1, 'b' : 2 }
+
     fetch_result = { 'a' : 3, 'b' : 4 }
-    expected_result = { 'timestamp' : load_time }
-    expected_result.update(fetch_result)
     fake_fetch = lambda: fetch_result
-    fake_stream = io.BytesIO(pickle.dumps(stored, pickle.HIGHEST_PROTOCOL))
-    result = load_or_fetch(fake_stream, fake_fetch, load_time)
-    assert result == expected_result
-"""
+
+    stored = { 'timestamp' : stored_time, 'data' : { 'a' : 1, 'b' : 2 } }
+    expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
+
+    with open(test_file, 'wb') as tf:
+        pickle.dump(stored, tf, pickle.HIGHEST_PROTOCOL)
+
+    result = load_or_fetch(test_file, fake_fetch, load_time)
+
+    with open(test_file, 'rb') as tf:
+        saved = pickle.load(tf)
+
+    os.remove(test_file)
+
+    assert result == fetch_result
+    assert saved == expected_saved
+
+def test_load_or_fetch_Fetch_File_Not_Created():
+    test_file = 'test.pkl'
+    load_time = datetime.datetime.now()
+
+    fetch_result = { 'a' : 3, 'b' : 4 }
+    fake_fetch = lambda: fetch_result
+
+    expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
+
+    result = load_or_fetch(test_file, fake_fetch, load_time)
+
+    with open(test_file, 'rb') as tf:
+        saved = pickle.load(tf)
+
+    os.remove(test_file)
+
+    assert result == fetch_result
+    assert saved == expected_saved
 
 """
 def test_get_basic_info_Valid():
