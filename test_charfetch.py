@@ -19,6 +19,84 @@ import io
 
 from charfetch import *
 
+classes_raw = {'classes': [
+    {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
+    {'id': 2, 'mask': 2, 'powerType': 'mana', 'name': 'Paladin'},
+    {'id': 3, 'mask': 4, 'powerType': 'focus', 'name': 'Hunter'},
+    {'id': 4, 'mask': 8, 'powerType': 'energy', 'name': 'Rogue'},
+    {'id': 5, 'mask': 16, 'powerType': 'mana', 'name': 'Priest'},
+    {'id': 6, 'mask': 32, 'powerType': 'runic-power', 'name': 'Death Knight'},
+    {'id': 7, 'mask': 64, 'powerType': 'mana', 'name': 'Shaman'},
+    {'id': 8, 'mask': 128, 'powerType': 'mana', 'name': 'Mage'},
+    {'id': 9, 'mask': 256, 'powerType': 'mana', 'name': 'Warlock'},
+    {'id': 10, 'mask': 512, 'powerType': 'energy', 'name': 'Monk'},
+    {'id': 11, 'mask': 1024, 'powerType': 'mana', 'name': 'Druid'},
+    {'id': 12, 'mask': 2048, 'powerType': 'fury', 'name': 'Demon Hunter'}]}
+
+races_raw = {'races': [
+    {'id': 1, 'mask': 1, 'side': 'alliance', 'name': 'Human'},
+    {'id': 2, 'mask': 2, 'side': 'horde', 'name': 'Orc'},
+    {'id': 3, 'mask': 4, 'side': 'alliance', 'name': 'Dwarf'},
+    {'id': 4, 'mask': 8, 'side': 'alliance', 'name': 'Night Elf'},
+    {'id': 5, 'mask': 16, 'side': 'horde', 'name': 'Undead'},
+    {'id': 6, 'mask': 32, 'side': 'horde', 'name': 'Tauren'},
+    {'id': 7, 'mask': 64, 'side': 'alliance', 'name': 'Gnome'},
+    {'id': 8, 'mask': 128, 'side': 'horde', 'name': 'Troll'},
+    {'id': 9, 'mask': 256, 'side': 'horde', 'name': 'Goblin'},
+    {'id': 10, 'mask': 512, 'side': 'horde', 'name': 'Blood Elf'},
+    {'id': 11, 'mask': 1024, 'side': 'alliance', 'name': 'Draenei'},
+    {'id': 22, 'mask': 2097152, 'side': 'alliance', 'name': 'Worgen'},
+    {'id': 24, 'mask': 8388608, 'side': 'neutral', 'name': 'Pandaren'},
+    {'id': 25, 'mask': 16777216, 'side': 'alliance', 'name': 'Pandaren'},
+    {'id': 26, 'mask': 33554432, 'side': 'horde', 'name': 'Pandaren'},
+    {'id': 27, 'mask': 67108864, 'side': 'horde', 'name': 'Nightborne'},
+    {'id': 28, 'mask': 134217728, 'side': 'horde', 'name': 'Highmountain Tauren'},
+    {'id': 29, 'mask': 268435456, 'side': 'alliance', 'name': 'Void Elf'},
+    {'id': 30, 'mask': 536870912, 'side': 'alliance', 'name': 'Lightforged Draenei'},
+    {'id': 31, 'mask': 1073741824, 'side': 'horde', 'name': 'Zandalari Troll'},
+    {'id': 32, 'mask': -2147483648, 'side': 'alliance', 'name': 'Kul Tiran'},
+    {'id': 34, 'mask': 2, 'side': 'alliance', 'name': 'Dark Iron Dwarf'},
+    {'id': 36, 'mask': 8, 'side': 'horde', 'name': "Mag'har Orc"}]}
+
+classes = {
+        1 : 'Warrior',
+        2 : 'Paladin',
+        3 : 'Hunter',
+        4 : 'Rogue',
+        5 : 'Priest',
+        6 : 'Death Knight',
+        7 : 'Shaman',
+        8 : 'Mage',
+        9 : 'Warlock',
+        10 : 'Monk',
+        11 : 'Druid',
+        12 : 'Demon Hunter'}
+
+races = {
+        1 : {'side': 'alliance', 'name': 'Human'},
+        2 : {'side': 'horde', 'name': 'Orc'},
+        3 : {'side': 'alliance', 'name': 'Dwarf'},
+        4 : {'side': 'alliance', 'name': 'Night Elf'},
+        5 : {'side': 'horde', 'name': 'Undead'},
+        6 : {'side': 'horde', 'name': 'Tauren'},
+        7 : {'side': 'alliance', 'name': 'Gnome'},
+        8 : {'side': 'horde', 'name': 'Troll'},
+        9 : {'side': 'horde', 'name': 'Goblin'},
+        10 : {'side': 'horde', 'name': 'Blood Elf'},
+        11 : {'side': 'alliance', 'name': 'Draenei'},
+        22 : {'side': 'alliance', 'name': 'Worgen'},
+        24 : {'side': 'neutral', 'name': 'Pandaren'},
+        25 : {'side': 'alliance', 'name': 'Pandaren'},
+        26 : {'side': 'horde', 'name': 'Pandaren'},
+        27 : {'side': 'horde', 'name': 'Nightborne'},
+        28 : {'side': 'horde', 'name': 'Highmountain Tauren'},
+        29 : {'side': 'alliance', 'name': 'Void Elf'},
+        30 : {'side': 'alliance', 'name': 'Lightforged Draenei'},
+        31 : {'side': 'horde', 'name': 'Zandalari Troll'},
+        32 : {'side': 'alliance', 'name': 'Kul Tiran'},
+        34 : {'side': 'alliance', 'name': 'Dark Iron Dwarf'},
+        36 : {'side': 'horde', 'name': "Mag'har Orc"}}
+
 def exploding_fake():
     assert False
 
@@ -52,13 +130,13 @@ def fake_api():
             self.last_region = region
             self.last_filters = filters
 
-            return self.return_value
+            return classes_raw
 
         def get_character_races(self, region, **filters):
             self.last_region = region
             self.last_filters = filters
 
-            return self.return_value
+            return races_raw
 
     return FakeWowApi()
 
@@ -120,27 +198,17 @@ def test_get_classes_None():
     assert get_classes(None) == None
 
 def test_get_classes_Valid(fake_api):
-    fake_api.return_value = {'classes' : [
-        {'id' : 1, 'mask' : 1, 'powerType': 'rage', 'name' : 'Warrior'},
-        {'id' : 2, 'mask' : 2, 'powerType': 'mana', 'name' : 'Paladin'}]}
-    expected_result = { 1 : 'Warrior', 2 : 'Paladin' }
     result = get_classes(fake_api)
     assert fake_api.last_region == 'us'
-    assert result == expected_result
+    assert result == classes
 
 def test_get_races_None():
     assert get_races(None) == None
 
 def test_get_races_Valid(fake_api):
-    fake_api.return_value = {'races' : [
-        {'id' : 1, 'side' : 'alliance', 'name': 'Human'},
-        {'id' : 5, 'side' : 'horde', 'name' : 'Undead'}]}
-    expected_result = {
-            1 : {'side' : 'alliance', 'name' : 'Human'},
-            5 : {'side' : 'horde', 'name' : 'Undead'}}
     result = get_races(fake_api)
     assert fake_api.last_region == 'us'
-    assert result == expected_result
+    assert result == races
 
 def test_load_or_fetch_Use_Stored():
     test_file = 'test.pkl'
@@ -207,44 +275,6 @@ def test_load_or_fetch_Fetch_File_Not_Created():
     assert saved == expected_saved
 
 """
-def test_get_basic_info_Valid():
-    classes = {
-            1 : 'Warrior',
-            2 : 'Paladin',
-            3 : 'Hunter',
-            4 : 'Rogue',
-            5 : 'Priest',
-            6 : 'Death Knight',
-            7 : 'Shaman',
-            8 : 'Mage',
-            9 : 'Warlock',
-            10 : 'Monk',
-            11 : 'Druid',
-            12 : 'Demon Hunter'}
-    races = {
-            1 : {'side': 'alliance', 'name': 'Human'},
-            2 : {'side': 'horde', 'name': 'Orc'},
-            3 : {'side': 'alliance', 'name': 'Dwarf'},
-            4 : {'side': 'alliance', 'name': 'Night Elf'},
-            5 : {'side': 'horde', 'name': 'Undead'},
-            6 : {'side': 'horde', 'name': 'Tauren'},
-            7 : {'side': 'alliance', 'name': 'Gnome'},
-            8 : {'side': 'horde', 'name': 'Troll'},
-            9 : {'side': 'horde', 'name': 'Goblin'},
-            10 : {'side': 'horde', 'name': 'Blood Elf'},
-            11 : {'side': 'alliance', 'name': 'Draenei'},
-            22 : {'side': 'alliance', 'name': 'Worgen'},
-            24 : {'side': 'neutral', 'name': 'Pandaren'},
-            25 : {'side': 'alliance', 'name': 'Pandaren'},
-            26 : {'side': 'horde', 'name': 'Pandaren'},
-            27 : {'side': 'horde', 'name': 'Nightborne'},
-            28 : {'side': 'horde', 'name': 'Highmountain Tauren'},
-            29 : {'side': 'alliance', 'name': 'Void Elf'},
-            30 : {'side': 'alliance', 'name': 'Lightforged Draenei'},
-            31 : {'side': 'horde', 'name': 'Zandalari Troll'},
-            32 : {'side': 'alliance', 'name': 'Kul Tiran'},
-            34 : {'side': 'alliance', 'name': 'Dark Iron Dwarf'},
-            36 : {'side': 'horde', 'name': "Mag'har Orc"}}
     fake_data =
 {'lastModified': 1560826495000, 'name': 'Clegg', 'realm': "Kil'jaeden", 'battlegroup': 'Bloodlust', 'class': 9, 'race': 5, 'gender': 0, 'level': 120, 'achievementPoints': 14510, 'thumbnail': 'kiljaeden/96/184987488-avatar.jpg', 'calcClass': 'V', 'faction': 1, 'totalHonorableKills': 9523}
     (klass, level, faction, gender, race) = get_basic_info(classes, races, fake_data)
