@@ -54,15 +54,17 @@ def get_char_profile(character, api, **filters):
     except:
         pass
 
-def load_or_fetch(stream, fetcher, now):
-    stored = pickle.load(stream)
+def load_or_fetch(fname, fetcher, now):
+    with open(fname, 'rb') as tf:
+        return pickle.load(tf)['data']
+    # stored = pickle.load(stream)
 
-    if now - stored['timestamp'] >= datetime.timedelta(days=1):
-        fetch = fetcher()
-        fetch['timestamp'] = now
-        return fetch
+    # if now - stored['timestamp'] >= datetime.timedelta(days=1):
+    #     fetch = fetcher()
+    #     fetch['timestamp'] = now
+    #     return fetch
 
-    return stored
+    # return stored
 
 """
 def serialize_character(character):
@@ -92,5 +94,10 @@ def test(**kwargs):
     print(kwargs)
 
 if __name__ == "__main__":
-    print(load_yaml_file('characters.yaml'))
-    test(locale='en_GB', fields='challenge')
+    tokens = load_yaml_file('tokens.yaml')
+    characters = convert_to_char_list(load_yaml_file('characters.yaml'))
+    api = WowApi(tokens['client_id'], tokens['client_secret'])
+    output = []
+    for character in characters:
+        print(get_char_profile(character, api, locale='en_US', fields='talents,items,statistics,professions,reputation,audit')['lastModified'])
+        # output.append(get_all_info(api))

@@ -12,6 +12,11 @@ Unit Tests for charfetch.py
 import pytest
 from unittest.mock import patch
 
+import datetime
+import pickle
+import os
+import io
+
 from charfetch import *
 
 def exploding_fake():
@@ -61,7 +66,6 @@ def test_load_yaml_file_None():
     assert load_yaml_file(None) == None
 
 def test_load_yaml_file_File(fake_char_dict):
-    import os
     test_file = 'test.yaml'
     fake_yaml = """us:
     kil'jaeden:
@@ -139,20 +143,28 @@ def test_get_races_Valid(fake_api):
     assert result == expected_result
 
 def test_load_or_fetch_Use_Stored():
-    import datetime
-    import pickle
-    import io
+    test_file = 'test.pkl'
     stored_time = datetime.datetime.now()
     load_time = stored_time + datetime.timedelta(hours=1)
-    expected_result = { 'timestamp' : stored_time, 'a' : 1, 'b' : 2 }
-    fake_stream = io.BytesIO(pickle.dumps(expected_result, pickle.HIGHEST_PROTOCOL))
-    result = load_or_fetch(fake_stream, exploding_fake, load_time)
-    assert result == expected_result
 
+    expected_result = { 'a' : 1, 'b' : 2 }
+    expected_stored = { 'timestamp' : stored_time, 'data' : expected_result }
+
+    with open(test_file, 'wb') as tf:
+        pickle.dump(expected_stored, tf, pickle.HIGHEST_PROTOCOL)
+
+    result = load_or_fetch(test_file, exploding_fake, load_time)
+
+    with open(test_file, 'rb') as tf:
+        stored = pickle.load(tf)
+
+    os.remove(test_file)
+
+    assert result == expected_result
+    assert stored == expected_stored
+
+"""
 def test_load_or_fetch_Fetch():
-    import datetime
-    import pickle
-    import io
     stored_time = datetime.datetime.now()
     load_time = stored_time + datetime.timedelta(days=1)
     stored = { 'timestamp' : stored_time, 'a' : 1, 'b' : 2 }
@@ -163,6 +175,7 @@ def test_load_or_fetch_Fetch():
     fake_stream = io.BytesIO(pickle.dumps(stored, pickle.HIGHEST_PROTOCOL))
     result = load_or_fetch(fake_stream, fake_fetch, load_time)
     assert result == expected_result
+"""
 
 """
 def test_get_basic_info_Valid():
