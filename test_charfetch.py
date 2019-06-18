@@ -97,6 +97,11 @@ races = {
         34 : {'side': 'alliance', 'name': 'Dark Iron Dwarf'},
         36 : {'side': 'horde', 'name': "Mag'har Orc"}}
 
+with open('clegg.pkl', 'rb') as f:
+    character_data = pickle.load(f)
+
+character = { 'name' : 'clegg', 'realm' : "kil'jaeden", 'region' : 'us' }
+
 def exploding_fake():
     assert False
 
@@ -273,6 +278,22 @@ def test_load_or_fetch_Fetch_File_Not_Created():
 
     assert result == fetch_result
     assert saved == expected_saved
+
+def test_get_all_info_Entry0_3(fake_api):
+    result = get_all_info(character, fake_api, datetime.datetime.now())
+    assert result[0].lower() == character['name'].lower()
+    assert result[1].lower() == character['region'].lower()
+    assert result[2].lower() == character['realm'].lower()
+
+def test_get_all_info_Entries_Class_Lvl_Spec_Faction_Gender_Race(fake_api):
+    result = get_all_info(character, fake_api, datetime.datetime.now())
+    assert result[3] == 'Warlock'
+    assert result[4] == 120
+    assert result[5] == 'Affliction'
+    assert result[6] == 'Horde'
+    assert result[7] == 'Male'
+    assert result[8] == 'Undead'
+
 
 """
     fake_data =

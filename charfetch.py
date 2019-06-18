@@ -76,36 +76,18 @@ def load_or_fetch(fname, fetcher, now):
     return stored['data']
 
 """
-def serialize_character(character):
-    return [character['region'], character['realm'], character['name']]
-
-with open('characters.yaml', 'r') as f:
-    data = yaml.safe_load(f)
-with open('tokens.yaml', 'r') as f:
-    tokens = yaml.safe_load(f)
-
-characters = [{'name' : character,'realm' : realm,'region' : region} for region,realms in data.items() for realm,characters in realms.items() for character in characters]
-
-print(characters)
-print([serialize_character(c) for c in characters])
-
 with open('test.csv', 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerows([serialize_character(c) for c in characters])
-
-api = WowApi(tokens['client_id'], tokens['client_secret'])
-
-for character in characters:
-    profile = api.get_character_profile(character['region'], character['realm'], character['name'])
 """
 
-def test(**kwargs):
-    print(kwargs)
+def get_all_info(character, api, now):
+    return [character['name'], character['region'], character['realm']]
 
 if __name__ == "__main__":
     tokens = load_yaml_file('tokens.yaml')
     characters = convert_to_char_list(load_yaml_file('characters.yaml'))
     api = WowApi(tokens['client_id'], tokens['client_secret'])
     output = []
-    for character in characters:
-        # output.append(get_all_info(character, api))
+    # for character in characters:
+    #     output.append(get_all_info(character, api))
