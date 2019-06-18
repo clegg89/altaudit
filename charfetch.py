@@ -12,6 +12,8 @@
 
 import yaml
 import csv
+import pickle
+import datetime
 from wowapi import WowApi
 
 def load_yaml_file(fileName):
@@ -51,6 +53,16 @@ def get_char_profile(character, api, **filters):
         return api.get_character_profile(character['region'], character['realm'], character['name'], **filters)
     except:
         pass
+
+def load_or_fetch(stream, fetcher, now):
+    stored = pickle.load(stream)
+
+    if now - stored['timestamp'] >= datetime.timedelta(days=1):
+        fetch = fetcher()
+        fetch['timestamp'] = now
+        return fetch
+
+    return stored
 
 """
 def serialize_character(character):

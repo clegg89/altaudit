@@ -10,8 +10,12 @@
 Unit Tests for charfetch.py
 """
 import pytest
+from unittest.mock import patch
 
 from charfetch import *
+
+def exploding_fake():
+    assert False
 
 @pytest.fixture
 def fake_char_dict():
@@ -134,6 +138,33 @@ def test_get_races_Valid(fake_api):
     assert fake_api.last_region == 'us'
     assert result == expected_result
 
+def test_load_or_fetch_Use_Stored():
+    import datetime
+    import pickle
+    import io
+    stored_time = datetime.datetime.now()
+    load_time = stored_time + datetime.timedelta(hours=1)
+    expected_result = { 'timestamp' : stored_time, 'a' : 1, 'b' : 2 }
+    fake_stream = io.BytesIO(pickle.dumps(expected_result, pickle.HIGHEST_PROTOCOL))
+    result = load_or_fetch(fake_stream, exploding_fake, load_time)
+    assert result == expected_result
+
+def test_load_or_fetch_Fetch():
+    import datetime
+    import pickle
+    import io
+    stored_time = datetime.datetime.now()
+    load_time = stored_time + datetime.timedelta(days=1)
+    stored = { 'timestamp' : stored_time, 'a' : 1, 'b' : 2 }
+    fetch_result = { 'a' : 3, 'b' : 4 }
+    expected_result = { 'timestamp' : load_time }
+    expected_result.update(fetch_result)
+    fake_fetch = lambda: fetch_result
+    fake_stream = io.BytesIO(pickle.dumps(stored, pickle.HIGHEST_PROTOCOL))
+    result = load_or_fetch(fake_stream, fake_fetch, load_time)
+    assert result == expected_result
+
+"""
 def test_get_basic_info_Valid():
     classes = {
             1 : 'Warrior',
@@ -180,3 +211,4 @@ def test_get_basic_info_Valid():
     assert level == 120
     assert gender == 'Male'
     assert race == 'Undead'
+"""
