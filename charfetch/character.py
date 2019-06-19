@@ -51,3 +51,6 @@ class Character:
         self._update_if_no_profile()
         return genders[self._profile['gender']]
 
+    def get_level(self):
+        self._update_if_no_profile()
+        return self._profile['level']

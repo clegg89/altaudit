@@ -94,6 +94,10 @@ def faction_key(request):
 def gender_key(request):
     return request.param
 
+@pytest.fixture(params=[5,10,120])
+def level(request):
+    return request.param
+
 class TestCharacter:
     @pytest.fixture(autouse=True)
     def create_character(self, classes, races, make_fake_char_dict, mock_api):
@@ -156,3 +160,8 @@ class TestCharacter:
         genders = { 0 : 'Male', 1 : 'Female' }
         self.api.get_character_profile.return_value = { 'gender' : gender_key }
         assert self.character.get_gender() == genders[gender_key]
+
+    def test_get_level(self, level):
+        self.api.get_character_profile.return_value = { 'level' : level }
+        assert self.character.get_level() == level
+
