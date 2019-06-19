@@ -2,36 +2,15 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2019 csmith <csmith@LAPTOP-RUIE9BRU>
-#
 # Distributed under terms of the MIT license.
-
 """
 
 """
-
-import yaml
-import csv
+# import csv
 import pickle
 import datetime
 from wowapi import WowApi
-
-def load_yaml_file(fileName):
-    """ Convenience function for loading yaml files """
-    try:
-        with open(fileName, 'r') as f:
-            return yaml.safe_load(f)
-    except:
-        pass
-
-def convert_to_char_list(data):
-    """ Convert a dictionary of {region:{realm:[toons]}} to a list of characters """
-    try:
-        return [{'name' : character, 'realm' : realm, 'region' : region} for region,realms in data.items()
-                for realm,characters in realms.items()
-                for character in characters]
-    except:
-        pass
+from .utility import *
 
 def get_classes(api):
     """ Query api for playabled classes. Return as a dict of form {id:class_name} """
@@ -54,16 +33,16 @@ def get_char_profile(character, api, **filters):
     except:
         pass
 
-def _fetch_and_stored(fname, fetcher, now):
-    fetch = {}
-    fetch['data'] = fetcher()
-    fetch['timestamp'] = now
-    with open(fname, 'wb') as tf:
-        pickle.dump(fetch, tf, pickle.HIGHEST_PROTOCOL)
-
-    return fetch['data']
-
 def load_or_fetch(fname, fetcher, now):
+    def _fetch_and_stored(fname, fetcher, now):
+        fetch = {}
+        fetch['data'] = fetcher()
+        fetch['timestamp'] = now
+        with open(fname, 'wb') as tf:
+            pickle.dump(fetch, tf, pickle.HIGHEST_PROTOCOL)
+
+        return fetch['data']
+
     try :
         with open(fname, 'rb') as tf:
             stored = pickle.load(tf)
