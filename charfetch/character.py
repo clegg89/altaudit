@@ -54,3 +54,9 @@ class Character:
     def get_level(self):
         self._update_if_no_profile()
         return self._profile['level']
+
+    def get_mainspec(self):
+        self._update_if_no_profile()
+        for spec in self._profile['talents']:
+            if 'selected' in spec and spec['selected']:
+                return spec['spec']['name']

@@ -98,6 +98,19 @@ def gender_key(request):
 def level(request):
     return request.param
 
+@pytest.fixture(params=['Affliction','Shadow'])
+def spec_fixture(request):
+    spec = {}
+    spec['mainspec'] = request.param
+    spec['talents'] = [
+            { 'selected' : True, 'spec' : { 'name' : request.param } },
+            { 'selected' : False, 'spec' : { 'name' : 'Failed' } },
+            { 'selected' : False, 'spec' : { 'name' : 'Failed' } }]
+    for i in range(6):
+        spec['talents'].append({'talents': [], 'calcTalent': '', 'calcSpec': ''})
+
+    return spec
+
 class TestCharacter:
     @pytest.fixture(autouse=True)
     def create_character(self, classes, races, make_fake_char_dict, mock_api):
@@ -165,3 +178,6 @@ class TestCharacter:
         self.api.get_character_profile.return_value = { 'level' : level }
         assert self.character.get_level() == level
 
+    def test_get_mainspec(self, spec_fixture):
+        self.api.get_character_profile.return_value = { 'talents' : spec_fixture['talents'] }
+        assert self.character.get_mainspec() == spec_fixture['mainspec']
