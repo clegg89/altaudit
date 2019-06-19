@@ -111,6 +111,25 @@ def spec_fixture(request):
 
     return spec
 
+@pytest.fixture
+def fake_profile():
+    fake = {}
+    fake['data'] = {
+            'class' : 9,
+            'race' : 34,
+            'faction' : 0,
+            'gender' : 0,
+            'level' : 120,
+            'talents' : [{'selected' : True, 'spec' : { 'name' : 'Destruction' }}]}
+    fake['results'] = {
+            'class' : 'Warlock',
+            'race' : 'Dark Iron Dwarf',
+            'faction' : 'Alliance',
+            'gender' : 'Male',
+            'level' : 120,
+            'mainspec' : 'Destruction'}
+    return fake
+
 class TestCharacter:
     @pytest.fixture(autouse=True)
     def create_character(self, classes, races, make_fake_char_dict, mock_api):
@@ -181,3 +200,16 @@ class TestCharacter:
     def test_get_mainspec(self, spec_fixture):
         self.api.get_character_profile.return_value = { 'talents' : spec_fixture['talents'] }
         assert self.character.get_mainspec() == spec_fixture['mainspec']
+
+    def test_get_info_basic_info(self, fake_profile):
+        self.api.get_character_profile.return_value = fake_profile['data']
+        result = self.character.get_info()
+        assert result[0] == self.char_dict['name']
+        assert result[1] == self.char_dict['realm']
+        assert result[2] == self.char_dict['region']
+        assert result[3] == fake_profile['results']['class']
+        assert result[4] == fake_profile['results']['level']
+        assert result[5] == fake_profile['results']['mainspec']
+        assert result[6] == fake_profile['results']['faction']
+        assert result[7] == fake_profile['results']['gender']
+        assert result[8] == fake_profile['results']['race']

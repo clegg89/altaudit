@@ -60,3 +60,10 @@ class Character:
         for spec in self._profile['talents']:
             if 'selected' in spec and spec['selected']:
                 return spec['spec']['name']
+
+    def get_info(self):
+        self._update_if_no_profile()
+        return [self.name, self.realm, self.region,
+                self.get_class(), self.get_level(),
+                self.get_mainspec(), self.get_faction(),
+                self.get_gender(), self.get_race()]
