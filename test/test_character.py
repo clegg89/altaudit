@@ -78,6 +78,14 @@ def character_data():
 def mock_api(mocker):
     return mocker.patch('wowapi.WowApi').return_value
 
+@pytest.fixture(params=[1,3,9])
+def class_index(request):
+    return request.param
+
+@pytest.fixture(params=[2,22,24,25,34])
+def race_index(request):
+    return request.param
+
 class TestCharacter:
     @pytest.fixture(autouse=True)
     def create_character(self, classes, races, make_fake_char_dict, mock_api):
@@ -99,3 +107,34 @@ class TestCharacter:
     def test_store_classes_and_races(self):
         assert self.character._classes == self.classes
         assert self.character._races == self.races
+
+    def test_update_fetches_profile_from_api(self):
+        char = self.char_dict
+        args = (char['region'], char['realm'], char['name'])
+        kwargs = { 'locale' : 'en_US', 'filters' : 'talents,items,statistics,professions,reputation,audit' }
+        self.api.get_character_profile.return_value = 'Test Passed'
+        self.character._update()
+        self.api.get_character_profile.assert_called_once_with(*args, **kwargs)
+        assert self.character._profile == 'Test Passed'
+
+    def test_get_class_returns_string(self, class_index):
+        self.api.get_character_profile.return_value = { 'class' : class_index }
+        assert self.character.get_class() == self.classes[class_index]
+
+    def test_get_class_fetches_classes_if_necessary(self):
+        self.api.get_character_profile.return_value = { 'class' : 9 }
+        self.api.get_character_classes.return_value = self.classes
+        other_char = Character(self.char_dict, self.api)
+        other_char.get_class()
+        self.api.get_character_classes.assert_called_once_with('us')
+
+    def test_get_race_return_string(self, race_index):
+        self.api.get_character_profile.return_value = { 'race' : race_index }
+        assert self.character.get_race() == self.races[race_index]['name']
+
+    def test_get_race_fetches_races_if_necessary(self):
+        self.api.get_character_profile.return_value = { 'race' : 3 }
+        self.api.get_character_races.return_value = self.races
+        other_char = Character(self.char_dict, self.api)
+        other_char.get_race()
+        self.api.get_character_races.assert_called_once_with('us')
