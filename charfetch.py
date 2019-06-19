@@ -82,7 +82,20 @@ with open('test.csv', 'w', newline='') as f:
 """
 
 def get_all_info(character, api, now):
-    return [character['name'], character['region'], character['realm']]
+    classes = load_or_fetch('classes.pkl', lambda: get_classes(api), now)
+    races = load_or_fetch('races.pkl', lambda: get_races(api), now)
+
+    profile = get_char_profile(character, api)
+
+    character_class = classes[profile['class']]
+    race = races[profile['race']]['name']
+    faction = 'Alliance' if profile['faction'] is 0 else 'Horde'
+    gender = 'Male' if profile['gender'] is 0 else 'Female'
+    for spec in profile['talents']:
+        if 'selected' in spec and spec['selected']:
+            current_spec = spec['spec']['name']
+
+    return [character['name'], character['region'], character['realm'], character_class, profile['level'], current_spec, faction, gender, race]
 
 if __name__ == "__main__":
     tokens = load_yaml_file('tokens.yaml')
