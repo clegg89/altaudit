@@ -309,15 +309,3 @@ def test_get_all_info_Entries_Class_Lvl_Spec_Faction_Gender_Race_Other_Character
     assert result[6] == 'Alliance'
     assert result[7] == 'Female'
     assert result[8] == 'Lightforged Draenei'
-
-
-"""
-    fake_data =
-{'lastModified': 1560826495000, 'name': 'Clegg', 'realm': "Kil'jaeden", 'battlegroup': 'Bloodlust', 'class': 9, 'race': 5, 'gender': 0, 'level': 120, 'achievementPoints': 14510, 'thumbnail': 'kiljaeden/96/184987488-avatar.jpg', 'calcClass': 'V', 'faction': 1, 'totalHonorableKills': 9523}
-    (klass, level, faction, gender, race) = get_basic_info(classes, races, fake_data)
-    assert klass == 'Warlock'
-    assert faction == 'Horde'
-    assert level == 120
-    assert gender == 'Male'
-    assert race == 'Undead'
-"""
