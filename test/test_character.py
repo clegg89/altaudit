@@ -86,6 +86,14 @@ def class_index(request):
 def race_index(request):
     return request.param
 
+@pytest.fixture(params=[0,1,2])
+def faction_key(request):
+    return request.param
+
+@pytest.fixture(params=[0,1])
+def gender_key(request):
+    return request.param
+
 class TestCharacter:
     @pytest.fixture(autouse=True)
     def create_character(self, classes, races, make_fake_char_dict, mock_api):
@@ -138,3 +146,13 @@ class TestCharacter:
         other_char = Character(self.char_dict, self.api)
         other_char.get_race()
         self.api.get_character_races.assert_called_once_with('us')
+
+    def test_get_factions(self, faction_key):
+        factions = { 0 : 'Alliance', 1 : 'Horde', 2 : 'Neutral' }
+        self.api.get_character_profile.return_value = { 'faction' : faction_key }
+        assert self.character.get_faction() == factions[faction_key]
+
+    def test_get_gender(self, gender_key):
+        genders = { 0 : 'Male', 1 : 'Female' }
+        self.api.get_character_profile.return_value = { 'gender' : gender_key }
+        assert self.character.get_gender() == genders[gender_key]

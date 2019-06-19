@@ -40,3 +40,14 @@ class Character:
             self._races = self.api.get_character_races('us')
 
         return self._races[self._profile['race']]['name']
+
+    def get_faction(self):
+        factions = { 0 : 'Alliance', 1 : 'Horde', 2 : 'Neutral' }
+        self._update_if_no_profile()
+        return factions[self._profile['faction']]
+
+    def get_gender(self):
+        genders = { 0 : 'Male', 1 : 'Female' }
+        self._update_if_no_profile()
+        return genders[self._profile['gender']]
+
