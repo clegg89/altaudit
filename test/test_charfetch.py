@@ -17,7 +17,7 @@ import pickle
 import os
 import io
 
-from charfetch import *
+from charfetch.charfetch import *
 
 classes_raw = {'classes': [
     {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
@@ -97,10 +97,12 @@ races = {
         34 : {'side': 'alliance', 'name': 'Dark Iron Dwarf'},
         36 : {'side': 'horde', 'name': "Mag'har Orc"}}
 
-with open('clegg.pkl', 'rb') as f:
+test_dir = os.path.dirname(os.path.realpath(__file__))
+
+with open(test_dir + '/clegg.pkl', 'rb') as f:
     character_data = pickle.load(f)
 
-with open('minitru.pkl', 'rb') as f:
+with open(test_dir + '/minitru.pkl', 'rb') as f:
     other_character_data = pickle.load(f)
 
 character = { 'name' : 'clegg', 'realm' : "kil'jaeden", 'region' : 'us' }
