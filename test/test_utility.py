@@ -10,7 +10,7 @@ import pytest
 
 import os
 
-from charfetch import load_yaml_file, convert_to_char_list
+from charfetch import load_yaml_file, convert_to_char_list, flatten
 
 @pytest.fixture
 def fake_char_dict():
@@ -44,3 +44,8 @@ def test_convert_to_char_list_Valid(fake_char_dict):
             {'name' : 'toon1', 'realm' : "kil'jaeden", 'region' : 'us'},
             {'name' : 'toon2', 'realm' : "kil'jaeden", 'region' : 'us'}]
     assert convert_to_char_list(fake_char_dict) == expected_result
+
+def test_flatten_list():
+    expected_result = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    inlist = [1, [2, [3, [4, 5, 6]], 7], [8, 9], 10]
+    assert flatten(inlist) == expected_result

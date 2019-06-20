@@ -24,3 +24,14 @@ def convert_to_char_list(data):
                 for character in characters]
     except:
         pass
+
+def flatten(l):
+    output = []
+
+    for i in l:
+        if type(i) == list:
+            output += flatten(i)
+        else:
+            output.append(i)
+
+    return output
