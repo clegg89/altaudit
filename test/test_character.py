@@ -12,7 +12,7 @@ import os
 import pickle
 import wowapi
 
-from charfetch.character import Character
+from charfetch import Character
 
 @pytest.fixture(scope="module")
 def classes():

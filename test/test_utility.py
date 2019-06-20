@@ -10,7 +10,7 @@ import pytest
 
 import os
 
-from charfetch.utility import *
+from charfetch import load_yaml_file, convert_to_char_list
 
 @pytest.fixture
 def fake_char_dict():
