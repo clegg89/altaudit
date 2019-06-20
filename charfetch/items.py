@@ -16,11 +16,19 @@ class Item:
         self.quality = item_dict['quality']
         self.ilvl = item_dict['itemLevel']
 
+    def __eq__(self, other):
+        if not isinstance(other, Item):
+            return NotImplemented
+
+        return self.id == other.id and self.name == other.name and self.icon == other.icon and self.quality == other.quality and self.ilvl == other.ilvl
+
     def serialize(self):
         return [self.ilvl, self.id, self.name, self.icon, self.quality]
 
 class ItemManager:
     def __init__(self, items_dict):
+        slots = ['head', 'neck', 'shoulder', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet', 'finger1', 'finger2', 'trinket1', 'trinket2', 'mainHand', 'offHand']
+
         if 'neck' in items_dict and items_dict['neck']['quality'] == 6:
             self.hoa_level = items_dict['neck']['azeriteItem']['azeriteLevel']
             self.hoa_exp = items_dict['neck']['azeriteItem']['azeriteExperience']
@@ -29,3 +37,8 @@ class ItemManager:
             self.hoa_level = ''
             self.hoa_exp = ''
             self.hoa_exp_rem = ''
+
+        self.items = {}
+        for slot in slots:
+            if slot in items_dict:
+                self.items[slot] = Item(items_dict[slot])

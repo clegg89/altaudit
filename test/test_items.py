@@ -23,11 +23,29 @@ def fake_neck():
 
 @pytest.fixture
 def fake_item():
-    return {'id': 165822, 'name': 'Cowl of Tideborne Omens', 'icon': 'inv_helm_cloth_zuldazarraid_d_01', 'quality': 4, 'itemLevel': 405}
+    return
+
+@pytest.fixture
+def make_fake_item():
+    def _make_fake_item(offset=0):
+        return {'id': 165822+offset, 'name': 'Cowl of Tideborne Omens', 'icon': 'inv_helm_cloth_zuldazarraid_d_01', 'quality': 4, 'itemLevel': 405}
+
+    return _make_fake_item
 
 class TestItem:
-    def test_item_serialize(self, fake_item):
-        assert Item(fake_item).serialize() == [405, 165822, 'Cowl of Tideborne Omens', 'inv_helm_cloth_zuldazarraid_d_01', 4]
+    def test_item_serialize(self, make_fake_item):
+        assert Item(make_fake_item()).serialize() == [405, 165822, 'Cowl of Tideborne Omens', 'inv_helm_cloth_zuldazarraid_d_01', 4]
+
+    def test_item_equals(self, make_fake_item):
+        fake = make_fake_item()
+        other_fake = make_fake_item(1)
+        other_fake['name'] += ' 2'
+        other_fake['icon'] += '_2'
+        other_fake['quality'] += 3
+        other_fake['itemLevel'] += 10
+        assert Item(fake) == Item(fake)
+        assert Item(fake) != Item(other_fake)
+        assert Item(fake) != 5 # check that it won't try to compare itself to other objects
 
 class TestItemManager:
     def test_azerite_info_no_neck(self):
@@ -47,3 +65,16 @@ class TestItemManager:
         assert im.hoa_level == fake_hoa['azeriteItem']['azeriteLevel']
         assert im.hoa_exp == fake_hoa['azeriteItem']['azeriteExperience']
         assert im.hoa_exp_rem == fake_hoa['azeriteItem']['azeriteExperienceRemaining']
+
+    def test_item_info(self, make_fake_item, fake_hoa):
+        items_dict = {}
+        items = ['head', 'neck', 'shoulder', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet', 'finger1', 'finger2', 'trinket1', 'trinket2', 'mainHand', 'offHand']
+
+        for i, k in enumerate(items):
+            items_dict[k] = make_fake_item(i)
+
+        items_dict['neck'] = fake_hoa
+
+        im = ItemManager(items_dict)
+        for k,v in items_dict.items():
+            assert im.items[k] == Item(v)
