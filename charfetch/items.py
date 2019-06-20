@@ -50,7 +50,7 @@ class ItemManager:
         self.equipped_ilvl /= len(self.items) if len(self.items) > 0 else 1
 
     def serialize(self):
-        ret = [self.hoa_level, self.hoa_exp, self.hoa_exp_rem]
+        ret = [self.equipped_ilvl, self.hoa_level, self.hoa_exp, self.hoa_exp_rem]
 
         for slot in self._slots:
             if slot in self.items:
