@@ -34,9 +34,9 @@ class ItemManager:
             self.hoa_exp = items_dict['neck']['azeriteItem']['azeriteExperience']
             self.hoa_exp_rem = items_dict['neck']['azeriteItem']['azeriteExperienceRemaining']
         else:
-            self.hoa_level = ''
-            self.hoa_exp = ''
-            self.hoa_exp_rem = ''
+            self.hoa_level = None
+            self.hoa_exp = None
+            self.hoa_exp_rem = None
 
         self.items = {}
         for slot in slots:
@@ -48,3 +48,10 @@ class ItemManager:
             self.equipped_ilvl += item.ilvl
 
         self.equipped_ilvl /= len(self.items) if len(self.items) > 0 else 1
+
+    def serialize(self):
+        ret = [self.hoa_level, self.hoa_exp, self.hoa_exp_rem]
+        for item in self.items.values():
+            ret.append(item.serialize())
+
+        return ret

@@ -62,15 +62,15 @@ class TestItem:
 class TestItemManager:
     def test_azerite_info_no_neck(self):
         im = ItemManager({})
-        assert im.hoa_level == ''
-        assert im.hoa_exp == ''
-        assert im.hoa_exp_rem == ''
+        assert not im.hoa_level
+        assert not im.hoa_exp
+        assert not im.hoa_exp_rem
 
     def test_azerite_info_neck_not_hoa(self, fake_neck):
         im = ItemManager({ 'neck' : fake_neck })
-        assert im.hoa_level == ''
-        assert im.hoa_exp == ''
-        assert im.hoa_exp_rem == ''
+        assert not im.hoa_level
+        assert not im.hoa_exp
+        assert not im.hoa_exp_rem
 
     def test_azerite_info_hoa(self, fake_hoa):
         im = ItemManager({ 'neck' : fake_hoa })
@@ -93,16 +93,26 @@ class TestItemManager:
 
         assert im.equipped_ilvl == expected
 
-    @pytest.mark.skip(reason="not yet testable")
-    def test_serialize(self, make_fake_item, fake_hoa):
-        items_dict = {}
-        items = ['head', 'neck', 'shoulder', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet', 'finger1', 'finger2', 'trinket1', 'trinket2', 'mainHand', 'offHand']
-
-        for i, k in enumerate(items):
-            items_dict[k] = make_fake_item(i)
-
-        items_dict['neck'] = fake_hoa
-
-        im = ItemManager(items_dict)
-
+    def test_serialize(self, default_item_dictionary, fake_hoa):
+        im = ItemManager(default_item_dictionary)
         result = im.serialize()
+
+        assert result[0] == fake_hoa['azeriteItem']['azeriteLevel']
+        assert result[1] == fake_hoa['azeriteItem']['azeriteExperience']
+        assert result[2] == fake_hoa['azeriteItem']['azeriteExperienceRemaining']
+        assert result[3] == Item(default_item_dictionary['head']).serialize()
+        assert result[4] == Item(default_item_dictionary['neck']).serialize()
+        assert result[5] == Item(default_item_dictionary['shoulder']).serialize()
+        assert result[6] == Item(default_item_dictionary['back']).serialize()
+        assert result[7] == Item(default_item_dictionary['chest']).serialize()
+        assert result[8] == Item(default_item_dictionary['wrist']).serialize()
+        assert result[9] == Item(default_item_dictionary['hands']).serialize()
+        assert result[10] == Item(default_item_dictionary['waist']).serialize()
+        assert result[11] == Item(default_item_dictionary['legs']).serialize()
+        assert result[12] == Item(default_item_dictionary['feet']).serialize()
+        assert result[13] == Item(default_item_dictionary['finger1']).serialize()
+        assert result[14] == Item(default_item_dictionary['finger2']).serialize()
+        assert result[15] == Item(default_item_dictionary['trinket1']).serialize()
+        assert result[16] == Item(default_item_dictionary['trinket2']).serialize()
+        assert result[17] == Item(default_item_dictionary['mainHand']).serialize()
+        assert result[18] == Item(default_item_dictionary['offHand']).serialize()
