@@ -27,7 +27,7 @@ class Item:
 
 class ItemManager:
     def __init__(self, items_dict):
-        slots = ['head', 'neck', 'shoulder', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet', 'finger1', 'finger2', 'trinket1', 'trinket2', 'mainHand', 'offHand']
+        self._slots = ['head', 'neck', 'shoulder', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet', 'finger1', 'finger2', 'trinket1', 'trinket2', 'mainHand', 'offHand']
 
         if 'neck' in items_dict and items_dict['neck']['quality'] == 6:
             self.hoa_level = items_dict['neck']['azeriteItem']['azeriteLevel']
@@ -39,7 +39,7 @@ class ItemManager:
             self.hoa_exp_rem = None
 
         self.items = {}
-        for slot in slots:
+        for slot in self._slots:
             if slot in items_dict:
                 self.items[slot] = Item(items_dict[slot])
 
@@ -51,7 +51,11 @@ class ItemManager:
 
     def serialize(self):
         ret = [self.hoa_level, self.hoa_exp, self.hoa_exp_rem]
-        for item in self.items.values():
-            ret.append(item.serialize())
+
+        for slot in self._slots:
+            if slot in self.items:
+                ret.append(self.items[slot].serialize())
+            else:
+                ret.append(None)
 
         return ret

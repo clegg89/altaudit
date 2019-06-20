@@ -116,3 +116,30 @@ class TestItemManager:
         assert result[16] == Item(default_item_dictionary['trinket2']).serialize()
         assert result[17] == Item(default_item_dictionary['mainHand']).serialize()
         assert result[18] == Item(default_item_dictionary['offHand']).serialize()
+
+    def test_serialize_missing_items(self, default_item_dictionary, fake_hoa):
+        del default_item_dictionary['offHand']
+        del default_item_dictionary['finger1']
+
+        im = ItemManager(default_item_dictionary)
+        result = im.serialize()
+
+        assert result[0] == fake_hoa['azeriteItem']['azeriteLevel']
+        assert result[1] == fake_hoa['azeriteItem']['azeriteExperience']
+        assert result[2] == fake_hoa['azeriteItem']['azeriteExperienceRemaining']
+        assert result[3] == Item(default_item_dictionary['head']).serialize()
+        assert result[4] == Item(default_item_dictionary['neck']).serialize()
+        assert result[5] == Item(default_item_dictionary['shoulder']).serialize()
+        assert result[6] == Item(default_item_dictionary['back']).serialize()
+        assert result[7] == Item(default_item_dictionary['chest']).serialize()
+        assert result[8] == Item(default_item_dictionary['wrist']).serialize()
+        assert result[9] == Item(default_item_dictionary['hands']).serialize()
+        assert result[10] == Item(default_item_dictionary['waist']).serialize()
+        assert result[11] == Item(default_item_dictionary['legs']).serialize()
+        assert result[12] == Item(default_item_dictionary['feet']).serialize()
+        assert result[13] == None
+        assert result[14] == Item(default_item_dictionary['finger2']).serialize()
+        assert result[15] == Item(default_item_dictionary['trinket1']).serialize()
+        assert result[16] == Item(default_item_dictionary['trinket2']).serialize()
+        assert result[17] == Item(default_item_dictionary['mainHand']).serialize()
+        assert result[18] == None
