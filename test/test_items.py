@@ -32,6 +32,18 @@ def make_fake_item():
 
     return _make_fake_item
 
+@pytest.fixture
+def default_item_dictionary(make_fake_item, fake_hoa):
+    items_dict = {}
+    items = ['head', 'neck', 'shoulder', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet', 'finger1', 'finger2', 'trinket1', 'trinket2', 'mainHand', 'offHand']
+
+    for i, k in enumerate(items):
+        items_dict[k] = make_fake_item(i)
+
+    items_dict['neck'] = fake_hoa
+
+    return items_dict
+
 class TestItem:
     def test_item_serialize(self, make_fake_item):
         assert Item(make_fake_item()).serialize() == [405, 165822, 'Cowl of Tideborne Omens', 'inv_helm_cloth_zuldazarraid_d_01', 4]
@@ -66,7 +78,23 @@ class TestItemManager:
         assert im.hoa_exp == fake_hoa['azeriteItem']['azeriteExperience']
         assert im.hoa_exp_rem == fake_hoa['azeriteItem']['azeriteExperienceRemaining']
 
-    def test_item_info(self, make_fake_item, fake_hoa):
+    def test_item_info(self, default_item_dictionary):
+        im = ItemManager(default_item_dictionary)
+        for k,v in default_item_dictionary.items():
+            assert im.items[k] == Item(v)
+
+    def test_equipped_ilvl(self, default_item_dictionary):
+        im = ItemManager(default_item_dictionary)
+        expected = 0
+        for v in default_item_dictionary.values():
+            expected += v['itemLevel']
+
+        expected /= len(default_item_dictionary.keys())
+
+        assert im.equipped_ilvl == expected
+
+    @pytest.mark.skip(reason="not yet testable")
+    def test_serialize(self, make_fake_item, fake_hoa):
         items_dict = {}
         items = ['head', 'neck', 'shoulder', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet', 'finger1', 'finger2', 'trinket1', 'trinket2', 'mainHand', 'offHand']
 
@@ -76,5 +104,5 @@ class TestItemManager:
         items_dict['neck'] = fake_hoa
 
         im = ItemManager(items_dict)
-        for k,v in items_dict.items():
-            assert im.items[k] == Item(v)
+
+        result = im.serialize()

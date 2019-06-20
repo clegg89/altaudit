@@ -42,3 +42,9 @@ class ItemManager:
         for slot in slots:
             if slot in items_dict:
                 self.items[slot] = Item(items_dict[slot])
+
+        self.equipped_ilvl = 0
+        for item in self.items.values():
+            self.equipped_ilvl += item.ilvl
+
+        self.equipped_ilvl /= len(self.items) if len(self.items) > 0 else 1
