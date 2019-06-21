@@ -26,6 +26,7 @@ def convert_to_char_list(data):
         pass
 
 def flatten(l):
+    """ Recursively convert a list of lists to a single flat list """
     output = []
 
     for i in l:
@@ -35,3 +36,7 @@ def flatten(l):
             output.append(i)
 
     return output
+
+def get_char_data(character, blizzard_api):
+    return { 'blizzard' : blizzard_api.get_character_profile(character['region'], character['realm'], character['name'],
+            locale='en_US', filters='statistics,talents,reputation,items,achievements,audit,professions') }

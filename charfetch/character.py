@@ -7,6 +7,12 @@
 The Character class
 """
 
+def get_basic_info(profile, classes, races, region=''):
+    return [profile['name'], profile['realm'], region,
+            profile['lastModified'], classes[profile['class']],
+            profile['level'],
+            races[profile['race']]['name']]
+
 class Character:
     def __init__(self, char_dict, api, classes=None, races=None):
         for k, v in char_dict.items():

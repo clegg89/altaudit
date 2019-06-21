@@ -7,12 +7,14 @@
 Test the Character class
 """
 import pytest
+from unittest.mock import MagicMock
 
 import os
 import pickle
 import wowapi
+import datetime
 
-from charfetch import Character
+from charfetch import Character, get_basic_info
 
 @pytest.fixture(scope="module")
 def classes():
@@ -58,15 +60,6 @@ def races():
             36 : {'side': 'horde', 'name': "Mag'har Orc"}}
 
 @pytest.fixture(scope="module")
-def make_fake_char_dict():
-    def _make_fake_char_dict(v):
-        return { 'name' : 'toon{}'.format(v),
-                 'realm' : 'realm{}'.format(v),
-                 'region' : 'region{}'.format(v) }
-
-    return _make_fake_char_dict
-
-@pytest.fixture(scope="module")
 def character_data():
     testdir = os.path.dirname(os.path.realpath(__file__))
     with open(testdir + '/test_toons.pkl', 'rb') as f:
@@ -76,7 +69,8 @@ def character_data():
 
 @pytest.fixture
 def mock_api(mocker):
-    return mocker.patch('wowapi.WowApi').return_value
+    # return mocker.patch('wowapi.WowApi') This is how we would make sure someone calling WowApi would get somethin else
+    return MagicMock()
 
 @pytest.fixture(params=[1,3,9])
 def class_index(request):
@@ -129,6 +123,91 @@ def fake_profile():
             'level' : 120,
             'mainspec' : 'Destruction'}
     return fake
+
+@pytest.fixture
+def fake_profile_maker(classes, races):
+    def _maker(name='toon1', realm='realm1', timestamp=int(datetime.datetime.now().timestamp())*1000, kls=9, race=34, gender=0, level=120, mainspec='Destruction'):
+        assert kls in classes
+        assert race in races
+        assert gender in (0,1)
+
+        faction = 0 if races[race]['side'] == 'alliance' else 1 if races[race]['side'] == 'horde' else 2
+
+        return { 'data' : {
+                'lastModified' : timestamp,
+                'name' : name,
+                'realm' : realm,
+                'class' : kls,
+                'race' : race,
+                'faction' : faction,
+                'gender' : gender,
+                'level' : level,
+                'talents' : [{'selected' : True, 'spec' : { 'name' : mainspec }}]},
+            'results' : {
+                'name' : name,
+                'realm' : realm,
+                'lastModified' : timestamp,
+                'class' : classes[kls],
+                'race' : races[race]['name'],
+                'faction' : races[race]['side'].capitalize(),
+                'gender' : 'Male' if gender == 0 else 'Female',
+                'level' : level,
+                'mainspec' : mainspec }}
+
+    return _maker
+
+def test_basic_info_name(fake_profile_maker, classes, races):
+    profile = fake_profile_maker(name='tony')
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[0] == 'tony'
+
+def test_basic_info_realm(fake_profile_maker, classes, races):
+    profile = fake_profile_maker(realm="Zin'azshara")
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[1] == "Zin'azshara"
+
+def test_basic_info_region(fake_profile_maker, classes, races):
+    profile = fake_profile_maker()
+    result = get_basic_info(profile['data'], classes, races, 'us')
+    assert result[2] == 'us'
+
+def test_basic_info_timestamp(fake_profile_maker, classes, races):
+    now = datetime.datetime.now().timestamp()*1000
+    profile = fake_profile_maker(timestamp=now)
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[3] == now
+
+def test_basic_info_class(fake_profile_maker, classes, races):
+    kls = 10
+    profile = fake_profile_maker(kls=kls)
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[4] == profile['results']['class']
+
+def test_basic_info_level(fake_profile_maker, classes, races):
+    profile = fake_profile_maker(level=45)
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[5] == 45
+
+def test_basic_info_mainspec(fake_profile_maker, classes, races):
+    profile = fake_profile_maker(mainspec='Shadow')
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[6] == 'Shadow'
+
+def test_basic_info_faction(fake_profile_maker, classes, races):
+    profile = fake_profile_maker()
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[7] == 'Alliance'
+
+def test_basic_info_gender(fake_profile_maker, classes, races):
+    profile = fake_profile_maker(gender=1)
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[8] == 'Female'
+
+def test_basic_info_race(fake_profile_maker, classes, races):
+    race = 32
+    profile = fake_profile_maker()
+    result = get_basic_info(profile['data'], classes, races)
+    assert result[9] == profile['results']['race']
 
 class TestCharacter:
     @pytest.fixture(autouse=True)
