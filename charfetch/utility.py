@@ -6,7 +6,21 @@
 """
 Utility functions used throughout charfetch
 """
+import datetime
 import yaml
+import pickle
+
+def flatten(l):
+    """ Recursively convert a list of lists to a single flat list """
+    output = []
+
+    for i in l:
+        if type(i) == list:
+            output += flatten(i)
+        else:
+            output.append(i)
+
+    return output
 
 def load_yaml_file(fileName):
     """ Convenience function for loading yaml files """
@@ -25,18 +39,38 @@ def convert_to_char_list(data):
     except:
         pass
 
-def flatten(l):
-    """ Recursively convert a list of lists to a single flat list """
-    output = []
+def get_classes(api):
+    """ Query Blizzard API for playabled classes. Return as a dict of form {id:class_name} """
+    raw = api.get_character_classes('us', locale='en_US')
+    return {kls['id']:kls['name'] for kls in raw['classes']}
 
-    for i in l:
-        if type(i) == list:
-            output += flatten(i)
-        else:
-            output.append(i)
-
-    return output
+def get_races(api):
+    """ Query Blizzard API for playabled races. Return as a dict of form {id:{'side':side,'name':name}} """
+    raw = api.get_character_races('us', locale='en_US')
+    return {race['id']:{'side':race['side'],'name':race['name']} for race in raw['races']}
 
 def get_char_data(character, blizzard_api):
+    """ Query API's for character's data and return it """
     return { 'blizzard' : blizzard_api.get_character_profile(character['region'], character['realm'], character['name'],
             locale='en_US', filters='statistics,talents,reputation,items,achievements,audit,professions') }
+
+def load_or_fetch(fname, fetcher, now):
+    def _fetch_and_store(fname, fetcher, now):
+        fetch = {}
+        fetch['data'] = fetcher()
+        fetch['timestamp'] = now
+        with open(fname, 'wb') as tf:
+            pickle.dump(fetch, tf, pickle.HIGHEST_PROTOCOL)
+
+        return fetch['data']
+
+    try :
+        with open(fname, 'rb') as tf:
+            stored = pickle.load(tf)
+    except FileNotFoundError:
+        return _fetch_and_store(fname, fetcher, now)
+
+    if now - stored['timestamp'] >= datetime.timedelta(days=1):
+        return _fetch_and_store(fname, fetcher, now)
+
+    return stored['data']
