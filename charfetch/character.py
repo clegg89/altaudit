@@ -30,4 +30,32 @@ def _get_item(item_dictionary):
             item_dictionary['quality']]
 
 def get_all_items(items_dictionary):
-    return [mean([item['itemLevel'] for item in items_dictionary.values()])]
+    slots = ['head', 'neck', 'shoulder', 'back',
+            'chest', 'wrist', 'hands', 'waist',
+            'legs', 'feet', 'finger1', 'finger2',
+            'trinket1', 'trinket2', 'mainHand', 'offHand']
+
+    ilevels = {}
+    for slot in slots:
+        ilevels[slot] = items_dictionary[slot]['itemLevel'] if slot in items_dictionary else 0
+
+    # Special case for missing offHand
+    # Note: This is not technically correct. Blizzard will only replace
+    # the offHand slot if the mainHand slot is a 2h weapon.
+    # However, we don't have enough information from the character item
+    # list to determine this. We could query the Item API and use the
+    # class/subclass to determine if it is 1h/2h, but that's a lot of
+    # extra work, for very little reward. We'll mark it as a todo
+    # TODO Query wow API to determine if mainHand is 1h or 2h
+    if ilevels['offHand'] == 0:
+        ilevels['offHand'] = ilevels['mainHand']
+
+    ilvls = list(ilevels.values())
+
+    equipped_ilvl = mean(ilvls)
+
+    for idx,ilvl in enumerate(ilvls):
+        if ilvl == 0:
+            ilvls[idx] = None
+
+    return [equipped_ilvl] + ilvls
