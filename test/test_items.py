@@ -11,7 +11,8 @@ Unit Tests for Item related code
 """
 import pytest
 
-from charfetch import Item, ItemManager
+from charfetch import get_all_items, Item, ItemManager
+from charfetch.character import _get_item
 
 @pytest.fixture
 def fake_hoa():
@@ -20,10 +21,6 @@ def fake_hoa():
 @pytest.fixture
 def fake_neck():
     return {'id': 122666, 'name': 'Eternal Woven Ivy Necklace', 'icon': 'inv_misc_herb_15', 'quality': 7, 'itemLevel': 65}
-
-@pytest.fixture
-def fake_item():
-    return
 
 @pytest.fixture
 def make_fake_item():
@@ -43,6 +40,18 @@ def default_item_dictionary(make_fake_item, fake_hoa):
     items_dict['neck'] = fake_hoa
 
     return items_dict
+
+def test_get_item(make_fake_item):
+    assert _get_item(make_fake_item()) == [405, 165822, 'Cowl of Tideborne Omens', 'inv_helm_cloth_zuldazarraid_d_01', 4]
+
+def test_get_all_items_quipped_ilevel_default(default_item_dictionary):
+    assert get_all_items(default_item_dictionary)[0] == 406.375
+
+def test_get_all_items_quipped_ilevel_default(default_item_dictionary):
+    for i,k in enumerate(default_item_dictionary.keys()):
+        default_item_dictionary[k]['itemLevel'] = 405+i
+
+    assert get_all_items(default_item_dictionary)[0] == 412.5
 
 class TestItem:
     def test_item_serialize(self, make_fake_item):
