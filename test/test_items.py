@@ -47,6 +47,9 @@ def default_item_dictionary(item_slots, make_fake_item, fake_hoa):
 def test_get_item(make_fake_item):
     assert _get_item(make_fake_item()) == [405, 165822, 'Cowl of Tideborne Omens', 'inv_helm_cloth_zuldazarraid_d_01', 4]
 
+def test_get_item_none():
+    assert _get_item(None) == [None, None, None, None, None]
+
 def test_get_all_items_equipped_ilevel_default(default_item_dictionary):
     assert get_all_items(default_item_dictionary)[0] == 406.375
 
@@ -67,28 +70,28 @@ def test_get_all_items_equipped_ilevel_missing_offhand_assumed_2h(default_item_d
 
     assert get_all_items(default_item_dictionary)[0] == 408.875
 
-def test_get_all_items_ilevels_in_order(default_item_dictionary, item_slots):
+def test_get_all_items_items_in_order(default_item_dictionary, item_slots):
     result = get_all_items(default_item_dictionary)
 
-    assert result[1] == default_item_dictionary[item_slots[0]]['itemLevel']
-    assert result[2] == default_item_dictionary[item_slots[1]]['itemLevel']
-    assert result[3] == default_item_dictionary[item_slots[2]]['itemLevel']
-    assert result[4] == default_item_dictionary[item_slots[3]]['itemLevel']
-    assert result[5] == default_item_dictionary[item_slots[4]]['itemLevel']
-    assert result[6] == default_item_dictionary[item_slots[5]]['itemLevel']
-    assert result[7] == default_item_dictionary[item_slots[6]]['itemLevel']
-    assert result[8] == default_item_dictionary[item_slots[7]]['itemLevel']
-    assert result[9] == default_item_dictionary[item_slots[8]]['itemLevel']
-    assert result[10] == default_item_dictionary[item_slots[9]]['itemLevel']
-    assert result[11] == default_item_dictionary[item_slots[10]]['itemLevel']
-    assert result[12] == default_item_dictionary[item_slots[11]]['itemLevel']
-    assert result[13] == default_item_dictionary[item_slots[12]]['itemLevel']
-    assert result[14] == default_item_dictionary[item_slots[13]]['itemLevel']
-    assert result[15] == default_item_dictionary[item_slots[14]]['itemLevel']
-    assert result[16] == default_item_dictionary[item_slots[15]]['itemLevel']
+    assert result[1] == _get_item(default_item_dictionary[item_slots[0]])
+    assert result[2] == _get_item(default_item_dictionary[item_slots[1]])
+    assert result[3] == _get_item(default_item_dictionary[item_slots[2]])
+    assert result[4] == _get_item(default_item_dictionary[item_slots[3]])
+    assert result[5] == _get_item(default_item_dictionary[item_slots[4]])
+    assert result[6] == _get_item(default_item_dictionary[item_slots[5]])
+    assert result[7] == _get_item(default_item_dictionary[item_slots[6]])
+    assert result[8] == _get_item(default_item_dictionary[item_slots[7]])
+    assert result[9] == _get_item(default_item_dictionary[item_slots[8]])
+    assert result[10] == _get_item(default_item_dictionary[item_slots[9]])
+    assert result[11] == _get_item(default_item_dictionary[item_slots[10]])
+    assert result[12] == _get_item(default_item_dictionary[item_slots[11]])
+    assert result[13] == _get_item(default_item_dictionary[item_slots[12]])
+    assert result[14] == _get_item(default_item_dictionary[item_slots[13]])
+    assert result[15] == _get_item(default_item_dictionary[item_slots[14]])
+    assert result[16] == _get_item(default_item_dictionary[item_slots[15]])
 
-def test_get_all_items_ilevels_missing_is_None(default_item_dictionary, item_slots):
+def test_get_all_items_ilevels_missing_is_None_item(default_item_dictionary, item_slots):
     del default_item_dictionary['finger1']
     result = get_all_items(default_item_dictionary)
 
-    assert result[item_slots.index('finger1')+1] == None
+    assert result[item_slots.index('finger1')+1] == _get_item(None)

@@ -23,11 +23,14 @@ def get_basic_info(profile, classes, races, region=''):
             races[profile['race']]['name']]
 
 def _get_item(item_dictionary):
-    return [item_dictionary['itemLevel'],
-            item_dictionary['id'],
-            item_dictionary['name'],
-            item_dictionary['icon'],
-            item_dictionary['quality']]
+    if item_dictionary:
+        return [item_dictionary['itemLevel'],
+                item_dictionary['id'],
+                item_dictionary['name'],
+                item_dictionary['icon'],
+                item_dictionary['quality']]
+    else:
+        return [None, None, None, None, None]
 
 def get_all_items(items_dictionary):
     slots = ['head', 'neck', 'shoulder', 'back',
@@ -36,8 +39,10 @@ def get_all_items(items_dictionary):
             'trinket1', 'trinket2', 'mainHand', 'offHand']
 
     ilevels = {}
+    items = []
     for slot in slots:
         ilevels[slot] = items_dictionary[slot]['itemLevel'] if slot in items_dictionary else 0
+        items.append(_get_item(items_dictionary[slot]) if slot in items_dictionary else _get_item(None))
 
     # Special case for missing offHand
     # Note: This is not technically correct. Blizzard will only replace
@@ -58,4 +63,4 @@ def get_all_items(items_dictionary):
         if ilvl == 0:
             ilvls[idx] = None
 
-    return [equipped_ilvl] + ilvls
+    return [equipped_ilvl] + items
