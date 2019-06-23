@@ -15,10 +15,6 @@ import os
 
 from charfetch.utility import *
 
-@pytest.fixture
-def fake_char_yaml():
-    return { 'us' : { "kil'jaeden" : ['toon1','toon2'] } }
-
 def test_flatten_list():
     expected_result = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     inlist = [1, [2, [3, [4, 5, 6]], 7], [8, 9], 10]
@@ -29,7 +25,10 @@ def test_load_yaml_file_valid(fake_char_yaml):
     fake_yaml = """us:
     kil'jaeden:
         - toon1
-        - toon2"""
+        - toon2
+    lightbringer:
+        - toon3
+        - toon4"""
     expected_result = fake_char_yaml
     with open(test_file, 'w') as f:
         f.write(fake_yaml)
@@ -50,7 +49,9 @@ def test_convert_to_char_list_None():
 def test_convert_to_char_list_valid(fake_char_yaml):
     expected_result = [
             {'name' : 'toon1', 'realm' : "kil'jaeden", 'region' : 'us'},
-            {'name' : 'toon2', 'realm' : "kil'jaeden", 'region' : 'us'}]
+            {'name' : 'toon2', 'realm' : "kil'jaeden", 'region' : 'us'},
+            {'name' : 'toon3', 'realm' : "lightbringer", 'region' : 'us'},
+            {'name' : 'toon4', 'realm' : "lightbringer", 'region' : 'us'}]
     assert convert_to_char_list(fake_char_yaml) == expected_result
 
 def test_convert_to_char_list_invalid_returns_None():

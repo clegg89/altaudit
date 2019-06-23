@@ -22,3 +22,7 @@ def make_fake_char_dict():
                  'region' : 'region{}'.format(v) }
 
     return _make_fake_char_dict
+
+@pytest.fixture
+def fake_char_yaml():
+    return { 'us' : { "kil'jaeden" : ['toon1','toon2'], 'lightbringer' : ['toon3', 'toon4'] } }
