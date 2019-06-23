@@ -7,6 +7,7 @@
 Unit Tests for charfetch.utility
 """
 import pytest
+from unittest.mock import MagicMock
 
 import datetime
 import pickle
@@ -231,3 +232,10 @@ def test_load_or_fetch_fetch_file_not_created():
 
     assert result == fetch_result
     assert saved == expected_saved
+
+def test_make_fetcher():
+    mock_fetch_func = MagicMock()
+    fake_api = 0xdeadbeef
+    result = make_fetcher(mock_fetch_func, fake_api)
+    result()
+    mock_fetch_func.assert_called_once_with(fake_api)

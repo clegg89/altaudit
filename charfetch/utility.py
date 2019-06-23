@@ -74,3 +74,6 @@ def load_or_fetch(fname, fetcher, now):
         return _fetch_and_store(fname, fetcher, now)
 
     return stored['data']
+
+def make_fetcher(fetch_func, api):
+    return lambda: fetch_func(api)
