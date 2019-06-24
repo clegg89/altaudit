@@ -7,7 +7,6 @@
 Unit Tests for charfetch.utility
 """
 import pytest
-from unittest.mock import MagicMock, patch, mock_open, call, DEFAULT
 
 import datetime
 
@@ -26,8 +25,8 @@ def test_load_yaml_file_valid(fake_char_yaml, mock_yaml, mocker):
     test_file = 'test.yaml'
 
     mock_yaml.safe_load.return_value = fake_char_yaml
-    with patch('charfetch.utility.open', mock_open()) as m:
-        result = load_yaml_file(test_file)
+    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    result = load_yaml_file(test_file)
 
     m.assert_called_once_with(test_file, 'r')
     mock_yaml.safe_load.assert_called_once_with(m.return_value)
@@ -171,7 +170,7 @@ def test_get_races_return_value_coerced(mock_api):
 def mock_pickle(mocker):
     return mocker.patch('charfetch.utility.pickle')
 
-def test_load_or_fetch_use_stored_old(mock_pickle):
+def test_load_or_fetch_use_stored_old(mock_pickle, mocker):
     test_file = 'test.pkl'
     stored_time = datetime.datetime.now()
     load_time = stored_time + datetime.timedelta(hours=1)
@@ -180,14 +179,14 @@ def test_load_or_fetch_use_stored_old(mock_pickle):
     stored = { 'timestamp' : stored_time, 'data' : expected_result }
 
     mock_pickle.load.return_value = stored
-    with patch('charfetch.utility.open', mock_open()) as m:
-        result = load_or_fetch(test_file, None, load_time)
+    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    result = load_or_fetch(test_file, None, load_time)
 
     m.assert_called_once_with(test_file, 'rb')
     mock_pickle.load.assert_called_once_with(m.return_value)
     assert result == expected_result
 
-def test_load_or_fetch_fetch(mock_pickle):
+def test_load_or_fetch_fetch(mock_pickle, mocker):
     test_file = 'test.pkl'
     stored_time = datetime.datetime.now()
     load_time = stored_time + datetime.timedelta(days=1)
@@ -199,14 +198,20 @@ def test_load_or_fetch_fetch(mock_pickle):
     expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
 
     mock_pickle.load.return_value = stored
-    with patch('charfetch.utility.open', mock_open()) as m:
-        result = load_or_fetch(test_file, fake_fetch, load_time)
+    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    result = load_or_fetch(test_file, fake_fetch, load_time)
 
     mock_pickle.load.assert_called_once_with(m.return_value)
     mock_pickle.dump.assert_called_once_with(expected_saved, m.return_value, mock_pickle.HIGHEST_PROTOCOL)
     assert result == fetch_result
 
-def test_load_or_fetch_fetch_file_not_created(mock_pickle):
+def test_load_or_fetch_fetch_file_not_created(mock_pickle, mocker):
+    def _raise_on_read(fname, mode):
+        if mode != 'wb':
+            raise FileNotFoundError
+        else:
+            return mocker.DEFAULT
+
     test_file = 'test.pkl'
     load_time = datetime.datetime.now()
 
@@ -215,26 +220,20 @@ def test_load_or_fetch_fetch_file_not_created(mock_pickle):
 
     expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
 
-    with patch('charfetch.utility.open', mock_open()) as m:
-        def _raise_on_read(fname, mode):
-            if mode != 'wb':
-                raise FileNotFoundError
-            else:
-                return DEFAULT
-
-        m.side_effect = _raise_on_read
-        result = load_or_fetch(test_file, fake_fetch, load_time)
+    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    m.side_effect = _raise_on_read
+    result = load_or_fetch(test_file, fake_fetch, load_time)
 
     mock_pickle.load.assert_not_called()
     mock_pickle.dump.assert_called_once_with(expected_saved, m.return_value, mock_pickle.HIGHEST_PROTOCOL)
     assert result == fetch_result
 
-def test_load_or_fetch_fetch_args_and_kwargs(mock_pickle):
+def test_load_or_fetch_fetch_args_and_kwargs(mock_pickle, mocker):
     test_file = 'test.pkl'
     stored_time = datetime.datetime.now()
     load_time = stored_time + datetime.timedelta(days=1)
 
-    mock_fetcher = MagicMock()
+    mock_fetcher = mocker.MagicMock()
     args = [3, 'test']
     kwargs = {'var1' : 4, 'var3' : 'passed'}
 
@@ -245,8 +244,8 @@ def test_load_or_fetch_fetch_args_and_kwargs(mock_pickle):
     expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
 
     mock_pickle.load.return_value = stored
-    with patch('charfetch.utility.open', mock_open()) as m:
-        result = load_or_fetch(test_file, mock_fetcher, load_time, *args, **kwargs)
+    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    result = load_or_fetch(test_file, mock_fetcher, load_time, *args, **kwargs)
 
     mock_pickle.load.assert_called_once_with(m.return_value)
     mock_fetcher.assert_called_once_with(*args, **kwargs)
