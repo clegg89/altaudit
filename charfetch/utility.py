@@ -56,10 +56,10 @@ def get_char_data(character, blizzard_api):
     return { 'blizzard' : blizzard_api.get_character_profile(character['region'], character['realm'], character['name'],
             locale='en_US', filters='statistics,talents,reputation,items,achievements,audit,professions') }
 
-def load_or_fetch(fname, fetcher, now):
+def load_or_fetch(fname, fetcher, now, *fetchargs, **fetchkwargs):
     def _fetch_and_store(fname, fetcher, now):
         fetch = {}
-        fetch['data'] = fetcher()
+        fetch['data'] = fetcher(*fetchargs, **fetchkwargs)
         fetch['timestamp'] = now
         with open(fname, 'wb') as tf:
             pickle.dump(fetch, tf, pickle.HIGHEST_PROTOCOL)
@@ -76,6 +76,3 @@ def load_or_fetch(fname, fetcher, now):
         return _fetch_and_store(fname, fetcher, now)
 
     return stored['data']
-
-def make_fetcher(fetch_func, api):
-    return lambda: fetch_func(api)

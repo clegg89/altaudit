@@ -215,7 +215,7 @@ def test_load_or_fetch_fetch_file_not_created(mock_pickle):
 
     expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
 
-    with patch('charfetch.utility.open', mock_open(), create=True) as m:
+    with patch('charfetch.utility.open', mock_open()) as m:
         def _raise_on_read(fname, mode):
             if mode != 'wb':
                 raise FileNotFoundError
@@ -229,11 +229,25 @@ def test_load_or_fetch_fetch_file_not_created(mock_pickle):
     mock_pickle.dump.assert_called_once_with(expected_saved, m.return_value, mock_pickle.HIGHEST_PROTOCOL)
     assert result == fetch_result
 
-# def test_load_or_fetch_fetch_args_and_kwargs():
+def test_load_or_fetch_fetch_args_and_kwargs(mock_pickle):
+    test_file = 'test.pkl'
+    stored_time = datetime.datetime.now()
+    load_time = stored_time + datetime.timedelta(days=1)
 
-def test_make_fetcher():
-    mock_fetch_func = MagicMock()
-    fake_api = 0xdeadbeef
-    result = make_fetcher(mock_fetch_func, fake_api)
-    result()
-    mock_fetch_func.assert_called_once_with(fake_api)
+    mock_fetcher = MagicMock()
+    args = [3, 'test']
+    kwargs = {'var1' : 4, 'var3' : 'passed'}
+
+    fetch_result = { 'a' : 3, 'b' : 4 }
+    mock_fetcher.return_value = fetch_result
+
+    stored = { 'timestamp' : stored_time, 'data' : { 'a' : 1, 'b' : 2 } }
+    expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
+
+    mock_pickle.load.return_value = stored
+    with patch('charfetch.utility.open', mock_open()) as m:
+        result = load_or_fetch(test_file, mock_fetcher, load_time, *args, **kwargs)
+
+    mock_pickle.load.assert_called_once_with(m.return_value)
+    mock_fetcher.assert_called_once_with(*args, **kwargs)
+    mock_pickle.dump.assert_called_once_with(expected_saved, m.return_value, mock_pickle.HIGHEST_PROTOCOL)
