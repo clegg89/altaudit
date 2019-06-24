@@ -170,6 +170,8 @@ def test_get_races_return_value_coerced(mock_api):
 def mock_pickle(mocker):
     return mocker.patch('charfetch.utility.pickle')
 
+# TODO refactor - lots of duplicate code in following tests
+
 def test_load_or_fetch_use_stored_old(mock_pickle, mocker):
     test_file = 'test.pkl'
     stored_time = datetime.datetime.now()
