@@ -11,6 +11,37 @@ import pytest
 import charfetch
 
 @pytest.fixture
+def fake_load_or_fetch(mocker):
+    def _fake_load_or_fetch(fileName, fetcher, now):
+        if fileName == 'classes.pkl':
+            return 'Classes'
+        elif fileName == 'races.pkl':
+            return 'Races'
+        else:
+            raise Exception('load_or_fetch called with unrecognized file: {}'.format(fileName))
+
+    fake = mocker.patch('charfetch.charfetch.load_or_fetch')
+    fake.side_effect = _fake_load_or_fetch
+
+    return fake
+
+def test_fake_load_or_fetch_classes(fake_load_or_fetch):
+    result = charfetch.charfetch.load_or_fetch('classes.pkl', 'A', 'B')
+    fake_load_or_fetch.assert_called_once_with('classes.pkl', 'A', 'B')
+    assert result == 'Classes'
+
+def test_fake_load_or_fetch_races(fake_load_or_fetch):
+    result = charfetch.charfetch.load_or_fetch('races.pkl', 'A', 'B')
+    fake_load_or_fetch.assert_called_once_with('races.pkl', 'A', 'B')
+    assert result == 'Races'
+
+def test_fake_load_or_fetch_unknown(fake_load_or_fetch):
+    with pytest.raises(Exception):
+        result = charfetch.charfetch.fake_load_or_fetch('unknown.pkl', 'C', 'D')
+
+# def test_internal_get_all_character_info():
+
+@pytest.fixture
 def fake_token_file():
     return 'fake_tokens.yaml'
 
@@ -25,9 +56,9 @@ def fake_tokens():
 @pytest.fixture
 def fake_load_yaml(mocker, fake_token_file, fake_characters_file, fake_tokens, fake_char_yaml):
     def _fake_load(fileName):
-        if fileName is fake_token_file:
+        if fileName == fake_token_file:
             return fake_tokens
-        elif fileName is fake_characters_file:
+        elif fileName == fake_characters_file:
             return fake_char_yaml
         else:
             raise Exception('load_yaml_file called with unrecognized file: {}'.format(fileName))

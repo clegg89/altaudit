@@ -11,7 +11,7 @@ import pytest
 from unittest.mock import MagicMock
 
 @pytest.fixture
-def mock_blizzard_api():
+def mock_api():
     return MagicMock()
 
 @pytest.fixture(scope="module")
