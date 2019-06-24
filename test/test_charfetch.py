@@ -8,6 +8,8 @@ Unit Tests for main charfetch entry point
 """
 import pytest
 
+import datetime
+
 import charfetch
 
 @pytest.fixture
@@ -126,6 +128,52 @@ def test_mock_blizzard_api(mock_blizzard_api):
     mock_blizzard_api.assert_called_once_with('TEST_CLIENT_ID', 'TEST_CLIENT_SECRET')
     assert result == 'Test Passed'
 
-def test_charfetch_create_blizzard_api(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_tokens):
-    charfetch.fetch_all(fake_token_file, fake_characters_file)
+@pytest.fixture
+def mock_get_all_character_info(mocker):
+    return mocker.patch('charfetch.charfetch._get_all_character_info')
+
+def test_charfetch_create_blizzard_api(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_tokens, mock_get_all_character_info):
+    charfetch.fetch_all(fake_token_file, fake_characters_file, None)
+
     mock_blizzard_api.assert_called_once_with(fake_tokens['blizzard']['client_id'], fake_tokens['blizzard']['client_secret'])
+
+def test_charfetch_get_all_character_info_character_info(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_char_yaml, mock_get_all_character_info):
+    characters = charfetch.utility.convert_to_char_list(fake_char_yaml)
+    now = datetime.datetime.now()
+    def _char_info(character, call_now, api):
+        if character not in characters or call_now != now or api != mock_blizzard_api.return_value:
+            raise Exception('_get_all_character_info called with unrecognized arguments: Expected: {}, {}, {}; Actual: {}, {}, {}.'.format(characters, now, mock_blizzard_api, character, call_now, api))
+
+        return characters.index(character)
+
+    expected_result = [i for i in range(0,len(characters))]
+    mock_get_all_character_info.side_effect = _char_info
+
+    result = charfetch.fetch_all(fake_token_file, fake_characters_file, now)
+
+    assert result == expected_result
+
+@pytest.fixture
+def mock_fetch_all(mocker):
+    return mocker.patch('charfetch.charfetch.fetch_all')
+
+@pytest.fixture
+def mock_csv(mocker):
+    return mocker.patch('charfetch.charfetch.csv')
+
+def test_main(mock_fetch_all, mock_csv, mocker):
+    mock_fetch_all.return_value = 'Test Passed'
+    mock_writer = mocker.MagicMock()
+    mock_csv.writer.return_value = mock_writer
+
+    m = mocker.patch('charfetch.charfetch.open', mocker.mock_open())
+    charfetch.main()
+    m.assert_called_once_with('characters.csv', 'w', newline='')
+
+    mock_fetch_all.assert_called_once()
+    args = mock_fetch_all.call_args[0]
+    assert args[0] == 'tokens.yaml'
+    assert args[1] == 'characters.yaml'
+    assert type(args[2]) is type(datetime.datetime.now())
+    mock_csv.writer.assert_called_once_with(m.return_value)
+    mock_writer.writerows.assert_called_once_with('Test Passed')
