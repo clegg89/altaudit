@@ -181,9 +181,7 @@ def test_main(mock_fetch_all, mock_csv, mock_sleep, mocker):
     m = mocker.patch('charfetch.charfetch.open', mocker.mock_open())
     manager = mocker.Mock()
 
-    # manager.attach_mock(mock_fetch_all, 'fetch_all')
     manager.attach_mock(m, 'open')
-    # manager.attach_mock(mock_csv, 'csv')
     manager.attach_mock(mock_sleep, 'sleep')
 
     charfetch.main()
