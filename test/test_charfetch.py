@@ -132,26 +132,36 @@ def test_mock_blizzard_api(mock_blizzard_api):
 def mock_get_all_character_info(mocker):
     return mocker.patch('charfetch.charfetch._get_all_character_info')
 
-def test_charfetch_fetch_all_create_blizzard_api(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_tokens, mock_get_all_character_info):
-    charfetch.fetch_all(fake_token_file, fake_characters_file, None)
+class Counter:
+    """A sort of generator object that lets us access its current value without incrementing"""
+    def __init__(self):
+        self.index = 0
 
-    mock_blizzard_api.assert_called_once_with(fake_tokens['blizzard']['client_id'], fake_tokens['blizzard']['client_secret'])
+    def next(self):
+        self.index += 1
+        return self.index
 
-def test_charfetch_fetch_all_character_info(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_char_yaml, mock_get_all_character_info):
+def test_charfetch_fetch_all_character_info(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_char_yaml, mock_get_all_character_info, mocker):
     characters = charfetch.utility.convert_to_char_list(fake_char_yaml)
-    now = datetime.datetime.now()
+    g = Counter()
+    mock_datetime = mocker.MagicMock()
+    mock_datetime.now.side_effect = lambda: g.next() # Will keep counting on each call
+
     def _char_info(character, call_now, api):
-        if character not in characters or call_now != now or api != mock_blizzard_api.return_value:
-            raise Exception('_get_all_character_info called with unrecognized arguments: Expected: {}, {}, {}; Actual: {}, {}, {}.'.format(characters, now, mock_blizzard_api, character, call_now, api))
+        if character not in characters or call_now != g.index or api != mock_blizzard_api.return_value:
+            raise Exception("""_get_all_character_info called with unrecognized arguments:
+Expected: {}, {}, {}
+Actual: {}, {}, {}.""".format(characters, g.index, mock_blizzard_api, character, call_now, api))
 
         return characters.index(character)
 
     expected_result = [i for i in range(0,len(characters))]
     mock_get_all_character_info.side_effect = _char_info
 
-    result = charfetch.fetch_all(fake_token_file, fake_characters_file, now)
+    result = charfetch.fetch_all(fake_token_file, fake_characters_file, mock_datetime)
 
-    assert result == expected_result
+    assert next(result) == expected_result
+    assert next(result) == expected_result
 
 @pytest.fixture
 def mock_fetch_all(mocker):
@@ -161,19 +171,46 @@ def mock_fetch_all(mocker):
 def mock_csv(mocker):
     return mocker.patch('charfetch.charfetch.csv')
 
-def test_main(mock_fetch_all, mock_csv, mocker):
-    mock_fetch_all.return_value = 'Test Passed'
-    mock_writer = mocker.MagicMock()
-    mock_csv.writer.return_value = mock_writer
+@pytest.fixture
+def mock_sleep(mocker):
+    return mocker.patch('charfetch.charfetch.time.sleep')
 
+def test_main(mock_fetch_all, mock_csv, mock_sleep, mocker):
+    fake_rows = [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]
+    mock_fetch_all.return_value = iter(fake_rows)
     m = mocker.patch('charfetch.charfetch.open', mocker.mock_open())
+    manager = mocker.Mock()
+
+    # manager.attach_mock(mock_fetch_all, 'fetch_all')
+    manager.attach_mock(m, 'open')
+    # manager.attach_mock(mock_csv, 'csv')
+    manager.attach_mock(mock_sleep, 'sleep')
+
     charfetch.main()
-    m.assert_called_once_with('characters.csv', 'w', newline='')
+
+    open_call_args = ['characters.csv', 'w']
+    open_call_kwargs = { 'newline' : '' }
+    open_call = mocker.call(*open_call_args, **open_call_kwargs)
+    assert m.call_count == 2
+    assert m.call_args_list == [open_call, open_call]
 
     mock_fetch_all.assert_called_once()
     args = mock_fetch_all.call_args[0]
     assert 'tokens.yaml' in args[0]
     assert 'characters.yaml' in args[1]
-    assert type(args[2]) is type(datetime.datetime.now())
-    mock_csv.writer.assert_called_once_with(m.return_value)
-    mock_writer.writerows.assert_called_once_with('Test Passed')
+    assert datetime.datetime == args[2]
+
+    writer_call = mocker.call(m.return_value)
+    writerows_call = lambda x: mocker.call().writerows(fake_rows[x])
+    mock_csv.writer.assert_has_calls([writer_call, writerows_call(0),
+        writer_call, writerows_call(1)])
+
+    "Verify that sleep is called after file is closed"
+    manager.assert_has_calls([mocker.call.open(*open_call_args, **open_call_kwargs),
+        mocker.call.open().__enter__(),
+        mocker.call.open().__exit__(None, None, None),
+        mocker.call.sleep(20),
+        mocker.call.open(*open_call_args, **open_call_kwargs),
+        mocker.call.open().__enter__(),
+        mocker.call.open().__exit__(None, None, None),
+        mocker.call.sleep(20)])
