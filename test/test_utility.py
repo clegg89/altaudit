@@ -33,11 +33,13 @@ def test_load_yaml_file_valid(fake_char_yaml, mock_yaml, mocker):
     assert result == fake_char_yaml
 
 def test_load_yaml_invalid_returns_None():
-    garbage = 'file_does_not_exist'
-    assert load_yaml_file(garbage) == None
+    with pytest.raises(Exception):
+        garbage = 'file_does_not_exist'
+        load_yaml_file(garbage)
 
 def test_load_yaml_file_None():
-    assert load_yaml_file(None) == None
+    with pytest.raises(Exception):
+        load_yaml_file(None)
 
 def test_convert_to_char_list_None():
     assert convert_to_char_list(None) == None
@@ -83,7 +85,7 @@ def test_get_char_data_api_call_kwargs_keys_correct(make_fake_char_dict, mock_ap
     get_char_data(character, blizzard_api=mock_api)
     _, kwargs = mock_api.get_character_profile.call_args
 
-    assert list(kwargs.keys()) == ['locale', 'filters']
+    assert list(kwargs.keys()) == ['locale', 'fields']
 
 def test_get_char_data_api_call_kwargs_locale_correct(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(3)
@@ -93,18 +95,18 @@ def test_get_char_data_api_call_kwargs_locale_correct(make_fake_char_dict, mock_
 
     assert kwargs['locale'] == 'en_US'
 
-def test_get_char_data_api_call_kwargs_filters_correct(make_fake_char_dict, mock_api):
+def test_get_char_data_api_call_kwargs_fields_correct(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(3)
-    expected_filters = ['achievements', 'talents', 'items', 'statistics', 'professions', 'reputation', 'audit']
-    expected_filters.sort()
+    expected_fields = ['achievements', 'talents', 'items', 'statistics', 'professions', 'reputation', 'audit']
+    expected_fields.sort()
 
     get_char_data(character, blizzard_api=mock_api)
     _, kwargs = mock_api.get_character_profile.call_args
 
-    filters = kwargs['filters'].split(',')
-    filters.sort()
+    fields = kwargs['fields'].split(',')
+    fields.sort()
 
-    assert filters == expected_filters
+    assert fields == expected_fields
 
 def test_get_char_data_api_call_in_return_value(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(3)

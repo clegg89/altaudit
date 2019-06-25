@@ -26,11 +26,8 @@ def flatten(l):
 
 def load_yaml_file(fileName):
     """ Convenience function for loading yaml files """
-    try:
-        with open(fileName, 'r') as f:
-            return yaml.safe_load(f)
-    except:
-        pass
+    with open(fileName, 'r') as f:
+        return yaml.safe_load(f)
 
 def convert_to_char_list(data):
     """ Convert a dictionary of {region:{realm:[toons]}} to a list of characters """
@@ -54,7 +51,7 @@ def get_races(api):
 def get_char_data(character, blizzard_api):
     """ Query API's for character's data and return it """
     return { 'blizzard' : blizzard_api.get_character_profile(character['region'], character['realm'], character['name'],
-            locale='en_US', filters='statistics,talents,reputation,items,achievements,audit,professions') }
+            locale='en_US', fields='statistics,talents,reputation,items,achievements,audit,professions') }
 
 def load_or_fetch(fname, fetcher, now, *fetchargs, **fetchkwargs):
     def _fetch_and_store(fname, fetcher, now):

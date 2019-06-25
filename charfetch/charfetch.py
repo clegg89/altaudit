@@ -17,7 +17,7 @@ def _get_all_character_info(character, now, blizzard_api):
     pass
     classes = load_or_fetch('classes.pkl', get_classes, now, blizzard_api)
     races = load_or_fetch('races.pkl', get_races, now, blizzard_api)
-    profile = get_char_data(character, blizzard_api)
+    profile = get_char_data(character, blizzard_api)['blizzard']
 
     return flatten([get_basic_info(profile, classes, races, character['region']),
                     get_all_items(profile['items'])])
@@ -35,7 +35,7 @@ def fetch_all(tokens_file, character_file, now):
     return rows
 
 def main():
-    characters = fetch_all('tokens.yaml', 'characters.yaml', datetime.datetime.now())
+    characters = fetch_all('charfetch/tokens.yaml', 'charfetch/characters.yaml', datetime.datetime.now())
     with open('characters.csv', 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(characters)

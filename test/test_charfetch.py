@@ -58,7 +58,7 @@ def mock_get_all_items(mocker):
     return mocker.patch('charfetch.charfetch.get_all_items')
 
 def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data, mock_get_basic_info, mock_get_all_items, mocker):
-    mock_get_char_data.return_value = { 'items' : 'Items' }
+    mock_get_char_data.return_value = { 'blizzard' : { 'items' : 'Items' } }
     mock_get_basic_info.return_value = ['Basic', 'Info']
     mock_get_all_items.return_value = ['All', 'Items']
     character = {'region' : 'us'}
@@ -71,7 +71,7 @@ def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data,
                 mocker.call('races.pkl', charfetch.charfetch.get_races, 'Now', 'Blizzard_API')],
             any_order=True)
     mock_get_char_data.assert_called_once_with(character, 'Blizzard_API')
-    mock_get_basic_info.assert_called_once_with(mock_get_char_data.return_value, 'Classes', 'Races', 'us')
+    mock_get_basic_info.assert_called_once_with(mock_get_char_data.return_value['blizzard'], 'Classes', 'Races', 'us')
     mock_get_all_items.assert_called_once_with('Items')
     assert result == expected_result
 
@@ -132,12 +132,12 @@ def test_mock_blizzard_api(mock_blizzard_api):
 def mock_get_all_character_info(mocker):
     return mocker.patch('charfetch.charfetch._get_all_character_info')
 
-def test_charfetch_create_blizzard_api(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_tokens, mock_get_all_character_info):
+def test_charfetch_fetch_all_create_blizzard_api(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_tokens, mock_get_all_character_info):
     charfetch.fetch_all(fake_token_file, fake_characters_file, None)
 
     mock_blizzard_api.assert_called_once_with(fake_tokens['blizzard']['client_id'], fake_tokens['blizzard']['client_secret'])
 
-def test_charfetch_get_all_character_info_character_info(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_char_yaml, mock_get_all_character_info):
+def test_charfetch_fetch_all_character_info(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_char_yaml, mock_get_all_character_info):
     characters = charfetch.utility.convert_to_char_list(fake_char_yaml)
     now = datetime.datetime.now()
     def _char_info(character, call_now, api):
@@ -172,8 +172,8 @@ def test_main(mock_fetch_all, mock_csv, mocker):
 
     mock_fetch_all.assert_called_once()
     args = mock_fetch_all.call_args[0]
-    assert args[0] == 'tokens.yaml'
-    assert args[1] == 'characters.yaml'
+    assert 'tokens.yaml' in args[0]
+    assert 'characters.yaml' in args[1]
     assert type(args[2]) is type(datetime.datetime.now())
     mock_csv.writer.assert_called_once_with(m.return_value)
     mock_writer.writerows.assert_called_once_with('Test Passed')
