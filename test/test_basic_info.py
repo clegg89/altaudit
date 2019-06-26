@@ -7,7 +7,6 @@
 Test the Character class
 """
 import pytest
-from unittest.mock import MagicMock
 
 import datetime
 
@@ -74,6 +73,7 @@ def fake_profile_maker(classes, races):
                 'faction' : faction,
                 'gender' : gender,
                 'level' : level,
+                'thumbnail' : realm + '/96/184987488-avatar.jpg',
                 'talents' : [
                     { 'selected' : True, 'spec' : { 'name' : mainspec } },
                     { 'selected' : False, 'spec' : { 'name' : 'Failed' } },
@@ -87,6 +87,7 @@ def fake_profile_maker(classes, races):
                 'faction' : races[race]['side'].capitalize(),
                 'gender' : 'Male' if gender == 0 else 'Female',
                 'level' : level,
+                'thumbnail' : realm + '/96/184987488-avatar.jpg',
                 'mainspec' : mainspec }}
 
     return _maker
@@ -143,3 +144,10 @@ def test_basic_info_race(fake_profile_maker, classes, races):
     profile = fake_profile_maker()
     result = get_basic_info(profile['data'], classes, races)
     assert result[9] == profile['results']['race']
+
+def test_basic_info_thumbnail(fake_profile_maker, classes, races):
+    profile = fake_profile_maker()
+
+    result = get_basic_info(profile['data'], classes, races)
+
+    assert result[10] == profile['results']['thumbnail']

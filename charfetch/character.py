@@ -20,7 +20,8 @@ def get_basic_info(profile, classes, races, region=''):
             mainspec,
             'Alliance' if profile['faction'] == 0 else 'Horde' if profile['faction'] == 1 else 'Neutral',
             'Male' if profile['gender'] == 0 else 'Female' if profile['gender'] == 1 else None,
-            races[profile['race']]['name']]
+            races[profile['race']]['name'],
+            profile['thumbnail']]
 
 def _get_item(item_dictionary):
     if item_dictionary:
@@ -64,3 +65,14 @@ def get_all_items(items_dictionary):
             ilvls[idx] = None
 
     return [equipped_ilvl] + items
+
+def _get_trait_info(trait, blizzard_api, region='us'):
+    if trait is None:
+        return None
+
+    spell = blizzard_api.get_spell(region, trait['spellId'])
+
+    return '{}+{}+{}+{}'.format(trait['id'],spell['id'],spell['name'],spell['icon'])
+
+def get_azerite_info(items_dictionary, character_class, blizzard_api):
+    pass
