@@ -74,5 +74,12 @@ def _get_trait_info(trait, blizzard_api, region='us'):
 
     return '{}+{}+{}+{}'.format(trait['id'],spell['id'],spell['name'],spell['icon'])
 
-def get_azerite_info(items_dictionary, character_class, blizzard_api):
+def _get_item_traits(item, character_class, blizzard_api, region='us'):
+    return [[None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None]]
+
+def get_azerite_info(items_dictionary, character_class, blizzard_api, region='us'):
     pass

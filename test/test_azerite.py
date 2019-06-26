@@ -9,7 +9,7 @@ Unit tests for character Azerite info
 import pytest
 
 from charfetch import get_azerite_info
-from charfetch.character import _get_trait_info
+from charfetch.character import _get_trait_info, _get_item_traits
 
 def test_get_trait_info_None():
     result = _get_trait_info(None, None)
@@ -46,6 +46,19 @@ def test_get_trait_info_use_given_region(mock_api):
     result = _get_trait_info(trait, mock_api, 'eu')
 
     mock_api.get_spell.assert_called_once_with('eu', spellId)
+
+    assert result == expected
+
+def test_get_item_traits_no_azerite_empowered():
+    item = { 'azeriteEmpoweredItem' : { 'azeritePowers' : [] } }
+
+    result = _get_item_traits(item, None, None)
+
+    expected = [[None, None], # tier 0
+                [None, None], # tier 1
+                [None, None], # tier 2
+                [None, None], # tier 3
+                [None, None]] # tier 4
 
     assert result == expected
 
