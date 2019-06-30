@@ -75,11 +75,10 @@ def _get_trait_info(trait, blizzard_api, region='us'):
     return '{}+{}+{}+{}'.format(trait['id'],spell['id'],spell['name'],spell['icon'])
 
 def _get_item_traits(item, character_class, blizzard_api, region='us'):
-    return [[None, None],
-            [None, None],
-            [None, None],
-            [None, None],
-            [None, None]]
+    if not item['azeriteEmpoweredItem']['azeritePowers']:
+        return []
+
+    return blizzard_api.get_item('us', item['id'])['azeriteClassPowers'][str(character_class)]
 
 def get_azerite_info(items_dictionary, character_class, blizzard_api, region='us'):
     pass
