@@ -57,12 +57,19 @@ def mock_get_basic_info(mocker):
 def mock_get_all_items(mocker):
     return mocker.patch('charfetch.charfetch.get_all_items')
 
-def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data, mock_get_basic_info, mock_get_all_items, mocker):
-    mock_get_char_data.return_value = { 'blizzard' : { 'items' : 'Items' } }
+@pytest.fixture
+def mock_get_azerite_info(mocker):
+    return mocker.patch('charfetch.charfetch.get_azerite_info')
+
+def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data, mock_get_basic_info, mock_get_all_items, mock_get_azerite_info, mocker):
+    character = {'region' : 'us'}
+    mock_get_char_data.return_value = { 'blizzard' : { 'items' : 'Items', 'class' : 9 } }
+
     mock_get_basic_info.return_value = ['Basic', 'Info']
     mock_get_all_items.return_value = ['All', 'Items']
-    character = {'region' : 'us'}
-    expected_result = ['Basic', 'Info', 'All', 'Items']
+    mock_get_azerite_info.return_value = [50, 10]
+
+    expected_result = ['Basic', 'Info', 'All', 'Items', 50, 10]
 
     result = charfetch.charfetch._get_all_character_info(character, 'Now', 'Blizzard_API')
 
@@ -70,10 +77,14 @@ def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data,
             [mocker.call('classes.pkl', charfetch.charfetch.get_classes, 'Now', 'Blizzard_API'),
                 mocker.call('races.pkl', charfetch.charfetch.get_races, 'Now', 'Blizzard_API')],
             any_order=True)
+
+    assert result == expected_result
+
     mock_get_char_data.assert_called_once_with(character, 'Blizzard_API')
+
     mock_get_basic_info.assert_called_once_with(mock_get_char_data.return_value['blizzard'], 'Classes', 'Races', 'us')
     mock_get_all_items.assert_called_once_with('Items')
-    assert result == expected_result
+    mock_get_azerite_info.assert_called_once_with('Items', 9, 'Blizzard_API', 'us')
 
 @pytest.fixture
 def fake_token_file():

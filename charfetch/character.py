@@ -81,19 +81,19 @@ def _get_item_traits(item, character_class, blizzard_api, region='us'):
     return blizzard_api.get_item(region, item['id'])['azeriteClassPowers'][str(character_class)]
 
 def _get_azerite_item_info(item, character_class, blizzard_api, region='us'):
-    result = [[None, None], [None, None], [None, None], [None, None], [None, None]]
-
     item_traits = item['azeriteEmpoweredItem']['azeritePowers']
 
     if not item_traits:
-        return result
+        return [[None, None], [None, None], [None, None], [None, None], [None, None]]
 
     all_traits = _get_item_traits(item, character_class, blizzard_api, region)
+
+    result = [['', ''], ['', ''], ['', ''], ['', ''], ['', '']]
 
     for trait in all_traits:
         tier = trait['tier']
         trait_info = _get_trait_info(trait, blizzard_api, region)
-        result[tier][0] = trait_info + '|'
+        result[tier][0] += trait_info + '|'
         if next((t for t in item_traits if t['id'] == trait['id']), None) is not None:
             result[tier][1] = trait_info
 
@@ -104,4 +104,20 @@ def _get_azerite_item_info(item, character_class, blizzard_api, region='us'):
 
 
 def get_azerite_info(items_dictionary, character_class, blizzard_api, region='us'):
-    return [[None, None], [None, None], [None, None], [None, None]]
+    result = [None, None, None, None]
+
+    if 'neck' in items_dictionary and items_dictionary['neck']['quality'] == 6:
+        result[0] = items_dictionary['neck']['azeriteItem']['azeriteLevel']
+        result[1] = items_dictionary['neck']['azeriteItem']['azeriteExperience']
+        result[2] = items_dictionary['neck']['azeriteItem']['azeriteExperienceRemaining']
+
+    item_traits = {}
+    for slot in ('head', 'shoulder', 'chest'):
+        if slot not in items_dictionary:
+            item_traits[slot] = [[None, None], [None, None], [None, None], [None, None], [None, None]]
+        else:
+            item_traits[slot] = _get_azerite_item_info(items_dictionary[slot], character_class, blizzard_api, region)
+
+        result.append(item_traits[slot])
+
+    return result
