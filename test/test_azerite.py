@@ -9,7 +9,7 @@ Unit tests for character Azerite info
 import pytest
 
 from charfetch import get_azerite_info
-from charfetch.character import _get_trait_info, _get_item_traits
+from charfetch.character import _get_trait_info, _get_item_traits, _get_azerite_item_info
 
 def test_get_trait_info_None():
     result = _get_trait_info(None, None)
@@ -135,6 +135,21 @@ def test_get_item_return_list_of_class_traits(mock_api, fake_azerite_item_class_
     mock_api.get_item.assert_called_once_with('us', item['id'])
     assert result == mock_api.get_item.return_value['azeriteClassPowers']['9']
 
+def test_get_item_use_region(mock_api, fake_azerite_item_class_powers):
+    item = { 'id' : 165822,
+             'azeriteEmpoweredItem' : { 'azeritePowers' : [
+                 {'id': 13, 'tier': 0, 'spellId': 263978},
+                 {'id': 15, 'tier': 1, 'spellId': 263962},
+                 {'id': 30, 'tier': 2, 'spellId': 266180},
+                 {'id': 123, 'tier': 3, 'spellId': 272891},
+                 {'id': 183, 'tier': 4, 'spellId': 273521}]}}
+
+    mock_api.get_item.return_value = fake_azerite_item_class_powers
+
+    result = _get_item_traits(item, 9, mock_api, 'eu')
+
+    mock_api.get_item.assert_called_once_with('eu', item['id'])
+
 
     # item = { 'azeriteEmpoweredItem' : { 'azeritePowers' : [
     #     { 'id' : 13, 'tier' : 0, 'spellId' : 263978 },
@@ -142,10 +157,47 @@ def test_get_item_return_list_of_class_traits(mock_api, fake_azerite_item_class_
     #     { 'id' : 0, 'tier' : 2, 'spellId' : 0 },
     #     { 'id' : 482, 'tier' : 3, 'spellId' : 280380 }]}}
 
+def test_get_azerite_item_info_no_traits():
+    expected_result = [
+            [None, None], # tier 0
+            [None, None], # tier 1
+            [None, None], # tier 2
+            [None, None], # tier 3
+            [None, None]] # tier 4
+
+    result = _get_azerite_item_info({ 'azeriteEmpoweredItem' : { 'azeritePowers' : [] } }, 9, None)
+
+    assert result == expected_result
+
+@pytest.fixture
+def mock_get_trait_info(mocker):
+    return mocker.patch('charfetch.character._get_trait_info')
+
+@pytest.fixture
+def mock_get_item_traits(mocker):
+    return mocker.patch('charfetch.character._get_item_traits')
+
+def test_get_azerite_item_info_traits(mock_api, fake_azerite_item_class_powers):
+    item = { 'id' : 165822,
+             'azeriteEmpoweredItem' : { 'azeritePowers' : [
+                 {'id': 13, 'tier': 0, 'spellId': 263978},
+                 {'id': 15, 'tier': 1, 'spellId': 263962},
+                 {'id': 30, 'tier': 2, 'spellId': 266180},
+                 {'id': 123, 'tier': 3, 'spellId': 272891},
+                 {'id': 183, 'tier': 4, 'spellId': 273521}]}}
+
 @pytest.mark.skip
 def test_get_azerite_info_no_neck_is_empty():
-    result = get_azerite_info({})
-    assert result == [None, None, None, None,
-            [[],[],[],[],[]],
-            [],
-            []]
+    expected_result = [
+            None,         # HoA Level
+            None,         # Azerite Exp
+            None,         # Azerite Exp Remaining
+            [None, None], # tier 0
+            [None, None], # tier 1
+            [None, None], # tier 2
+            [None, None], # tier 3
+            [None, None]] # tier 4
+
+    result = get_azerite_info({}, 9, None)
+
+    assert result == expected_result

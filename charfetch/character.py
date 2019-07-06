@@ -78,7 +78,30 @@ def _get_item_traits(item, character_class, blizzard_api, region='us'):
     if not item['azeriteEmpoweredItem']['azeritePowers']:
         return []
 
-    return blizzard_api.get_item('us', item['id'])['azeriteClassPowers'][str(character_class)]
+    return blizzard_api.get_item(region, item['id'])['azeriteClassPowers'][str(character_class)]
+
+def _get_azerite_item_info(item, character_class, blizzard_api, region='us'):
+    result = [[None, None], [None, None], [None, None], [None, None], [None, None]]
+
+    item_traits = item['azeriteEmpoweredItem']['azeritePowers']
+
+    if not item_traits:
+        return result
+
+    all_traits = _get_item_traits(item, character_class, blizzard_api, region)
+
+    for trait in all_traits:
+        tier = trait['tier']
+        trait_info = _get_trait_info(trait, blizzard_api, region)
+        result[tier][0] = trait_info + '|'
+        if next((t for t in item_traits if t['id'] == trait['id']), None) is not None:
+            result[tier][1] = trait_info
+
+    for tier in result:
+        tier[0] = tier[0][:-1]
+
+    return result
+
 
 def get_azerite_info(items_dictionary, character_class, blizzard_api, region='us'):
-    pass
+    return [[None, None], [None, None], [None, None], [None, None]]
