@@ -19,9 +19,13 @@ def _get_all_character_info(character, now, blizzard_api):
     classes = load_or_fetch('classes.pkl', get_classes, now, blizzard_api)
     races = load_or_fetch('races.pkl', get_races, now, blizzard_api)
     profile = get_char_data(character, blizzard_api)['blizzard']
+    community_profile = profile['community_profile']
+    media = profile['media']
 
-    return flatten([get_basic_info(profile, classes, races, character['region']),
-                    get_all_items(profile['items']), get_azerite_info(profile['items'], profile['class'], blizzard_api, character['region'])])
+    return flatten([get_basic_info(community_profile, media, classes, races, character['region']),
+                    get_all_items(community_profile['items']),
+                    get_azerite_info(community_profile['items'],
+                        community_profile['class'], blizzard_api, character['region'])])
 
 def fetch_all(tokens, characters_yaml, dt):
     api = WowApi(tokens['blizzard']['client_id'], tokens['blizzard']['client_secret'])

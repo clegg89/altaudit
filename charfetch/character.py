@@ -8,7 +8,7 @@ Functions to get information about a character
 """
 from statistics import mean
 
-def get_basic_info(profile, classes, races, region=''):
+def get_basic_info(profile, media, classes, races, region=''):
     mainspec = None
     for spec in profile['talents']:
         if 'selected' in spec and spec['selected']:
@@ -21,7 +21,9 @@ def get_basic_info(profile, classes, races, region=''):
             'Alliance' if profile['faction'] == 0 else 'Horde' if profile['faction'] == 1 else 'Neutral',
             'Male' if profile['gender'] == 0 else 'Female' if profile['gender'] == 1 else None,
             races[profile['race']]['name'],
-            profile['thumbnail']]
+            media['avatar_url'],
+            media['bust_url'],
+            media['render_url']]
 
 def _get_item(item_dictionary):
     if item_dictionary:

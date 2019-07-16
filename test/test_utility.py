@@ -56,21 +56,21 @@ def test_convert_to_char_list_invalid_returns_None():
     garbage = {'a' : 2}
     assert convert_to_char_list(garbage) == None
 
-def test_get_char_data_api_called(make_fake_char_dict, mock_api):
+def test_get_char_data_api_no_unexpected_calls(make_fake_char_dict, mock_api):
+    character = make_fake_char_dict(2)
+
+    get_char_data(character, blizzard_api=mock_api)
+
+    assert len(mock_api.method_calls) == 2, 'Unexpcted method was called'
+
+def test_get_char_data_api_character_profile_called(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(1)
 
     get_char_data(character, blizzard_api=mock_api)
 
     mock_api.get_character_profile.assert_called_once()
 
-def test_get_char_data_api_no_unexpected_calls(make_fake_char_dict, mock_api):
-    character = make_fake_char_dict(2)
-
-    get_char_data(character, blizzard_api=mock_api)
-
-    assert len(mock_api.method_calls) == 1, 'Unexpcted method was called'
-
-def test_get_char_data_api_call_args(make_fake_char_dict, mock_api):
+def test_get_char_data_api_character_profile_call_args(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(3)
     expected_args = (character['region'], character['realm'], character['name'])
 
@@ -79,7 +79,7 @@ def test_get_char_data_api_call_args(make_fake_char_dict, mock_api):
 
     assert args == expected_args
 
-def test_get_char_data_api_call_kwargs_keys_correct(make_fake_char_dict, mock_api):
+def test_get_char_data_api_character_profile_call_kwargs_keys_correct(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(3)
 
     get_char_data(character, blizzard_api=mock_api)
@@ -87,7 +87,7 @@ def test_get_char_data_api_call_kwargs_keys_correct(make_fake_char_dict, mock_ap
 
     assert list(kwargs.keys()) == ['locale', 'fields']
 
-def test_get_char_data_api_call_kwargs_locale_correct(make_fake_char_dict, mock_api):
+def test_get_char_data_api_character_profile_call_kwargs_locale_correct(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(3)
 
     get_char_data(character, blizzard_api=mock_api)
@@ -95,7 +95,7 @@ def test_get_char_data_api_call_kwargs_locale_correct(make_fake_char_dict, mock_
 
     assert kwargs['locale'] == 'en_US'
 
-def test_get_char_data_api_call_kwargs_fields_correct(make_fake_char_dict, mock_api):
+def test_get_char_data_api_character_profile_call_kwargs_fields_correct(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(3)
     expected_fields = ['achievements', 'talents', 'items', 'statistics', 'professions', 'reputation', 'audit']
     expected_fields.sort()
@@ -108,13 +108,21 @@ def test_get_char_data_api_call_kwargs_fields_correct(make_fake_char_dict, mock_
 
     assert fields == expected_fields
 
+def test_get_char_data_api_media_call_correct(make_fake_char_dict, mock_api):
+    character = make_fake_char_dict(1)
+
+    get_char_data(character, blizzard_api=mock_api)
+
+    mock_api.get_resource.assert_called_once_with('profile/wow/character/{0}/{1}/character-media', 'us', *[character['realm'], character['name']], locale='en_US', namespace='profile-us')
+
 def test_get_char_data_api_call_in_return_value(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(3)
 
     mock_api.get_character_profile.return_value = 'Test Passed'
+    mock_api.get_resource.return_value = 'Other Test Passed'
     result = get_char_data(character, blizzard_api=mock_api)
 
-    assert result['blizzard'] == 'Test Passed'
+    assert result['blizzard'] == {'community_profile' : 'Test Passed', 'media' : 'Other Test Passed'}
 
 def test_get_classes_api_called_with_region(mock_api):
     get_classes(mock_api)

@@ -63,7 +63,9 @@ def mock_get_azerite_info(mocker):
 
 def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data, mock_get_basic_info, mock_get_all_items, mock_get_azerite_info, mocker):
     character = {'region' : 'us'}
-    mock_get_char_data.return_value = { 'blizzard' : { 'items' : 'Items', 'class' : 9 } }
+    mock_get_char_data.return_value = { 'blizzard' : {
+        'community_profile' : { 'items' : 'Items', 'class' : 9 },
+        'media' : {'url'}}}
 
     mock_get_basic_info.return_value = ['Basic', 'Info']
     mock_get_all_items.return_value = ['All', 'Items']
@@ -82,7 +84,9 @@ def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data,
 
     mock_get_char_data.assert_called_once_with(character, 'Blizzard_API')
 
-    mock_get_basic_info.assert_called_once_with(mock_get_char_data.return_value['blizzard'], 'Classes', 'Races', 'us')
+    mock_get_basic_info.assert_called_once_with(
+            mock_get_char_data.return_value['blizzard']['community_profile'],
+            mock_get_char_data.return_value['blizzard']['media'], 'Classes', 'Races', 'us')
     mock_get_all_items.assert_called_once_with('Items')
     mock_get_azerite_info.assert_called_once_with('Items', 9, 'Blizzard_API', 'us')
 
