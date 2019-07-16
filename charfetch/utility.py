@@ -54,9 +54,13 @@ def get_char_data(character, blizzard_api):
     return { 'blizzard' : {
         'community_profile' : blizzard_api.get_character_profile(character['region'],
             character['realm'], character['name'],
-            locale='en_US', fields='statistics,talents,reputation,items,achievements,audit,professions'),
-        'media' : blizzard_api.get_resource('profile/wow/character/{0}/{1}/character-media', 'us',
-            *[character['realm'], character['name']], locale='en_US', namespace='profile-us')}}
+            locale='en_US', fields='statistics,talents,reputation,items,achievements,audit,professions')}}
+
+# Left as an example for how to get profile API data
+"""
+'media' : blizzard_api.get_resource('profile/wow/character/{0}/{1}/character-media', 'us',
+    *[character['realm'], character['name']], locale='en_US', namespace='profile-us')}}
+"""
 
 def load_or_fetch(fname, fetcher, now, *fetchargs, **fetchkwargs):
     def _fetch_and_store(fname, fetcher, now):

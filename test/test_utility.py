@@ -61,7 +61,8 @@ def test_get_char_data_api_no_unexpected_calls(make_fake_char_dict, mock_api):
 
     get_char_data(character, blizzard_api=mock_api)
 
-    assert len(mock_api.method_calls) == 2, 'Unexpcted method was called'
+    "Change if any calls are added"
+    assert len(mock_api.method_calls) == 1, 'Unexpcted method was called'
 
 def test_get_char_data_api_character_profile_called(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(1)
@@ -108,6 +109,7 @@ def test_get_char_data_api_character_profile_call_kwargs_fields_correct(make_fak
 
     assert fields == expected_fields
 
+@pytest.mark.skip(reason="Character Profile Media API not working for some characters")
 def test_get_char_data_api_media_call_correct(make_fake_char_dict, mock_api):
     character = make_fake_char_dict(1)
 
@@ -116,13 +118,14 @@ def test_get_char_data_api_media_call_correct(make_fake_char_dict, mock_api):
     mock_api.get_resource.assert_called_once_with('profile/wow/character/{0}/{1}/character-media', 'us', *[character['realm'], character['name']], locale='en_US', namespace='profile-us')
 
 def test_get_char_data_api_call_in_return_value(make_fake_char_dict, mock_api):
+    """ The commented out sections are due to issues in the Character Profile Media API """
     character = make_fake_char_dict(3)
 
     mock_api.get_character_profile.return_value = 'Test Passed'
-    mock_api.get_resource.return_value = 'Other Test Passed'
+    # mock_api.get_resource.return_value = 'Other Test Passed'
     result = get_char_data(character, blizzard_api=mock_api)
 
-    assert result['blizzard'] == {'community_profile' : 'Test Passed', 'media' : 'Other Test Passed'}
+    assert result['blizzard'] == {'community_profile' : 'Test Passed'} #, 'media' : 'Other Test Passed'}
 
 def test_get_classes_api_called_with_region(mock_api):
     get_classes(mock_api)
