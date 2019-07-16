@@ -1,0 +1,16 @@
+api:
+  blizzard:
+    client_id: your_id_here
+    client_secret: your_secret_here
+
+characters:
+  region:
+    realm0:
+      - character0
+      - character1
+    reaml1:
+      - character2
+      - character3
+
+server:
+  localhost:/var/www/html

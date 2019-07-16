@@ -10,6 +10,7 @@ from wowapi import WowApi
 import csv
 import datetime
 import time
+import os
 
 from .utility import load_or_fetch, load_yaml_file, get_classes, get_races, get_char_data, flatten, convert_to_char_list
 from .character import get_basic_info, get_all_items, get_azerite_info
@@ -22,11 +23,10 @@ def _get_all_character_info(character, now, blizzard_api):
     return flatten([get_basic_info(profile, classes, races, character['region']),
                     get_all_items(profile['items']), get_azerite_info(profile['items'], profile['class'], blizzard_api, character['region'])])
 
-def fetch_all(tokens_file, character_file, dt):
-    tokens = load_yaml_file(tokens_file)
+def fetch_all(tokens, characters_yaml, dt):
     api = WowApi(tokens['blizzard']['client_id'], tokens['blizzard']['client_secret'])
 
-    characters = convert_to_char_list(load_yaml_file(character_file))
+    characters = convert_to_char_list(characters_yaml)
 
     while True:
         rows = []
@@ -37,11 +37,14 @@ def fetch_all(tokens_file, character_file, dt):
 
 def main():
     print("Starting...")
-    for characters in fetch_all('charfetch/tokens.yaml', 'charfetch/characters.yaml', datetime.datetime):
+    config = load_yaml_file('config.yaml')
+    for characters in fetch_all(config['api'], config['characters'], datetime.datetime):
         print("Write rows to csv...")
         with open('characters.csv', 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerows(characters)
+        print("Sync")
+        os.system('rsync -razq characters.csv {}'.format(config['server']))
         print("Sleep")
         time.sleep(20)
         print("Do next fetch")

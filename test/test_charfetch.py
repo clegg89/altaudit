@@ -87,47 +87,19 @@ def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data,
     mock_get_azerite_info.assert_called_once_with('Items', 9, 'Blizzard_API', 'us')
 
 @pytest.fixture
-def fake_token_file():
-    return 'fake_tokens.yaml'
-
-@pytest.fixture
-def fake_characters_file():
-    return 'fake_characters.yaml'
-
-@pytest.fixture
 def fake_tokens():
     return { 'blizzard' : { 'client_id' : 'CLIENT_ID', 'client_secret' : 'CLIENT_SECRET' } }
 
 @pytest.fixture
-def fake_load_yaml(mocker, fake_token_file, fake_characters_file, fake_tokens, fake_char_yaml):
-    def _fake_load(fileName):
-        if fileName == fake_token_file:
-            return fake_tokens
-        elif fileName == fake_characters_file:
-            return fake_char_yaml
-        else:
-            raise Exception('load_yaml_file called with unrecognized file: {}'.format(fileName))
+def fake_server():
+    return '192.168.1.1:/var/www/html'
 
+@pytest.fixture
+def fake_load_yaml(mocker, fake_tokens, fake_char_yaml, fake_server):
     fake = mocker.patch('charfetch.charfetch.load_yaml_file')
-    fake.side_effect = _fake_load
+    fake.return_value = {'api' : fake_tokens, 'characters' : fake_char_yaml, 'server' : fake_server }
 
     return fake
-
-def test_fake_load_yaml_tokens(fake_load_yaml, fake_token_file, fake_tokens):
-    result = charfetch.charfetch.load_yaml_file(fake_token_file)
-
-    fake_load_yaml.assert_called_once_with(fake_token_file)
-    assert result == fake_tokens
-
-def test_fake_load_yaml_characters(fake_load_yaml, fake_characters_file, fake_char_yaml):
-    result = charfetch.charfetch.load_yaml_file(fake_characters_file)
-
-    fake_load_yaml.assert_called_once_with(fake_characters_file)
-    assert result == fake_char_yaml
-
-def test_fake_load_yaml_unknown(fake_load_yaml):
-    with pytest.raises(Exception):
-        result = charfetch.charfetch.load_yaml_file('unknown.yaml')
 
 @pytest.fixture
 def mock_blizzard_api(mocker):
@@ -152,7 +124,7 @@ class Counter:
         self.index += 1
         return self.index
 
-def test_charfetch_fetch_all_character_info(mock_blizzard_api, fake_load_yaml, fake_token_file, fake_characters_file, fake_char_yaml, mock_get_all_character_info, mocker):
+def test_charfetch_fetch_all_character_info(mock_blizzard_api, fake_tokens, fake_char_yaml, mock_get_all_character_info, mocker):
     characters = charfetch.utility.convert_to_char_list(fake_char_yaml)
     g = Counter()
     mock_datetime = mocker.MagicMock()
@@ -169,7 +141,7 @@ Actual: {}, {}, {}.""".format(characters, g.index, mock_blizzard_api, character,
     expected_result = [i for i in range(0,len(characters))]
     mock_get_all_character_info.side_effect = _char_info
 
-    result = charfetch.fetch_all(fake_token_file, fake_characters_file, mock_datetime)
+    result = charfetch.fetch_all(fake_tokens, fake_char_yaml, mock_datetime)
 
     assert next(result) == expected_result
     assert next(result) == expected_result
@@ -186,35 +158,49 @@ def mock_csv(mocker):
 def mock_sleep(mocker):
     return mocker.patch('charfetch.charfetch.time.sleep')
 
-def test_main(mock_fetch_all, mock_csv, mock_sleep, mocker):
-    fake_rows = [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]
+@pytest.fixture
+def mock_os(mocker):
+    return mocker.patch('charfetch.charfetch.os.system')
+
+def test_main(mock_fetch_all, mock_csv, mock_sleep, mock_os, fake_load_yaml, mocker):
+    "Not exactly the best UnitTest setup, but this is the top-level"
+    fake_rows = [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]] # A fake result from fetch_all
     mock_fetch_all.return_value = iter(fake_rows)
     m = mocker.patch('charfetch.charfetch.open', mocker.mock_open())
     manager = mocker.Mock()
 
+    # We use a manager so that we can assure sleep and open were called in correct order
     manager.attach_mock(m, 'open')
     manager.attach_mock(mock_sleep, 'sleep')
 
     charfetch.main()
 
+    "Verify load_yaml_file was called properly"
+    fake_load_yaml.assert_called_once_with('config.yaml')
+
+    "Verify fetch_all was called with proper arguments"
+    mock_fetch_all.assert_called_once()
+    args = mock_fetch_all.call_args[0]
+    assert fake_load_yaml.return_value['api'] == args[0]
+    assert fake_load_yaml.return_value['characters'] == args[1]
+    assert datetime.datetime == args[2]
+
+    "Verify that open was called with proper arguments"
     open_call_args = ['characters.csv', 'w']
     open_call_kwargs = { 'newline' : '' }
     open_call = mocker.call(*open_call_args, **open_call_kwargs)
     assert m.call_count == 2
     assert m.call_args_list == [open_call, open_call]
 
-    mock_fetch_all.assert_called_once()
-    args = mock_fetch_all.call_args[0]
-    assert 'tokens.yaml' in args[0]
-    assert 'characters.yaml' in args[1]
-    assert datetime.datetime == args[2]
-
+    "Verify csv was called properly"
     writer_call = mocker.call(m.return_value)
+    # The call(). format is used for method calls to the object
     writerows_call = lambda x: mocker.call().writerows(fake_rows[x])
     mock_csv.writer.assert_has_calls([writer_call, writerows_call(0),
         writer_call, writerows_call(1)])
 
     "Verify that sleep is called after file is closed"
+    # Obtained the following by just observing what it should come out as
     manager.assert_has_calls([mocker.call.open(*open_call_args, **open_call_kwargs),
         mocker.call.open().__enter__(),
         mocker.call.open().__exit__(None, None, None),
@@ -223,3 +209,8 @@ def test_main(mock_fetch_all, mock_csv, mock_sleep, mocker):
         mocker.call.open().__enter__(),
         mocker.call.open().__exit__(None, None, None),
         mocker.call.sleep(20)])
+
+    "Verify rsync"
+    mock_os_call = mocker.call('rsync -razq characters.csv ' + fake_load_yaml.return_value['server'])
+    mock_os.call_count == 2
+    assert mock_os.call_args_list == [mock_os_call, mock_os_call]
