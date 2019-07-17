@@ -7,6 +7,7 @@
 Functions to get information about a character
 """
 from statistics import mean
+from .gem_enchant import gem_lookup, enchant_lookup
 
 def get_basic_info(profile, classes, races, region=''):
     mainspec = None
@@ -125,3 +126,7 @@ def get_azerite_info(items_dictionary, character_class, blizzard_api, region='us
         result.append(item_traits[slot])
 
     return result
+
+def get_audit_info(profile, blizzard_api, region='us'):
+    info = enchant_lookup[profile['items']['mainHand']['tooltipParams']['enchant']]
+    return [[profile['items']['mainHand']['tooltipParams']['enchant'], info['quality'], info['name'], info['description']]]
