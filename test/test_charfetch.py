@@ -149,8 +149,15 @@ Actual: {}, {}, {}.""".format(characters, g.index, mock_blizzard_api, character,
     assert next(result) == expected_result
 
 @pytest.fixture
-def mock_fetch_all(mocker):
-    return mocker.patch('charfetch.charfetch.fetch_all')
+def fake_rows():
+    return [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]
+
+@pytest.fixture
+def mock_fetch_all(mocker, fake_rows):
+    mock = mocker.patch('charfetch.charfetch.fetch_all')
+    mock.return_value = iter(fake_rows)
+
+    return mock
 
 @pytest.fixture
 def mock_csv(mocker):
@@ -164,45 +171,64 @@ def mock_sleep(mocker):
 def mock_os(mocker):
     return mocker.patch('charfetch.charfetch.os.system')
 
-def test_main(mock_fetch_all, mock_csv, mock_sleep, mock_os, fake_load_yaml, mocker):
-    "Not exactly the best UnitTest setup, but this is the top-level"
-    fake_rows = [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]] # A fake result from fetch_all
-    mock_fetch_all.return_value = iter(fake_rows)
-    m = mocker.patch('charfetch.charfetch.open', mocker.mock_open())
-    manager = mocker.Mock()
+@pytest.fixture
+def mock_charfetch_open(mocker):
+    return mocker.patch('charfetch.charfetch.open', mocker.mock_open())
 
-    # We use a manager so that we can assure sleep and open were called in correct order
-    manager.attach_mock(m, 'open')
-    manager.attach_mock(mock_sleep, 'sleep')
+def test_main_load_config_file(mock_fetch_all, mock_csv, mock_sleep, mock_os,
+        fake_load_yaml, mock_charfetch_open):
 
     charfetch.main()
 
-    "Verify load_yaml_file was called properly"
     fake_load_yaml.assert_called_once_with('config.yaml')
 
-    "Verify fetch_all was called with proper arguments"
+def test_main_fetch_all_called_correctly(mock_fetch_all, mock_csv, mock_sleep, mock_os,
+        fake_load_yaml, mock_charfetch_open):
+
+    charfetch.main()
+
     mock_fetch_all.assert_called_once()
     args = mock_fetch_all.call_args[0]
     assert fake_load_yaml.return_value['api'] == args[0]
     assert fake_load_yaml.return_value['characters'] == args[1]
     assert datetime.datetime == args[2]
 
-    "Verify that open was called with proper arguments"
+def test_main_open_called_properly(mock_fetch_all, mock_csv, mock_sleep, mock_os,
+        fake_load_yaml, mock_charfetch_open, mocker):
+
+    charfetch.main()
+
     open_call_args = ['characters.csv', 'w']
     open_call_kwargs = { 'newline' : '' }
     open_call = mocker.call(*open_call_args, **open_call_kwargs)
-    assert m.call_count == 2
-    assert m.call_args_list == [open_call, open_call]
+    assert mock_charfetch_open.call_count == 2
+    assert mock_charfetch_open.call_args_list == [open_call, open_call]
 
-    "Verify csv was called properly"
-    writer_call = mocker.call(m.return_value)
-    # The call(). format is used for method calls to the object
+def test_main_csv_called_properly(mock_fetch_all, fake_rows, mock_csv, mock_sleep, mock_os,
+        fake_load_yaml, mock_charfetch_open, mocker):
+
+    charfetch.main()
+
+    writer_call = mocker.call(mock_charfetch_open.return_value)
+    "The call(). format is used for method calls to the object"
     writerows_call = lambda x: mocker.call().writerows(fake_rows[x])
     mock_csv.writer.assert_has_calls([writer_call, writerows_call(0),
         writer_call, writerows_call(1)])
 
-    "Verify that sleep is called after file is closed"
-    # Obtained the following by just observing what it should come out as
+def test_main_open_sleep_called_properly(mock_fetch_all, mock_csv, mock_sleep, mock_os,
+        fake_load_yaml, mock_charfetch_open, mocker):
+
+    open_call_args = ['characters.csv', 'w']
+    open_call_kwargs = { 'newline' : '' }
+    manager = mocker.Mock()
+
+    "We use a manager so that we can assure sleep and open were called in correct order"
+    manager.attach_mock(mock_charfetch_open, 'open')
+    manager.attach_mock(mock_sleep, 'sleep')
+
+    charfetch.main()
+
+    "Obtained the following by just observing what it should come out as"
     manager.assert_has_calls([mocker.call.open(*open_call_args, **open_call_kwargs),
         mocker.call.open().__enter__(),
         mocker.call.open().__exit__(None, None, None),
@@ -212,7 +238,33 @@ def test_main(mock_fetch_all, mock_csv, mock_sleep, mock_os, fake_load_yaml, moc
         mocker.call.open().__exit__(None, None, None),
         mocker.call.sleep(20)])
 
-    "Verify rsync"
+def test_main_rsync_called(mock_fetch_all, mock_csv, mock_sleep, mock_os,
+        fake_load_yaml, mock_charfetch_open, mocker):
+
+    charfetch.main()
+
     mock_os_call = mocker.call('rsync -razq characters.csv ' + fake_load_yaml.return_value['server'])
     mock_os.call_count == 2
     assert mock_os.call_args_list == [mock_os_call, mock_os_call]
+
+def test_main_retry_if_exception(mock_fetch_all, fake_rows, mock_csv, mock_sleep, mock_os,
+        fake_load_yaml, mock_charfetch_open, mocker):
+
+    first_call = True
+    def _fail_first_call(api, characters, datetime):
+        nonlocal first_call
+        if first_call:
+            first_call = False
+            raise Exception('This is a fake exception')
+        else:
+            return mocker.DEFAULT
+
+    mock_fetch_all.side_effect = _fail_first_call
+
+    charfetch.main()
+
+    writer_call = mocker.call(mock_charfetch_open.return_value)
+    "The call(). format is used for method calls to the object"
+    writerows_call = lambda x: mocker.call().writerows(fake_rows[x])
+    mock_csv.writer.assert_has_calls([writer_call, writerows_call(0),
+        writer_call, writerows_call(1)])

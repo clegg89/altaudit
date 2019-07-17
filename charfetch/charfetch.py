@@ -38,9 +38,7 @@ def fetch_all(tokens, characters_yaml, dt):
 
         yield rows
 
-def main():
-    print("Starting...")
-    config = load_yaml_file('config.yaml')
+def _main(config):
     for characters in fetch_all(config['api'], config['characters'], datetime.datetime):
         print("Write rows to csv...")
         with open('characters.csv', 'w', newline='') as f:
@@ -51,3 +49,14 @@ def main():
         print("Sleep")
         time.sleep(20)
         print("Do next fetch")
+
+def main():
+    print("Starting...")
+    config = load_yaml_file('config.yaml')
+    while True:
+        try:
+            _main(config)
+        except Exception as e:
+            print(e)
+            continue
+        break
