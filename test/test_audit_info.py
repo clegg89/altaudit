@@ -112,6 +112,7 @@ def test_audit_info_gem_nominal():
 
 def test_audit_info_no_gems():
     profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 1, 'items' : {
+        'averageItemLevel' : 380,
         'back' : { 'tooltipParams' : {}},
         'wrist' : { 'tooltipParams' : {}},
         'finger2' : { 'tooltipParams' : {}}}}

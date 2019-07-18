@@ -9,6 +9,11 @@ Functions to get information about a character
 from statistics import mean
 from .gem_enchant import gem_lookup, enchant_lookup
 
+item_slots = ['head', 'neck', 'shoulder', 'back',
+        'chest', 'wrist', 'hands', 'waist',
+        'legs', 'feet', 'finger1', 'finger2',
+        'trinket1', 'trinket2', 'mainHand', 'offHand']
+
 def get_basic_info(profile, classes, races, region=''):
     mainspec = None
     for spec in profile['talents']:
@@ -39,14 +44,9 @@ def _get_item(item_dictionary):
         return [None, None, None, None, None]
 
 def get_all_items(items_dictionary):
-    slots = ['head', 'neck', 'shoulder', 'back',
-            'chest', 'wrist', 'hands', 'waist',
-            'legs', 'feet', 'finger1', 'finger2',
-            'trinket1', 'trinket2', 'mainHand', 'offHand']
-
     ilevels = {}
     items = []
-    for slot in slots:
+    for slot in item_slots:
         ilevels[slot] = items_dictionary[slot]['itemLevel'] if slot in items_dictionary else 0
         items.append(_get_item(items_dictionary[slot]) if slot in items_dictionary else _get_item(None))
 
@@ -157,7 +157,10 @@ def get_audit_info(profile, blizzard_api, region='us'):
     result.append(profile['audit']['emptySockets'])
 
     gem_audit = { 'id' : '', 'quality' : '', 'name' : '', 'icon' : '', 'stat' : '', 'slot' : '' }
-    for slot,item in profile['items'].items():
+    for slot in item_slots:
+        item = profile['items'][slot] if slot in profile['items'] else None
+        if not item:
+            continue
         if 'gem0' in item['tooltipParams']:
             gem_audit['slot'] += slot + '|'
             gem_id = item['tooltipParams']['gem0']
