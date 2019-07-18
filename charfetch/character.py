@@ -127,6 +127,56 @@ def get_azerite_info(items_dictionary, character_class, blizzard_api, region='us
 
     return result
 
+def _get_item_enchant(item):
+    if not item or 'enchant' not in item['tooltipParams']:
+        return [None, None, None, None]
+
+    enchant_id = item['tooltipParams']['enchant']
+    info = enchant_lookup[enchant_id] if enchant_id in enchant_lookup else { 'quality' : 0, 'name' : None, 'description' : None }
+
+    return [enchant_id, info['quality'], info['name'], info['description']]
+
+def _get_hand_enchant(item, faction):
+    enchant = _get_item_enchant(item)
+
+    prefix = 'Kul Tiran ' if faction == 0 else 'Zandalari ' if faction == 1 else ''
+    if enchant[2]:
+        enchant[2] = prefix + enchant[2]
+
+    return enchant
+
 def get_audit_info(profile, blizzard_api, region='us'):
-    info = enchant_lookup[profile['items']['mainHand']['tooltipParams']['enchant']]
-    return [[profile['items']['mainHand']['tooltipParams']['enchant'], info['quality'], info['name'], info['description']]]
+    result = []
+
+    result.append(_get_item_enchant(profile['items']['mainHand'] if 'mainHand' in profile['items'] else None))
+    result.append(_get_item_enchant(profile['items']['offHand'] if 'offHand' in profile['items'] else None))
+    result.append(_get_item_enchant(profile['items']['finger1'] if 'finger1' in profile['items'] else None))
+    result.append(_get_item_enchant(profile['items']['finger2'] if 'finger2' in profile['items'] else None))
+    result.append(_get_hand_enchant(profile['items']['hands'] if 'hands' in profile['items'] else None, profile['faction']))
+    result.append(_get_item_enchant(profile['items']['wrist'] if 'wrist' in profile['items'] else None))
+    result.append(profile['audit']['emptySockets'])
+
+    gem_audit = { 'id' : '', 'quality' : '', 'name' : '', 'icon' : '', 'stat' : '', 'slot' : '' }
+    for slot,item in profile['items'].items():
+        if 'gem0' in item['tooltipParams']:
+            gem_audit['slot'] += slot + '|'
+            gem_id = item['tooltipParams']['gem0']
+            if gem_id in gem_lookup:
+                gem_info = gem_lookup[gem_id]
+            else:
+                api_result = blizzard_api.get_item(region, gem_id, locale='en_US')
+                gem_info = { 'quality' : 0, 'name' : api_result['name'], 'icon' : api_result['icon'], 'stat' : api_result['gemInfo']['bonus']['name'] }
+            gem_audit['id'] += str(gem_id) + '|'
+            gem_audit['quality'] += str(gem_info['quality']) + '|'
+            gem_audit['name'] += str(gem_info['name']) + '|'
+            gem_audit['icon'] += str(gem_info['icon']) + '|'
+            gem_audit['stat'] += str(gem_info['stat']) + '|'
+
+    result.append([gem_audit['id'][:-1],
+        gem_audit['quality'][:-1],
+        gem_audit['name'][:-1],
+        gem_audit['icon'][:-1],
+        gem_audit['stat'][:-1],
+        gem_audit['slot'][:-1]])
+
+    return result
