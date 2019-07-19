@@ -12,6 +12,16 @@ import datetime
 
 import charfetch
 
+def test_internal_get_metadata(mocker):
+    mock_datetime = mocker.MagicMock()
+    mock_datetime.now.return_value = "Today's Date and Time"
+
+    result = charfetch.charfetch.get_metadata(mock_datetime)
+
+    mock_datetime.now.assert_called_once()
+    assert result[0] == mock_datetime.now.return_value
+    assert result[1] == charfetch.charfetch.VERSION
+
 @pytest.fixture
 def mock_load_or_fetch(mocker):
     def _mock_load_or_fetch(fileName, fetcher, now, *args, **kwargs):

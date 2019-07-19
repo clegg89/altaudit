@@ -15,6 +15,8 @@ import os
 from .utility import load_or_fetch, load_yaml_file, get_classes, get_races, get_char_data, flatten, convert_to_char_list
 from .character import get_basic_info, get_all_items, get_azerite_info, get_audit_info
 
+VERSION = 820
+
 def _get_all_character_info(character, now, blizzard_api):
     classes = load_or_fetch('classes.pkl', get_classes, now, blizzard_api)
     races = load_or_fetch('races.pkl', get_races, now, blizzard_api)
@@ -38,6 +40,9 @@ def fetch_all(tokens, characters_yaml, dt):
             rows.append(_get_all_character_info(character, dt.now(), api))
 
         yield rows
+
+def get_metadata(dt):
+    return [dt.now(), VERSION]
 
 def _main(config):
     for characters in fetch_all(config['api'], config['characters'], datetime.datetime):
