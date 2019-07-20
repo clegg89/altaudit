@@ -191,6 +191,13 @@ def mock_os(mocker):
 def mock_charfetch_open(mocker):
     return mocker.patch('charfetch.charfetch.open', mocker.mock_open())
 
+@pytest.fixture
+def mock_get_metadata(mocker):
+    mock = mocker.patch('charfetch.charfetch.get_metadata')
+    mock.return_value = ['The Date', 'Version']
+
+    return mock
+
 def test_main_load_config_file(mock_fetch_all, mock_csv, mock_sleep, mock_os,
         fake_load_yaml, mock_charfetch_open):
 
@@ -209,6 +216,13 @@ def test_main_fetch_all_called_correctly(mock_fetch_all, mock_csv, mock_sleep, m
     assert fake_load_yaml.return_value['characters'] == args[1]
     assert datetime.datetime == args[2]
 
+def test_main_get_metadata_called_correctly(mock_get_metadata, mock_fetch_all, mock_csv, mock_sleep, mock_os,
+        fake_load_yaml, mock_charfetch_open, mocker):
+
+    charfetch.main()
+
+    mock_get_metadata.assert_has_calls([mocker.call(datetime.datetime), mocker.call(datetime.datetime)])
+
 def test_main_open_called_properly(mock_fetch_all, mock_csv, mock_sleep, mock_os,
         fake_load_yaml, mock_charfetch_open, mocker):
 
@@ -220,16 +234,24 @@ def test_main_open_called_properly(mock_fetch_all, mock_csv, mock_sleep, mock_os
     assert mock_charfetch_open.call_count == 2
     assert mock_charfetch_open.call_args_list == [open_call, open_call]
 
-def test_main_csv_called_properly(mock_fetch_all, fake_rows, mock_csv, mock_sleep, mock_os,
+def test_main_csv_called_properly(mock_get_metadata, mock_fetch_all, fake_rows, mock_csv, mock_sleep, mock_os,
         fake_load_yaml, mock_charfetch_open, mocker):
 
     charfetch.main()
 
     writer_call = mocker.call(mock_charfetch_open.return_value)
+
+    metadata_call = mocker.call().writerow((mock_get_metadata.return_value))
+
     "The call(). format is used for method calls to the object"
     writerows_call = lambda x: mocker.call().writerows(fake_rows[x])
-    mock_csv.writer.assert_has_calls([writer_call, writerows_call(0),
-        writer_call, writerows_call(1)])
+
+    mock_csv.writer.assert_has_calls([writer_call,
+        metadata_call,
+        writerows_call(0),
+        writer_call,
+        metadata_call,
+        writerows_call(1)])
 
 def test_main_open_sleep_called_properly(mock_fetch_all, mock_csv, mock_sleep, mock_os,
         fake_load_yaml, mock_charfetch_open, mocker):
@@ -263,7 +285,7 @@ def test_main_rsync_called(mock_fetch_all, mock_csv, mock_sleep, mock_os,
     mock_os.call_count == 2
     assert mock_os.call_args_list == [mock_os_call, mock_os_call]
 
-def test_main_retry_if_exception(mock_fetch_all, fake_rows, mock_csv, mock_sleep, mock_os,
+def test_main_retry_if_exception(mock_get_metadata, mock_fetch_all, fake_rows, mock_csv, mock_sleep, mock_os,
         fake_load_yaml, mock_charfetch_open, mocker):
 
     first_call = True
@@ -280,7 +302,15 @@ def test_main_retry_if_exception(mock_fetch_all, fake_rows, mock_csv, mock_sleep
     charfetch.main()
 
     writer_call = mocker.call(mock_charfetch_open.return_value)
+
+    metadata_call = mocker.call().writerow(mock_get_metadata.return_value)
+
     "The call(). format is used for method calls to the object"
     writerows_call = lambda x: mocker.call().writerows(fake_rows[x])
-    mock_csv.writer.assert_has_calls([writer_call, writerows_call(0),
-        writer_call, writerows_call(1)])
+
+    mock_csv.writer.assert_has_calls([writer_call,
+        metadata_call,
+        writerows_call(0),
+        writer_call,
+        metadata_call,
+        writerows_call(1)])

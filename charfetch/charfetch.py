@@ -47,8 +47,10 @@ def get_metadata(dt):
 def _main(config):
     for characters in fetch_all(config['api'], config['characters'], datetime.datetime):
         print("Write rows to csv...")
+        metadata = get_metadata(datetime.datetime)
         with open('characters.csv', 'w', newline='') as f:
             writer = csv.writer(f)
+            writer.writerow(metadata)
             writer.writerows(characters)
         print("Sync")
         os.system('rsync -razq characters.csv {}'.format(config['server']))
