@@ -42,7 +42,7 @@ def fetch_all(tokens, characters_yaml, dt):
         yield rows
 
 def get_metadata(dt):
-    return [dt.now(), VERSION]
+    return [dt.utcnow(), VERSION]
 
 def _main(config):
     for characters in fetch_all(config['api'], config['characters'], datetime.datetime):

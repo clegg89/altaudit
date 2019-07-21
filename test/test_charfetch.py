@@ -14,12 +14,12 @@ import charfetch
 
 def test_internal_get_metadata(mocker):
     mock_datetime = mocker.MagicMock()
-    mock_datetime.now.return_value = "Today's Date and Time"
+    mock_datetime.utcnow.return_value = "Today's Date and Time"
 
     result = charfetch.charfetch.get_metadata(mock_datetime)
 
-    mock_datetime.now.assert_called_once()
-    assert result[0] == mock_datetime.now.return_value
+    mock_datetime.utcnow.assert_called_once()
+    assert result[0] == mock_datetime.utcnow.return_value
     assert result[1] == charfetch.charfetch.VERSION
 
 @pytest.fixture
