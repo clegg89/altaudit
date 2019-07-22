@@ -23,7 +23,7 @@ def _get_all_character_info(character, now, blizzard_api):
     profile = get_char_data(character, blizzard_api)['blizzard']
     community_profile = profile['community_profile']
 
-    return flatten([get_basic_info(community_profile, classes, races, character['region']),
+    return flatten([get_basic_info(community_profile, classes, races, character['realm'], character['region']),
                     get_all_items(community_profile['items']),
                     get_azerite_info(community_profile['items'],
                         community_profile['class'], blizzard_api, character['region']),

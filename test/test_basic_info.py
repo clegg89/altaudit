@@ -106,12 +106,12 @@ def test_basic_info_name(fake_profile_maker, classes, races):
 
 def test_basic_info_realm(fake_profile_maker, classes, races):
     profile = fake_profile_maker(realm="Zin'azshara")
-    result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[1] == "Zin'azshara"
+    result = get_basic_info(profile['data']['community_profile'], classes, races, 'testslug')
+    assert result[1] == "Zin'azshara|testslug"
 
 def test_basic_info_region(fake_profile_maker, classes, races):
     profile = fake_profile_maker()
-    result = get_basic_info(profile['data']['community_profile'], classes, races, 'us')
+    result = get_basic_info(profile['data']['community_profile'], classes, races, region='us')
     assert result[2] == 'us'
 
 def test_basic_info_timestamp(fake_profile_maker, classes, races):

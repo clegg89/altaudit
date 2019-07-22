@@ -76,7 +76,7 @@ def mock_get_audit_info(mocker):
     return mocker.patch('charfetch.charfetch.get_audit_info')
 
 def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data, mock_get_basic_info, mock_get_all_items, mock_get_azerite_info, mock_get_audit_info, mocker):
-    character = {'region' : 'us'}
+    character = {'realm' : 'testrealm', 'region' : 'us'}
     mock_get_char_data.return_value = { 'blizzard' : {
         'community_profile' : { 'items' : 'Items', 'class' : 9 }}}
 
@@ -99,7 +99,8 @@ def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data,
     mock_get_char_data.assert_called_once_with(character, 'Blizzard_API')
 
     mock_get_basic_info.assert_called_once_with(
-            mock_get_char_data.return_value['blizzard']['community_profile'], 'Classes', 'Races', 'us')
+            mock_get_char_data.return_value['blizzard']['community_profile'],
+            'Classes', 'Races', 'testrealm', 'us')
     mock_get_all_items.assert_called_once_with('Items')
     mock_get_azerite_info.assert_called_once_with('Items', 9, 'Blizzard_API', 'us')
     mock_get_audit_info.assert_called_once_with(mock_get_char_data.return_value['blizzard']['community_profile'], 'Blizzard_API', 'us')

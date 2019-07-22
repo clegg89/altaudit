@@ -14,7 +14,7 @@ item_slots = ['head', 'neck', 'shoulder', 'back',
         'legs', 'feet', 'finger1', 'finger2',
         'trinket1', 'trinket2', 'mainHand', 'offHand']
 
-def get_basic_info(profile, classes, races, region=''):
+def get_basic_info(profile, classes, races, realmslug='', region=''):
     mainspec = None
     for spec in profile['talents']:
         if 'selected' in spec and spec['selected']:
@@ -24,7 +24,7 @@ def get_basic_info(profile, classes, races, region=''):
     bust = avatar.replace('avatar', 'inset')
     render = avatar.replace('avatar', 'main')
 
-    return [profile['name'], profile['realm'], region,
+    return [profile['name'], '{}|{}'.format(profile['realm'],realmslug), region,
             profile['lastModified'], classes[profile['class']],
             profile['level'],
             mainspec,
