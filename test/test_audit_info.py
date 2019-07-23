@@ -31,7 +31,7 @@ def test_audit_info_mainhand_missing_enchant():
 
     result = get_audit_info(profile, None, 'us')
 
-    assert result[0] == [None, None, None, None]
+    assert result[0] == [None, 0, "None", None]
 
 def test_audit_info_mainhand_unrecognized_enchant():
     profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 1, 'items' : {
@@ -43,11 +43,27 @@ def test_audit_info_mainhand_unrecognized_enchant():
 
 def test_audit_info_offhand():
     profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 1, 'items' : {
-        'offHand' : { 'tooltipParams' : { 'enchant' : 5950 }}}}
+        'offHand' : { 'tooltipParams' : { 'enchant' : 5950 }, 'weaponInfo' : {}}}}
 
     result = get_audit_info(profile, None, 'us')
 
     assert result[1] == [5950, 4, "Gale-Force Striking", "Sometimes increase attack speed by 15% for 15 sec. when using melee or ranged attacks and abilities"]
+
+def test_audit_info_offhand_no_enchant_non_weapon():
+    profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 1, 'items' : {
+        'offHand' : { 'tooltipParams' : {}}}}
+
+    result = get_audit_info(profile, None, 'us')
+
+    assert result[1] == [None, None, None, None]
+
+def test_audit_info_offhand_no_enchant_weapon():
+    profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 1, 'items' : {
+        'offHand' : { 'tooltipParams' : {}, 'weaponInfo' : {}}}}
+
+    result = get_audit_info(profile, None, 'us')
+
+    assert result[1] == [None, 0, "None", None]
 
 def test_audit_info_finger1():
     profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 1, 'items' : {

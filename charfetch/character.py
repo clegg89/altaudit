@@ -129,7 +129,7 @@ def get_azerite_info(items_dictionary, character_class, blizzard_api, region='us
 
 def _get_item_enchant(item):
     if not item or 'enchant' not in item['tooltipParams']:
-        return [None, None, None, None]
+        return [None, 0, "None", None]
 
     enchant_id = item['tooltipParams']['enchant']
     info = enchant_lookup[enchant_id] if enchant_id in enchant_lookup else { 'quality' : 0, 'name' : None, 'description' : None }
@@ -149,7 +149,12 @@ def get_audit_info(profile, blizzard_api, region='us'):
     result = []
 
     result.append(_get_item_enchant(profile['items']['mainHand'] if 'mainHand' in profile['items'] else None))
-    result.append(_get_item_enchant(profile['items']['offHand'] if 'offHand' in profile['items'] else None))
+
+    if 'offHand' not in profile['items'] or 'weaponInfo' not in profile['items']['offHand']:
+        result.append([None, None, None, None])
+    else:
+        result.append(_get_item_enchant(profile['items']['offHand'] if 'offHand' in profile['items'] else None))
+
     result.append(_get_item_enchant(profile['items']['finger1'] if 'finger1' in profile['items'] else None))
     result.append(_get_item_enchant(profile['items']['finger2'] if 'finger2' in profile['items'] else None))
     result.append(_get_hand_enchant(profile['items']['hands'] if 'hands' in profile['items'] else None, profile['faction']))
