@@ -140,7 +140,7 @@ def _get_hand_enchant(item, faction):
     enchant = _get_item_enchant(item)
 
     prefix = 'Kul Tiran ' if faction == 0 else 'Zandalari ' if faction == 1 else ''
-    if enchant[2]:
+    if enchant[0] and enchant[2]:
         enchant[2] = prefix + enchant[2]
 
     return enchant

@@ -97,6 +97,14 @@ def test_audit_info_hand_alliance():
 
     assert result[4] == [5932, 4, "Kul Tiran Herbalism", "Increase the speed of herb gathering on Kul Tiras and Zandalar"]
 
+def test_audit_info_hand_no_enchant():
+    profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 0, 'items' : {
+        'hands' : { 'tooltipParams' : {}}}}
+
+    result = get_audit_info(profile, None, 'us')
+
+    assert result[4] == [None, 0, "None", None]
+
 def test_audit_info_wrist():
     profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 1, 'items' : {
         'wrist' : { 'tooltipParams' : { 'enchant' : 5936 }}}}
