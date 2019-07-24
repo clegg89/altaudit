@@ -13,7 +13,7 @@ import time
 import os
 
 from .utility import load_or_fetch, load_yaml_file, get_classes, get_races, get_char_data, flatten, convert_to_char_list
-from .character import get_basic_info, get_all_items, get_azerite_info, get_audit_info
+from .character import get_basic_info, get_all_items, get_azerite_info, get_audit_info, get_profession_info
 
 VERSION = 820
 
@@ -27,7 +27,8 @@ def _get_all_character_info(character, now, blizzard_api):
                     get_all_items(community_profile['items']),
                     get_azerite_info(community_profile['items'],
                         community_profile['class'], blizzard_api, character['region']),
-                    get_audit_info(community_profile, blizzard_api, character['region'])])
+                    get_audit_info(community_profile, blizzard_api, character['region']),
+                    get_profession_info(community_profile['professions'])])
 
 def fetch_all(tokens, characters_yaml, dt):
     api = WowApi(tokens['blizzard']['client_id'], tokens['blizzard']['client_secret'])

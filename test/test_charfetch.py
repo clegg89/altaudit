@@ -75,17 +75,22 @@ def mock_get_azerite_info(mocker):
 def mock_get_audit_info(mocker):
     return mocker.patch('charfetch.charfetch.get_audit_info')
 
-def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data, mock_get_basic_info, mock_get_all_items, mock_get_azerite_info, mock_get_audit_info, mocker):
+@pytest.fixture
+def mock_get_profession_info(mocker):
+    return mocker.patch('charfetch.charfetch.get_profession_info')
+
+def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data, mock_get_basic_info, mock_get_all_items, mock_get_azerite_info, mock_get_audit_info, mock_get_profession_info, mocker):
     character = {'realm' : 'testrealm', 'region' : 'us'}
     mock_get_char_data.return_value = { 'blizzard' : {
-        'community_profile' : { 'items' : 'Items', 'class' : 9 }}}
+        'community_profile' : { 'items' : 'Items', 'class' : 9, 'professions' : 'Professions' }}}
 
     mock_get_basic_info.return_value = ['Basic', 'Info']
     mock_get_all_items.return_value = ['All', 'Items']
     mock_get_azerite_info.return_value = [50, 10]
     mock_get_audit_info.return_value = [30, 40]
+    mock_get_profession_info.return_value = [20, 15]
 
-    expected_result = ['Basic', 'Info', 'All', 'Items', 50, 10, 30, 40]
+    expected_result = ['Basic', 'Info', 'All', 'Items', 50, 10, 30, 40, 20, 15]
 
     result = charfetch.charfetch._get_all_character_info(character, 'Now', 'Blizzard_API')
 
@@ -104,6 +109,7 @@ def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data,
     mock_get_all_items.assert_called_once_with('Items')
     mock_get_azerite_info.assert_called_once_with('Items', 9, 'Blizzard_API', 'us')
     mock_get_audit_info.assert_called_once_with(mock_get_char_data.return_value['blizzard']['community_profile'], 'Blizzard_API', 'us')
+    mock_get_profession_info.assert_called_once_with('Professions')
 
 @pytest.fixture
 def fake_tokens():
