@@ -11,6 +11,8 @@ import csv
 import datetime
 import time
 import os
+import sys
+import traceback
 
 from .utility import load_or_fetch, load_yaml_file, get_classes, get_races, get_char_data, flatten, convert_to_char_list
 from .character import get_basic_info, get_all_items, get_azerite_info, get_audit_info, get_profession_info
@@ -65,7 +67,7 @@ def main():
     while True:
         try:
             _main(config)
-        except Exception as e:
-            print(e)
+        except Exception:
+            traceback.print_exc(file=sys.stdout)
             continue
         break
