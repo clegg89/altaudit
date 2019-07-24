@@ -189,6 +189,41 @@ def get_audit_info(profile, blizzard_api, region='us'):
 
     return result
 
-def get_profession_info(professions_data, faction, region='us'):
-    return [["Herbalism", 'trade_herbalism', '150+300'], ['Mining', 'inv_pick_02', '122+300'],
-            ["Cooking", 'inv_misc_food_15', '0+300'], ["Fishing", 'trade_fishing', '0+300'], ["Archaeology", 'trade_archaeology', '0+950']]
+def _get_expac_string(expacs):
+    expac_prefixes = ['', 'Outland', 'Northrend', 'Cataclysm', 'Pandaria', 'Draenor', 'Legion', 'Kul Tiran']
+
+    expac_list = ['0+0|' if expac not in expacs else '{}|'.format(expacs[expac]) for expac in expac_prefixes]
+
+    return ''.join(expac_list)[:-1]
+
+def get_profession_info(professions_data):
+    # Classic has no prefix, and BfA is always Kul Tiran
+
+    professions = {}
+    for prof_type in ['primary', 'secondary']:
+        professions[prof_type] = {}
+        for prof in professions_data[prof_type]:
+            prof_name = prof['name'].split(' ')
+            name = prof_name[-1]
+            expac = ' '.join(prof_name[:-1])
+            rank = prof['rank']
+            max_rank = prof['max'] if not expac == 'Kul Tiran' else 175
+
+            if name not in professions[prof_type]:
+                professions[prof_type][name] = { 'icon' : prof['icon'], 'expacs' : {} }
+
+            professions[prof_type][name]['expacs'][expac] = '{}+{}'.format(rank, max_rank)
+
+    result = [[name, primary['icon'],
+        _get_expac_string(primary['expacs'])] for name,primary in professions['primary'].items()]
+
+    while len(result) < 2:
+        result.append(['', '', '0+0|0+0|0+0|0+0|0+0|0+0|0+0|0+0'])
+
+    result += [[secondary, professions['secondary'][secondary]['icon'],
+        _get_expac_string(professions['secondary'][secondary]['expacs'])]
+        for secondary in ['Cooking', 'Fishing', 'Archaeology']]
+
+    result[4][2] = result[4][2].split('|')[0] # Archaeology doesn't have expacs
+
+    return result
