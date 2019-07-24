@@ -25,8 +25,8 @@ def test_profession_info_simple_primaries():
 
     primaries = [result[0], result[1]]
 
-    assert ["Herbalism", 'trade_herbalism', '150+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
-    assert ["Mining", 'inv_pick_02', '122+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
+    assert ["Herbalism", 'trade_herbalism', [[150,300],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]] in primaries
+    assert ["Mining", 'inv_pick_02', [[122,300],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]] in primaries
 
 def test_profession_info_simple_secondaries():
     data = { 'primary' : [
@@ -41,9 +41,9 @@ def test_profession_info_simple_secondaries():
 
     result = get_profession_info(data)
 
-    assert ["Cooking", 'inv_misc_food_15', '0+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] == result[2]
-    assert ["Fishing", 'trade_fishing', '0+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] == result[3]
-    assert ["Archaeology", 'trade_archaeology', '0+950'] == result[4]
+    assert ["Cooking", 'inv_misc_food_15', [[0,300],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]] == result[2]
+    assert ["Fishing", 'trade_fishing', [[0,300],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]] == result[3]
+    assert ["Archaeology", 'trade_archaeology', [[0,950]]] == result[4]
 
 def test_profession_info_primaries_all_expacs():
     data = { 'primary' : [
@@ -74,8 +74,8 @@ def test_profession_info_primaries_all_expacs():
 
     primaries = [result[0], result[1]]
 
-    assert ["Tailoring", 'trade_tailoring', '300+300|75+75|75+75|75+75|75+75|100+100|100+100|175+175'] in primaries
-    assert ["Enchanting", 'trade_engraving', '300+300|75+75|75+75|75+75|75+75|100+100|100+100|175+175'] in primaries
+    assert ["Tailoring", 'trade_tailoring', [[300,300],[75,75],[75,75],[75,75],[75,75],[100,100],[100,100],[175,175]]] in primaries
+    assert ["Enchanting", 'trade_engraving', [[300,300],[75,75],[75,75],[75,75],[75,75],[100,100],[100,100],[175,175]]] in primaries
 
 def test_profession_info_secondaries_all_expacs():
     data = { 'primary' : [
@@ -104,9 +104,9 @@ def test_profession_info_secondaries_all_expacs():
 
     result = get_profession_info(data)
 
-    assert ["Cooking", 'inv_misc_food_15', '300+300|75+75|75+75|75+75|75+75|5+100|1+100|175+175'] == result[2]
-    assert ["Fishing", 'trade_fishing', '300+300|75+75|75+75|75+75|75+75|1+100|1+100|65+175'] == result[3]
-    assert ["Archaeology", 'trade_archaeology', '600+950'] == result[4]
+    assert ["Cooking", 'inv_misc_food_15', [[300,300],[75,75],[75,75],[75,75],[75,75],[5,100],[1,100],[175,175]]] == result[2]
+    assert ["Fishing", 'trade_fishing', [[300,300],[75,75],[75,75],[75,75],[75,75],[1,100],[1,100],[65,175]]] == result[3]
+    assert ["Archaeology", 'trade_archaeology', [[600,950]]] == result[4]
 
 def test_profession_info_primaries_missing_expacs():
     data = { 'primary' : [
@@ -133,8 +133,8 @@ def test_profession_info_primaries_missing_expacs():
 
     primaries = [result[0], result[1]]
 
-    assert ["Tailoring", 'trade_tailoring', '300+300|75+75|75+75|75+75|75+75|100+100|100+100|175+175'] in primaries
-    assert ["Enchanting", 'trade_engraving', '300+300|0+0|0+0|0+0|0+0|100+100|100+100|175+175'] in primaries
+    assert ["Tailoring", 'trade_tailoring', [[300,300],[75,75],[75,75],[75,75],[75,75],[100,100],[100,100],[175,175]]] in primaries
+    assert ["Enchanting", 'trade_engraving', [[300,300],[0,0],[0,0],[0,0],[0,0],[100,100],[100,100],[175,175]]] in primaries
 
 def test_professions_info_missing_primary():
     data  = { 'primary' : [
@@ -151,8 +151,8 @@ def test_professions_info_missing_primary():
 
     primaries = [result[0], result[1]]
 
-    assert ["Mining", 'inv_pick_02', '8+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
-    assert ['', '', '0+0|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
+    assert ["Mining", 'inv_pick_02', [[8,300],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]] in primaries
+    assert ['', '', [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]] in primaries
 
 def test_profession_info_primaries_missing_icon():
     data = { 'primary' : [
@@ -169,5 +169,5 @@ def test_profession_info_primaries_missing_icon():
 
     primaries = [result[0], result[1]]
 
-    assert ["Herbalism", 'trade_herbalism', '150+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
-    assert ["Engineering", '', '1+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
+    assert ["Herbalism", 'trade_herbalism', [[150,300],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]] in primaries
+    assert ["Engineering", '', [[1,300],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]] in primaries

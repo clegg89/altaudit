@@ -189,12 +189,10 @@ def get_audit_info(profile, blizzard_api, region='us'):
 
     return result
 
-def _get_expac_string(expacs):
+def _get_expac_list(expacs):
     expac_prefixes = ['', 'Outland', 'Northrend', 'Cataclysm', 'Pandaria', 'Draenor', 'Legion', 'Kul Tiran']
 
-    expac_list = ['0+0|' if expac not in expacs else '{}|'.format(expacs[expac]) for expac in expac_prefixes]
-
-    return ''.join(expac_list)[:-1]
+    return [expacs[expac] if expac in expacs else [0,0] for expac in expac_prefixes]
 
 def get_profession_info(professions_data):
     # Classic has no prefix, and BfA is always Kul Tiran
@@ -214,18 +212,18 @@ def get_profession_info(professions_data):
                         'icon' : prof['icon'] if 'icon' in prof else '',
                         'expacs' : {} }
 
-            professions[prof_type][name]['expacs'][expac] = '{}+{}'.format(rank, max_rank)
+            professions[prof_type][name]['expacs'][expac] = [rank, max_rank]
 
-    result = [[name, primary['icon'],
-        _get_expac_string(primary['expacs'])] for name,primary in professions['primary'].items()]
+    result = [[name, primary['icon'], _get_expac_list(primary['expacs'])]
+        for name,primary in professions['primary'].items()]
 
     while len(result) < 2:
-        result.append(['', '', '0+0|0+0|0+0|0+0|0+0|0+0|0+0|0+0'])
+        result.append(['', '', [[0,0]]*8])
 
     result += [[secondary, professions['secondary'][secondary]['icon'],
-        _get_expac_string(professions['secondary'][secondary]['expacs'])]
+        _get_expac_list(professions['secondary'][secondary]['expacs'])]
         for secondary in ['Cooking', 'Fishing', 'Archaeology']]
 
-    result[4][2] = result[4][2].split('|')[0] # Archaeology doesn't have expacs
+    result[4][2] = [result[4][2][0]] # Archaeology doesn't have expacs
 
     return result
