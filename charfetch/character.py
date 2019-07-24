@@ -188,3 +188,7 @@ def get_audit_info(profile, blizzard_api, region='us'):
         gem_audit['slot'][:-1]])
 
     return result
+
+def get_profession_info(professions_data, faction, region='us'):
+    return [["Herbalism", 'trade_herbalism', '150+300'], ['Mining', 'inv_pick_02', '122+300'],
+            ["Cooking", 'inv_misc_food_15', '0+300'], ["Fishing", 'trade_fishing', '0+300'], ["Archaeology", 'trade_archaeology', '0+950']]
