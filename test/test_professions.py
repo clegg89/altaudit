@@ -153,3 +153,21 @@ def test_professions_info_missing_primary():
 
     assert ["Mining", 'inv_pick_02', '8+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
     assert ['', '', '0+0|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
+
+def test_profession_info_primaries_missing_icon():
+    data = { 'primary' : [
+                { 'id' : 182, 'name' : "Herbalism", 'icon' : 'trade_herbalism', 'rank' : 150, 'max' : 300 },
+                { 'id' : 202, 'name' : "Engineering", 'rank' : 1, 'max' : 300 }
+            ],
+            'secondary' : [
+                { 'id' : 356, 'name' : "Fishing", 'icon' : 'trade_fishing', 'rank' : 0, 'max' : 300 },
+                { 'id' : 185, 'name' : "Cooking", 'icon' : 'inv_misc_food_15', 'rank' : 0, 'max' : 300 },
+                { 'id' : 794, 'name' : "Archaeology", 'icon' : 'trade_archaeology', 'rank' : 0, 'max' : 950 }
+            ]}
+
+    result = get_profession_info(data)
+
+    primaries = [result[0], result[1]]
+
+    assert ["Herbalism", 'trade_herbalism', '150+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries
+    assert ["Engineering", '', '1+300|0+0|0+0|0+0|0+0|0+0|0+0|0+0'] in primaries

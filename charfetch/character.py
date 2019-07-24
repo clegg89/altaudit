@@ -210,7 +210,9 @@ def get_profession_info(professions_data):
             max_rank = prof['max'] if not expac == 'Kul Tiran' else 175
 
             if name not in professions[prof_type]:
-                professions[prof_type][name] = { 'icon' : prof['icon'], 'expacs' : {} }
+                professions[prof_type][name] = {
+                        'icon' : prof['icon'] if 'icon' in prof else '',
+                        'expacs' : {} }
 
             professions[prof_type][name]['expacs'][expac] = '{}+{}'.format(rank, max_rank)
 
