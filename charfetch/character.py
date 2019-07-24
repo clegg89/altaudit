@@ -24,7 +24,7 @@ def get_basic_info(profile, classes, races, realmslug='', region=''):
     bust = avatar.replace('avatar', 'inset')
     render = avatar.replace('avatar', 'main')
 
-    return [profile['name'], '{}|{}'.format(profile['realm'],realmslug), region,
+    return [profile['name'], realmslug, profile['realm'], region,
             profile['lastModified'], classes[profile['class']],
             profile['level'],
             mainspec,

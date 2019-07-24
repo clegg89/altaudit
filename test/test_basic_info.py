@@ -104,65 +104,70 @@ def test_basic_info_name(fake_profile_maker, classes, races):
     result = get_basic_info(profile['data']['community_profile'], classes, races)
     assert result[0] == 'tony'
 
-def test_basic_info_realm(fake_profile_maker, classes, races):
+def test_basic_info_realm_slug(fake_profile_maker, classes, races):
     profile = fake_profile_maker(realm="Zin'azshara")
     result = get_basic_info(profile['data']['community_profile'], classes, races, 'testslug')
-    assert result[1] == "Zin'azshara|testslug"
+    assert result[1] == "testslug"
+
+def test_basic_info_realm(fake_profile_maker, classes, races):
+    profile = fake_profile_maker(realm="Zin'azshara")
+    result = get_basic_info(profile['data']['community_profile'], classes, races)
+    assert result[2] == "Zin'azshara"
 
 def test_basic_info_region(fake_profile_maker, classes, races):
     profile = fake_profile_maker()
     result = get_basic_info(profile['data']['community_profile'], classes, races, region='us')
-    assert result[2] == 'us'
+    assert result[3] == 'us'
 
 def test_basic_info_timestamp(fake_profile_maker, classes, races):
     now = datetime.datetime.now().timestamp()*1000
     profile = fake_profile_maker(timestamp=now)
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[3] == now
+    assert result[4] == now
 
 def test_basic_info_class(fake_profile_maker, classes, races):
     kls = 10
     profile = fake_profile_maker(kls=kls)
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[4] == profile['results']['class']
+    assert result[5] == profile['results']['class']
 
 def test_basic_info_level(fake_profile_maker, classes, races):
     profile = fake_profile_maker(level=45)
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[5] == 45
+    assert result[6] == 45
 
 def test_basic_info_mainspec(fake_profile_maker, classes, races):
     profile = fake_profile_maker(mainspec='Shadow')
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[6] == 'Shadow'
+    assert result[7] == 'Shadow'
 
 def test_basic_info_faction(fake_profile_maker, classes, races):
     profile = fake_profile_maker()
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[7] == 'Alliance'
+    assert result[8] == 'Alliance'
 
 def test_basic_info_gender(fake_profile_maker, classes, races):
     profile = fake_profile_maker(gender=1)
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[8] == 'Female'
+    assert result[9] == 'Female'
 
 def test_basic_info_race(fake_profile_maker, classes, races):
     race = 32
     profile = fake_profile_maker()
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[9] == profile['results']['race']
+    assert result[10] == profile['results']['race']
 
 def test_basic_info_avatar(fake_profile_maker, classes, races):
     profile = fake_profile_maker()
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[10] == profile['results']['avatar_url']
+    assert result[11] == profile['results']['avatar_url']
 
 def test_basic_info_bust(fake_profile_maker, classes, races):
     profile = fake_profile_maker()
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[11] == profile['results']['bust_url']
+    assert result[12] == profile['results']['bust_url']
 
 def test_basic_info_render(fake_profile_maker, classes, races):
     profile = fake_profile_maker()
     result = get_basic_info(profile['data']['community_profile'], classes, races)
-    assert result[12] == profile['results']['render_url']
+    assert result[13] == profile['results']['render_url']
