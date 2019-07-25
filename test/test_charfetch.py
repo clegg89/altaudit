@@ -89,6 +89,7 @@ def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data,
         'community_profile' : {
             'items' : 'Items',
             'class' : 9,
+            'faction' : 1,
             'professions' : 'Professions',
             'reputation' : 'Reputations' }}}
 
@@ -119,7 +120,7 @@ def test_internal_get_all_character_info(mock_load_or_fetch, mock_get_char_data,
     mock_get_azerite_info.assert_called_once_with('Items', 9, 'Blizzard_API', 'us')
     mock_get_audit_info.assert_called_once_with(mock_get_char_data.return_value['blizzard']['community_profile'], 'Blizzard_API', 'us')
     mock_get_profession_info.assert_called_once_with('Professions')
-    mock_get_reputation_info.assert_called_once_with('Reputations')
+    mock_get_reputation_info.assert_called_once_with('Reputations', 1)
 
 @pytest.fixture
 def fake_tokens():

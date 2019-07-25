@@ -31,7 +31,7 @@ def _get_all_character_info(character, now, blizzard_api):
                         community_profile['class'], blizzard_api, character['region']),
                     get_audit_info(community_profile, blizzard_api, character['region']),
                     get_profession_info(community_profile['professions']),
-                    get_reputation_info(community_profile['reputation'])])
+                    get_reputation_info(community_profile['reputation'], community_profile['faction'])])
 
 def fetch_all(tokens, characters_yaml, dt):
     api = WowApi(tokens['blizzard']['client_id'], tokens['blizzard']['client_secret'])
