@@ -230,8 +230,8 @@ def get_profession_info(professions_data):
 
 def get_reputation_info(reputation_data, faction):
     reputations = {
-                0 : [2160, 2162, 2161, 2159, 2164, 2163, 2373, 2391],
-                1 : [2103, 2156, 2158, 2157, 2164, 2163, 2400, 2391]
+                0 : [2160, 2162, 2161, 2159, 2164, 2163, 2400, 2391],
+                1 : [2103, 2156, 2158, 2157, 2164, 2163, 2373, 2391]
             }
 
     result = ''
