@@ -227,3 +227,20 @@ def get_profession_info(professions_data):
     result[4][2] = [result[4][2][0]] # Archaeology doesn't have expacs
 
     return result
+
+def get_reputation_info(reputation_data, faction):
+    reputations = {
+                0 : [2160, 2162, 2161, 2159, 2164, 2163, 2373, 2391],
+                1 : [2103, 2156, 2158, 2157, 2164, 2163, 2400, 2391]
+            }
+
+    result = ''
+    for rep in reputations[faction]:
+        data = next((d for (i, d) in enumerate(reputation_data) if d['id'] == rep), None)
+        if data:
+            result += '{}+{}+{}+{}+{}|'.format(data['id'], data['name'], data['standing'],
+                    data['value'], data['max'])
+        else:
+            result += '++++|'
+
+    return result[:-1]
