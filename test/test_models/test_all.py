@@ -1,8 +1,6 @@
 """Unit Tests for all models"""
 import pytest
 
-import os
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -10,13 +8,10 @@ from charfetch.models import Base, Region, Realm, Character
 
 @pytest.fixture
 def db():
-    path = os.path.dirname(os.path.realpath(__file__))
-    db_path = '{}/test.db'.format(path)
-    engine = create_engine("sqlite:///{}".format(db_path))
+    engine = create_engine("sqlite://")
     Base.metadata.create_all(engine)
     yield engine
     Base.metadata.drop_all(engine)
-    os.remove(db_path)
 
 @pytest.fixture
 def db_session(db):
