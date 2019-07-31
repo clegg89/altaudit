@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from charfetch.models import Base, Region, Realm, Character
+from charfetch.models import Base, Region, Realm, Character, Snapshot
 
 @pytest.fixture
 def db():
@@ -90,3 +90,11 @@ def test_add_character_realm(db_session):
     db_session.add(clegg)
 
     assert kj == db_session.query(Realm).filter_by(name="Kil'jaeden").join(Character).filter_by(name="clegg").first()
+
+def test_add_snapshots_to_character(db_session):
+    clegg = Character(name='clegg')
+    s1 = Snapshot(year=2019, week=30, world_quests_complete=10)
+    s2 = Snapshot(year=2019, week=31, world_quests_complete=4)
+    clegg.snapshots = [s1, s2]
+
+    db_session.add(clegg)

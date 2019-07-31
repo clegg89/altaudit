@@ -35,3 +35,14 @@ class Character(Base):
 
     for k,v in CHARACTER_HEADER_FIELDS.items():
         exec('{} = Column({})'.format(k,v))
+
+    snapshots = relationship('Snapshot', backref='character')
+
+class Snapshot(Base):
+    __tablename__ = 'snapshots'
+
+    id = Column(Integer, primary_key=True)
+    character_id = Column(Integer,  ForeignKey('characters.id'))
+    year = Column(Integer)
+    week = Column(Integer)
+    world_quests_complete = Column(Integer)
