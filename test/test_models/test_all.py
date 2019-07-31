@@ -6,15 +6,17 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from charfetch.models import Base, Region, Realm
+from charfetch.models import Base, Region, Realm, Character
 
 @pytest.fixture
 def db():
     path = os.path.dirname(os.path.realpath(__file__))
-    engine = create_engine("sqlite:///{}/test.db".format(path))
+    db_path = '{}/test.db'.format(path)
+    engine = create_engine("sqlite:///{}".format(db_path))
     Base.metadata.create_all(engine)
     yield engine
     Base.metadata.drop_all(engine)
+    os.remove(db_path)
 
 @pytest.fixture
 def db_session(db):
@@ -66,3 +68,30 @@ def test_add_realm_region(db_session):
     db_session.add(kj)
 
     assert us == db_session.query(Region).filter_by(name='US').join(Realm).filter_by(name="Kil'jaeden").first()
+
+def test_add_realm_character(db_session):
+    kj = Realm(name="Kil'jaeden", slug='kiljaeden')
+    clegg = Character(name="clegg")
+
+    kj.characters.append(clegg)
+
+    db_session.add(kj)
+
+    assert clegg == db_session.query(Character).filter_by(name="clegg").join(Realm).filter_by(name="Kil'jaeden").first()
+
+def test_add_character(db_session):
+    clegg = Character(name='clegg')
+
+    db_session.add(clegg)
+
+    assert clegg == db_session.query(Character).filter_by(name='clegg').first()
+
+def test_add_character_realm(db_session):
+    clegg = Character(name='clegg')
+    kj = Realm(name="Kil'jaeden", slug='kiljaeden')
+
+    clegg.realm = kj
+
+    db_session.add(clegg)
+
+    assert kj == db_session.query(Realm).filter_by(name="Kil'jaeden").join(Character).filter_by(name="clegg").first()

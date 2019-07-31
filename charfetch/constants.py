@@ -27,7 +27,7 @@ CHARACTER_HEADER_FIELDS = {
     'avatar' : 'String',
     'bust' : 'String',
     'render' : 'String',
-    'estimated_ilvl' : 'Numeric',
+    'estimated_ilvl' : 'Float',
 
     **{'{}_{}'.format(slot, item[0]) : item[1]
         for slot in ITEM_SLOTS
@@ -75,7 +75,7 @@ CHARACTER_HEADER_FIELDS = {
     'dungeons_total' : 'Integer',
     'dungeons_each_total' : 'String',
     'dungeons_weekly' : 'Integer',
-    'raiderio_score' : 'Numeric',
+    'raiderio_score' : 'Float',
     'mplus_weekly_highest' : 'Integer',
     'mplus_season_highest' : 'Integer',
 
