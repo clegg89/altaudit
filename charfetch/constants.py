@@ -17,69 +17,73 @@ EXPACS = [
 
 "Column Headers and their database types"
 CHARACTER_HEADER_FIELDS = {
-    'lastmodified' : 'Integer',
-    'klass' : 'String',
-    'level' : 'Integer',
-    'mainspec' : 'String',
-    'faction' : 'String',
-    'gender' : 'String',
-    'race' : 'String',
-    'avatar' : 'String',
-    'bust' : 'String',
-    'render' : 'String',
-    'estimated_ilvl' : 'Float',
+    'name' : 'Column(Integer)',
+    'realm_name' : "association_proxy('realm', 'name')",
+    'realm_slug' : "association_proxy('realm', 'slug')",
+    'region_name' : "association_proxy('realm', 'region_name')",
+    'lastmodified' : 'Column(Integer)',
+    'class_name' : "association_proxy('character_class', 'name')",
+    'level' : 'Column(Integer)',
+    'mainspec' : 'Column(String)',
+    'faction' : 'Column(String)',
+    'gender' : 'Column(String)',
+    'race' : 'Column(String)',
+    'avatar' : 'Column(String)',
+    'bust' : 'Column(String)',
+    'render' : 'Column(String)',
+    'estimated_ilvl' : 'Column(Float)',
 
     **{'{}_{}'.format(slot, item[0]) : item[1]
         for slot in ITEM_SLOTS
         for item in [
-            ('ilvl','Integer'),
-            ('id', 'Integer'),
-            ('name', 'String'),
-            ('icon', 'String'),
-            ('quality', 'Integer')]},
+            ('ilvl','Column(Integer)'),
+            ('id', 'Column(Integer)'),
+            ('name', 'Column(String)'),
+            ('icon', 'Column(String)'),
+            ('quality', 'Column(Integer)')]},
 
-    'hoa_level' : 'Integer',
-    'azerite_experience' : 'Integer',
-    'azerite_experience_remaining' : 'Integer',
-    'azerite_this_week' : 'Integer',
+    'hoa_level' : 'Column(Integer)',
+    'azerite_experience' : 'Column(Integer)',
+    'azerite_experience_remaining' : 'Column(Integer)',
+    'azerite_this_week' : 'Column(Integer)',
 
-    **{'{}_tier{}_{}'.format(piece, tier, field) : 'String'
+    **{'{}_tier{}_{}'.format(piece, tier, field) : 'Column(String)'
         for piece in ['head', 'shoulder', 'chest']
         for tier in range(5)
         for field in ['available', 'selected']},
 
     **{'{}_enchant_{}'.format(slot, field[0]) : field[1]
         for slot in ['mainHand', 'offHand', 'finger1', 'finger2', 'hand', 'wrist']
-        for field in [('id', 'Integer'), ('quality', 'Integer'), ('name', 'String'), ('description', 'String')]},
+        for field in [('id', 'Column(Integer)'), ('quality', 'Column(Integer)'), ('name', 'Column(String)'), ('description', 'Column(String)')]},
 
-    'empty_sockets' : 'Integer',
+    'empty_sockets' : 'Column(Integer)',
 
-    **{'gem_{}'.format(field) : 'String'
+    **{'gem_{}'.format(field) : 'Column(String)'
         for field in ['ids', 'qualities', 'names', 'icons', 'stats', 'slots']},
 
     **{'{}_{}'.format(prof, field[0]) : field[1]
         for prof in ['primary1', 'primary2', 'cooking', 'fishing']
-        for field in [('name', 'String'), ('icon', 'String'),
-            *[('{}_{}'.format(expac, f), 'Integer')
+        for field in [('name', 'Column(String)'), ('icon', 'Column(String)'),
+            *[('{}_{}'.format(expac, f), 'Column(Integer)')
                 for expac in EXPACS for f in ['level', 'max']]]},
 
     **{'archaeology_{}'.format(field[0]) : field[1] for field in
-        [('name', 'String'), ('icon', 'String'), ('level', 'Integer'), ('max', 'Integer')]},
+        [('name', 'Column(String)'), ('icon', 'Column(String)'), ('level', 'Column(Integer)'), ('max', 'Column(Integer)')]},
 
-    'reputations' : 'String',
-    'island_weekly_done' : 'String',
-    'islands_total' : 'Integer',
-    'world_quests_total' : 'Integer',
-    'world_quests_weekly' : 'Integer',
-    'weekly_event_done' : 'String',
-    'dungeons_total' : 'Integer',
-    'dungeons_each_total' : 'String',
-    'dungeons_weekly' : 'Integer',
-    'raiderio_score' : 'Float',
-    'mplus_weekly_highest' : 'Integer',
-    'mplus_season_highest' : 'Integer',
+    'reputations' : 'Column(String)',
+    'island_weekly_done' : 'Column(String)',
+    'islands_total' : 'Column(Integer)',
+    'world_quests_total' : 'Column(Integer)',
+    'world_quests_weekly' : 'Column(Integer)',
+    'weekly_event_done' : 'Column(String)',
+    'dungeons_total' : 'Column(Integer)',
+    'dungeons_each_total' : 'Column(String)',
+    'dungeons_weekly' : 'Column(Integer)',
+    'raiderio_score' : 'Column(Float)',
+    'mplus_weekly_highest' : 'Column(Integer)',
+    'mplus_season_highest' : 'Column(Integer)',
 
-    **{'raids_{}'.format(difficulty) : 'String'
+    **{'raids_{}'.format(difficulty) : 'Column(String)'
         for difficulty in ['lfr', 'nromal', 'heroic', 'mythic']}
 }
 

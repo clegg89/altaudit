@@ -12,6 +12,14 @@ class Base(object):
 
 Base = declarative_base(cls=Base)
 
+class Class(Base):
+    __tablename__ = 'classes'
+
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
 class Region(Base):
     __tablename__ = 'regions'
 
@@ -19,6 +27,8 @@ class Region(Base):
 
     realms = relationship('Realm', backref='region')
 
+    def __init__(self, name):
+        self.name = name
 
 class Realm(Base):
     __tablename__ = 'realms'
@@ -27,16 +37,24 @@ class Realm(Base):
     name = Column(String)
     slug = Column(String)
 
+    region_name = association_proxy('region', 'name')
     characters = relationship('Character', backref='realm')
+
+    def __init__(self, name, slug, region=None):
+        self.name = name
+        self.slug = slug
+        if region:
+            self.region = region
 
 class Character(Base):
     __tablename__ = 'characters'
 
     realm_id = Column(Integer, ForeignKey('realms.id'))
-    name = Column(String)
+    class_id = Column(Integer, ForeignKey('classes.id'))
+    character_class = relationship('Class')
 
     for k,v in CHARACTER_HEADER_FIELDS.items():
-        exec('{} = Column({})'.format(k,v))
+        exec('{} = {}'.format(k,v))
 
     years = relationship("Year", backref='character',
             collection_class=attribute_mapped_collection('year'))
@@ -48,6 +66,14 @@ class Character(Base):
 
     snapshots = association_proxy('years', 'snapshots',
             creator=_creator)
+
+    def __init__(self, name, **kwargs):
+        self.name = name
+
+        for k,v in kwargs.items():
+            if k in CHARACTER_HEADER_FIELDS or \
+            hasattr(self, k):
+                self.__setattr__(k, v)
 
 class Year(Base):
     __tablename__ = 'years'
