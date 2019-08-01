@@ -27,7 +27,7 @@ CHARACTER_HEADER_FIELDS = {
     'mainspec' : 'Column(String)',
     'faction' : 'Column(String)',
     'gender' : 'Column(String)',
-    'race' : 'Column(String)',
+    'race_name' : "association_proxy('race', 'name')",
     'avatar' : 'Column(String)',
     'bust' : 'Column(String)',
     'render' : 'Column(String)',

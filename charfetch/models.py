@@ -17,15 +17,28 @@ class Class(Base):
 
     name = Column(String)
 
-    def __init__(self, name):
+    def __init__(self, name, id=None):
         self.name = name
+        if id:
+            self.id = id
+
+class Race(Base):
+    __tablename__ = 'races'
+
+    name = Column(String)
+
+    def __init__(self, name, id=None):
+        self.name = name
+        if id:
+            self.id = id
 
 class Region(Base):
     __tablename__ = 'regions'
 
     name = Column(String)
 
-    realms = relationship('Realm', backref='region')
+    realms = relationship('Realm', backref='region',
+            cascade='all, delete, delete-orphan')
 
     def __init__(self, name):
         self.name = name
@@ -38,7 +51,8 @@ class Realm(Base):
     slug = Column(String)
 
     region_name = association_proxy('region', 'name')
-    characters = relationship('Character', backref='realm')
+    characters = relationship('Character', backref='realm',
+            cascade='all, delete, delete-orphan')
 
     def __init__(self, name, slug, region=None):
         self.name = name
@@ -51,13 +65,16 @@ class Character(Base):
 
     realm_id = Column(Integer, ForeignKey('realms.id'))
     class_id = Column(Integer, ForeignKey('classes.id'))
+    race_id = Column(Integer, ForeignKey('races.id'))
     character_class = relationship('Class')
+    race = relationship('Race')
 
     for k,v in CHARACTER_HEADER_FIELDS.items():
         exec('{} = {}'.format(k,v))
 
     years = relationship("Year", backref='character',
-            collection_class=attribute_mapped_collection('year'))
+            collection_class=attribute_mapped_collection('year'),
+            cascade='all, delete, delete-orphan')
 
     def _creator(k, v):
         y = Year(k)
@@ -84,7 +101,8 @@ class Year(Base):
     __table_args__ = (UniqueConstraint('character_id', 'year'),)
 
     weeks = relationship('Week', backref='year',
-            collection_class=attribute_mapped_collection('week'))
+            collection_class=attribute_mapped_collection('week'),
+            cascade='all, delete, delete-orphan')
 
     def _creator(k, v):
         w = Week(k)
@@ -105,7 +123,8 @@ class Week(Base):
 
     __table_args__ = (UniqueConstraint('year_id', 'week'),)
 
-    snapshot = relationship("Snapshot", uselist=False, backref='week')
+    snapshot = relationship("Snapshot", uselist=False, backref='week',
+            cascade='all, delete, delete-orphan')
 
     def __init__(self, week):
         self.week = week

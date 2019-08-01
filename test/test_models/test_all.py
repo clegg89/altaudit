@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from charfetch.models import Base, Class, Region, Realm, Character, Year, Week, Snapshot
+from charfetch.models import Base, Class, Race, Region, Realm, Character, Year, Week, Snapshot
 
 @pytest.fixture
 def db():
@@ -24,6 +24,9 @@ def db_session(db):
 def test_create_class_table(db):
     assert db.has_table('classes')
 
+def test_create_race_table(db):
+    assert db.has_table('races')
+
 def test_create_region_table(db):
     assert db.has_table('regions')
 
@@ -34,11 +37,18 @@ def test_create_character_table(db):
     assert db.has_table('characters')
 
 def test_create_class(db_session):
-    warlock = Class('Warlock')
+    warlock = Class('Warlock', id=9)
 
     db_session.add(warlock)
 
-    assert warlock == db_session.query(Class).filter_by(name='Warlock').first()
+    assert warlock == db_session.query(Class).filter_by(id=9).first()
+
+def test_create_race(db_session):
+    undead = Race('Undead', id=5)
+
+    db_session.add(undead)
+
+    assert undead == db_session.query(Race).filter_by(id=5).first()
 
 def test_add_region(db_session):
     us = Region(name='US')
@@ -112,7 +122,6 @@ def test_add_character_class(db_session):
 
     db_session.add(clegg)
 
-    print(db_session.query(Class).all())
     assert "Warlock" == db_session.query(Class).filter_by(name="Warlock").first().name
 
 def test_add_character_class_back_populate(db_session):
@@ -125,6 +134,13 @@ def test_add_character_class_back_populate(db_session):
     lookup.name = 'Warrior'
 
     assert clegg.character_class.name == 'Warrior'
+
+def test_add_character_race(db_session):
+    clegg = Character('clegg', race=Race('Undead'))
+
+    db_session.add(clegg)
+
+    assert 'Undead' == db_session.query(Race).filter_by(name="Undead").first().name
 
 def test_add_character_constructor(db_session):
     clegg = Character('clegg', level=120)
@@ -146,3 +162,40 @@ def test_add_snapshots_to_character(db_session):
                                 .join(Week).filter_by(week=3)\
                                 .join(Year).filter_by(year=2019)\
                                 .join(Character).filter_by(name='clegg').first()
+
+def test_delete_region_cascade_realms(db_session):
+    us = Region('us')
+    eu = Region('eu')
+
+    db_session.add(us)
+    db_session.add(eu)
+
+    kj = Realm("Kil'jaeden", 'kiljaeden', us)
+    lb = Realm("Lightbringer", 'lightbringer', us)
+    ad = Realm('Argent Dawn', 'argentdawn', eu)
+
+    db_session.commit()
+
+    db_session.delete(us)
+
+    assert [ad] == db_session.query(Realm).all()
+
+def test_delete_region_cascade_characters(db_session):
+    us = Region('us')
+    eu = Region('eu')
+
+    db_session.add(us)
+    db_session.add(eu)
+
+    kj = Realm("Kil'jaeden", 'kiljaeden', us)
+    lb = Realm("Lightbringer", 'lightbringer', us)
+    ad = Realm('Argent Dawn', 'argentdawn', eu)
+
+    clegg = Character('clegg', realm=kj)
+    tali = Character('tali', realm=ad)
+
+    db_session.commit()
+
+    db_session.delete(us)
+
+    assert [tali] == db_session.query(Character).all()
