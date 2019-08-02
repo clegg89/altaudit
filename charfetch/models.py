@@ -133,3 +133,6 @@ class Snapshot(Base):
     __tablename__ = 'snapshots'
 
     week_id = Column(Integer, ForeignKey('weeks.id'), nullable=False)
+    world_quests = Column(Integer)
+    dungeons = Column(Integer)
+    azerite_power = Column(Integer)

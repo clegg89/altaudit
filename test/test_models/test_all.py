@@ -153,6 +153,9 @@ def test_add_character_constructor(db_session):
 def test_add_snapshots_to_character(db_session):
     clegg = Character(name='clegg')
     s1 = Snapshot()
+    s1.world_quests = 10
+    s1.dungeons = 20
+    s1.azerite_power = 1500
     clegg.snapshots[2019] = {}
     clegg.snapshots[2019][3] = s1
 
