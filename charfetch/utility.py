@@ -10,8 +10,6 @@ import datetime
 import yaml
 import pickle
 
-_STORED_OBJ = {}
-
 def flatten(l):
     """ Recursively convert a list of lists to a single flat list """
     output = []
