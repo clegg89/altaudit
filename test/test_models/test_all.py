@@ -124,6 +124,18 @@ def test_add_character_class(db_session):
 
     assert "Warlock" == db_session.query(Class).filter_by(name="Warlock").first().name
 
+def test_character_class_by_id(db_session):
+    warlock = Class('Warlock', id=9)
+
+    db_session.add(warlock)
+
+    clegg = Character('clegg', class_id=9)
+
+    db_session.add(clegg)
+    db_session.flush()
+
+    assert clegg.class_name == 'Warlock'
+
 def test_add_character_class_back_populate(db_session):
     wl = Class('Warlock')
     clegg = Character('clegg', character_class=wl)
