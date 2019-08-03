@@ -147,6 +147,44 @@ def test_add_character_class_back_populate(db_session):
 
     assert clegg.character_class.name == 'Warrior'
 
+def test_character_class_delete_does_not_propogate(db_session):
+    wl = Class('warlock', id=9)
+    clegg = Character('clegg', character_class=wl)
+
+    db_session.add(wl)
+    db_session.add(clegg)
+    db_session.commit()
+    db_session.close()
+
+    db_session.delete(wl)
+    db_session.commit()
+    db_session.close()
+
+    assert 9 == db_session.query(Character).first().class_id
+    assert None == db_session.query(Character).first().character_class
+    assert None == db_session.query(Character).first().class_name
+
+def test_character_class_readd_works(db_session):
+    wl = Class('warlock', id=9)
+    clegg = Character('clegg', character_class=wl)
+
+    db_session.add(wl)
+    db_session.add(clegg)
+    db_session.commit()
+    db_session.close()
+
+    db_session.delete(wl)
+    db_session.commit()
+    db_session.close()
+
+    newwl = Class('warlock', id=9)
+    db_session.add(newwl)
+    db_session.commit()
+    db_session.close()
+
+    assert 9 == db_session.query(Character).first().class_id
+    assert 'warlock' == db_session.query(Character).first().class_name
+
 def test_add_character_race(db_session):
     clegg = Character('clegg', race=Race('Undead'))
 
