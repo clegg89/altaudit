@@ -80,38 +80,38 @@ def test_add_region(db_session):
 
 def test_add_region_realm(db_session):
     us = Region(name='US')
-    kj = Realm(name="Kil'jaeden", slug='kiljaeden')
+    kj = Realm('kiljaeden')
 
     us.realms.append(kj)
 
     db_session.add(us)
 
-    assert kj == db_session.query(Realm).filter_by(name="Kil'jaeden").join(Region).filter_by(name='US').first()
+    assert kj == db_session.query(Realm).filter_by(name="kiljaeden").join(Region).filter_by(name='US').first()
 
 def test_add_realm(db_session):
-    kj = Realm(name="Kil'jaeden", slug='kiljaeden')
+    kj = Realm('kiljaeden')
     db_session.add(kj)
 
-    assert kj == db_session.query(Realm).filter_by(name="Kil'jaeden").filter_by(slug='kiljaeden').first()
+    assert kj == db_session.query(Realm).filter_by(name='kiljaeden').first()
 
 def test_add_realm_region(db_session):
-    kj = Realm(name="Kil'jaeden", slug='kiljaeden')
+    kj = Realm('kiljaeden')
     us = Region(name='US')
 
     kj.region = us
 
     db_session.add(kj)
-    assert us == db_session.query(Region).filter_by(name='US').join(Realm).filter_by(name="Kil'jaeden").first()
+    assert us == db_session.query(Region).filter_by(name='US').join(Realm).filter_by(name="kiljaeden").first()
 
 def test_add_realm_character(db_session):
-    kj = Realm(name="Kil'jaeden", slug='kiljaeden')
+    kj = Realm('kiljaeden')
     clegg = Character(name="clegg")
 
     kj.characters.append(clegg)
 
     db_session.add(kj)
 
-    assert clegg == db_session.query(Character).filter_by(name="clegg").join(Realm).filter_by(name="Kil'jaeden").first()
+    assert clegg == db_session.query(Character).filter_by(name="clegg").join(Realm).filter_by(name="kiljaeden").first()
 
 def test_add_character(db_session):
     clegg = Character(name='clegg')
@@ -122,17 +122,17 @@ def test_add_character(db_session):
 
 def test_add_character_realm(db_session):
     clegg = Character(name='clegg')
-    kj = Realm(name="Kil'jaeden", slug='kiljaeden')
+    kj = Realm('kiljaeden')
 
     clegg.realm = kj
 
     db_session.add(clegg)
 
-    assert kj == db_session.query(Realm).filter_by(name="Kil'jaeden").join(Character).filter_by(name="clegg").first()
+    assert kj == db_session.query(Realm).filter_by(name="kiljaeden").join(Character).filter_by(name="clegg").first()
 
 def test_character_realm_region(db_session):
     us = Region('us')
-    kj = Realm("Kil'jaeden", 'kiljaeden', us)
+    kj = Realm('kiljaeden', us)
     clegg = Character('clegg', realm=kj)
 
     assert clegg.region_name == 'us'
@@ -253,9 +253,9 @@ def test_delete_region_cascade_realms(db_session):
     db_session.add(us)
     db_session.add(eu)
 
-    kj = Realm("Kil'jaeden", 'kiljaeden', us)
-    lb = Realm("Lightbringer", 'lightbringer', us)
-    ad = Realm('Argent Dawn', 'argentdawn', eu)
+    kj = Realm('kiljaeden', us)
+    lb = Realm('lightbringer', us)
+    ad = Realm('argentdawn', eu)
 
     db_session.commit()
 
@@ -270,9 +270,9 @@ def test_delete_region_cascade_characters(db_session):
     db_session.add(us)
     db_session.add(eu)
 
-    kj = Realm("Kil'jaeden", 'kiljaeden', us)
-    lb = Realm("Lightbringer", 'lightbringer', us)
-    ad = Realm('Argent Dawn', 'argentdawn', eu)
+    kj = Realm('kiljaeden', us)
+    lb = Realm('lightbringer', us)
+    ad = Realm('argentdawn', eu)
 
     clegg = Character('clegg', realm=kj)
     tali = Character('tali', realm=ad)

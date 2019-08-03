@@ -18,8 +18,8 @@ EXPACS = [
 "Column Headers and their database types"
 CHARACTER_HEADER_FIELDS = {
     'name' : 'Column(Integer)',
-    'realm_name' : "association_proxy('realm', 'name')",
-    'realm_slug' : "association_proxy('realm', 'slug')",
+    'realm_name' : "Column(Integer)",
+    'realm_slug' : "association_proxy('realm', 'name')",
     'region_name' : "association_proxy('realm', 'region_name')",
     'lastmodified' : 'Column(Integer)',
     'class_name' : "association_proxy('character_class', 'name')",

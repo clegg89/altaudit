@@ -64,15 +64,13 @@ class Realm(Base):
 
     region_id = Column(Integer, ForeignKey('regions.id'))
     name = Column(String)
-    slug = Column(String)
 
     region_name = association_proxy('region', 'name')
     characters = relationship('Character', backref='realm',
             cascade='all, delete, delete-orphan')
 
-    def __init__(self, name, slug, region=None):
+    def __init__(self, name, region=None):
         self.name = name
-        self.slug = slug
         if region:
             self.region = region
 
