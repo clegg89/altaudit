@@ -22,8 +22,8 @@ class Class(Base):
         if id:
             self.id = id
 
-class Race(Base):
-    __tablename__ = 'races'
+class Faction(Base):
+    __tablename__ = 'factions'
 
     name = Column(String)
 
@@ -31,6 +31,22 @@ class Race(Base):
         self.name = name
         if id:
             self.id = id
+
+class Race(Base):
+    __tablename__ = 'races'
+
+    faction_id = Column(Integer, ForeignKey('factions.id'))
+    name = Column(String)
+
+    faction = relationship('Faction')
+    faction_name = association_proxy('faction', 'name')
+
+    def __init__(self, name, **kwargs):
+        self.name = name
+
+        for k,v in kwargs.items():
+            if hasattr(self, k):
+                self.__setattr__(k, v)
 
 class Region(Base):
     __tablename__ = 'regions'
@@ -65,8 +81,10 @@ class Character(Base):
 
     realm_id = Column(Integer, ForeignKey('realms.id'))
     class_id = Column(Integer, ForeignKey('classes.id'))
+    faction_id = Column(Integer, ForeignKey('factions.id'))
     race_id = Column(Integer, ForeignKey('races.id'))
     character_class = relationship('Class')
+    faction = relationship('Faction')
     race = relationship('Race')
 
     for k,v in CHARACTER_HEADER_FIELDS.items():

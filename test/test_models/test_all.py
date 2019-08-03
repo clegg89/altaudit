@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from charfetch.models import Base, Class, Race, Region, Realm, Character, Year, Week, Snapshot
+from charfetch.models import Base, Faction, Class, Race, Region, Realm, Character, Year, Week, Snapshot
 
 @pytest.fixture
 def db():
@@ -23,6 +23,9 @@ def db_session(db):
 
 def test_create_class_table(db):
     assert db.has_table('classes')
+
+def test_create_faction_table(db):
+    assert db.has_table('factions')
 
 def test_create_race_table(db):
     assert db.has_table('races')
@@ -43,12 +46,29 @@ def test_create_class(db_session):
 
     assert warlock == db_session.query(Class).filter_by(id=9).first()
 
+def test_create_faction(db_session):
+    horde = Faction('horde')
+
+    db_session.add(horde)
+
+    assert horde == db_session.query(Faction).first()
+
 def test_create_race(db_session):
     undead = Race('Undead', id=5)
 
     db_session.add(undead)
 
     assert undead == db_session.query(Race).filter_by(id=5).first()
+
+def test_race_faction(db_session):
+    horde = Faction('horde', id=1)
+    undead = Race('undead', faction=horde)
+
+    db_session.add(horde)
+    db_session.add(undead)
+    db_session.commit()
+
+    assert 1 == db_session.query(Race).first().faction_id
 
 def test_add_region(db_session):
     us = Region(name='US')
@@ -184,6 +204,16 @@ def test_character_class_readd_works(db_session):
 
     assert 9 == db_session.query(Character).first().class_id
     assert 'warlock' == db_session.query(Character).first().class_name
+
+def test_character_faction(db_session):
+    horde = Faction('horde', id=1)
+    clegg = Character('clegg', faction=horde)
+
+    db_session.add(clegg)
+    db_session.commit()
+    db_session.close()
+
+    assert 'horde' == db_session.query(Character).first().faction_name
 
 def test_add_character_race(db_session):
     clegg = Character('clegg', race=Race('Undead'))
