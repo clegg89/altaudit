@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from charfetch.audit import Audit
 
-from charfetch.models import Faction, Class, Race
+from charfetch.models import Faction, Class, Race, Region, Realm, Character
 
 wow_classes = {'classes': [
     {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
@@ -155,3 +155,32 @@ class TestAuditInit:
         assert races[32] == ['Kul Tiran', 'Alliance']
         assert races[34] == ['Dark Iron Dwarf', 'Alliance']
         assert races[36] == ["Mag'har Orc", 'Horde']
+
+    def test_regions_added(self, db_session):
+        query = db_session.query(Region).all()
+        regions = [r.name for r in query]
+
+        assert 'us' in regions
+        assert 'eu' in regions
+
+    def test_realms_added(self, db_session):
+        query = db_session.query(Realm).all()
+        realms = [{'name' : r.name, 'region' : r.region_name} for r in query]
+
+        assert {'name' : 'kiljaeden', 'region' : 'us'} in realms
+        assert {'name' : 'lightbringer', 'region' : 'us'} in realms
+        assert {'name' : 'argentdawn', 'region' : 'eu'} in realms
+
+    def test_characters_added(self, db_session):
+        query = db_session.query(Character).all()
+        characters = [{'name' : c.name, 'realm' : c.realm_slug, 'region' : c.region_name} for c in query]
+
+        assert {'name' : 'clegg', 'realm' : 'kiljaeden', 'region' : 'us'} in characters
+        assert {'name' : 'salvorhardin', 'realm' : 'kiljaeden', 'region' : 'us'} in characters
+        assert {'name' : 'darksidemoon', 'realm' : 'kiljaeden', 'region' : 'us'} in characters
+        assert {'name' : 'clegg', 'realm' : 'lightbringer', 'region' : 'us'} in characters
+        assert {'name' : 'klegg', 'realm' : 'lightbringer', 'region' : 'us'} in characters
+        assert {'name' : 'ingsok', 'realm' : 'lightbringer', 'region' : 'us'} in characters
+        assert {'name' : 'tali', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
+        assert {'name' : 'jack', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
+        assert {'name' : 'bill', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
