@@ -102,32 +102,34 @@ class TestAuditInit:
 
     def test_factions_made(self, db_session):
         query = db_session.query(Faction)
+        factions = {f.id : f.name for f in query.all()}
 
         assert query.count() == 3
-        assert query.filter_by(id=1).first().name == 'Alliance'
-        assert query.filter_by(id=2).first().name == 'Horde'
-        assert query.filter_by(id=3).first().name == 'Neutral'
+        assert factions[1] == 'Alliance'
+        assert factions[2] == 'Horde'
+        assert factions[3] == 'Neutral'
 
     def test_classes_retrieved(self, db_session):
         query = db_session.query(Class)
+        classes = {c.id : c.name for c in query.all()}
 
         assert query.count() == 12
-        assert query.filter_by(id=1).first().name == 'Warrior'
-        assert query.filter_by(id=2).first().name == 'Paladin'
-        assert query.filter_by(id=3).first().name == 'Hunter'
-        assert query.filter_by(id=4).first().name == 'Rogue'
-        assert query.filter_by(id=5).first().name == 'Priest'
-        assert query.filter_by(id=6).first().name == 'Death Knight'
-        assert query.filter_by(id=7).first().name == 'Shaman'
-        assert query.filter_by(id=8).first().name == 'Mage'
-        assert query.filter_by(id=9).first().name == 'Warlock'
-        assert query.filter_by(id=10).first().name == 'Monk'
-        assert query.filter_by(id=11).first().name == 'Druid'
-        assert query.filter_by(id=12).first().name == 'Demon Hunter'
+        assert classes[1] == 'Warrior'
+        assert classes[2] == 'Paladin'
+        assert classes[3] == 'Hunter'
+        assert classes[4] == 'Rogue'
+        assert classes[5] == 'Priest'
+        assert classes[6] == 'Death Knight'
+        assert classes[7] == 'Shaman'
+        assert classes[8] == 'Mage'
+        assert classes[9] == 'Warlock'
+        assert classes[10] == 'Monk'
+        assert classes[11] == 'Druid'
+        assert classes[12] == 'Demon Hunter'
 
     def test_races_retrieved(self, db_session):
         query = db_session.query(Race)
-        races = {f.id : [f.name, f.faction_name] for f in query.all()}
+        races = {r.id : [r.name, r.faction_name] for r in query.all()}
 
         assert query.count() == 23
         assert races[1] == ['Human', 'Alliance']
