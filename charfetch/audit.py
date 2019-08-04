@@ -27,18 +27,20 @@ class Audit:
 
         if session.query(Faction).count() != 3:
             session.query(Faction).delete()
-            for i,v in enumerate(['alliance', 'horde', 'neutral']):
+            for i,v in enumerate(['Alliance', 'Horde', 'Neutral']):
                 f = Faction(v, id=i+1)
                 session.add(f)
 
-        # session.query(Class).delete()
-        # session.query(Race).delete()
+        session.query(Class).delete()
+        session.query(Race).delete()
 
-        # classes = self.api.get_character_classes('us', locale='en_US')['classes']
-        # races = self.api.get_character_races('us', locale='en_US')['races']
+        classes = self.blizzard_api.get_character_classes('us', locale='en_US')['classes']
+        races = self.blizzard_api.get_character_races('us', locale='en_US')['races']
 
-        # session.add_all([Class(c['name'], id=c['id']) for c in classes])
-        # session.add_all([Race(r['name'], id=r['id']) for r in races])
+        fquery = session.query(Faction)
+        session.add_all([Class(c['name'], id=c['id']) for c in classes])
+        session.add_all([
+            Race(r['name'], id=r['id'], faction=fquery.filter_by(name=r['side'].capitalize()).first()) for r in races])
 
         # config_characters = [{'name' : character, 'realm' : realm, 'region' : region}
         #         for region,realms in config['characters'].items()
