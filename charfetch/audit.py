@@ -8,6 +8,17 @@ from wowapi import WowApi
 
 from .models import Base, Class, Faction, Race, Region, Realm, Character
 
+# class AuditCharacter(Character):
+#     "Extends the Character class to add in methods to process API responses"
+#     def process_blizzard(self, response, api):
+#         """
+#         Processes the response from blizzard's API for this character
+
+#         @param response The response from blizzard's api
+
+#         @param api The api object used to make the request
+#         """
+
 class Audit:
     """
     Top-Level class Responsible for managing the system.
@@ -105,5 +116,12 @@ class Audit:
             session.delete(r)
 
     def refresh(self):
-        "Refresh each character and write the result to the server"
-        pass
+        # "Refresh each character"
+        # session = sessionmaker(self.engine)()
+        # characters = session.query(AuditCharacter).all()
+        # for character in characters:
+        #     response = self.blizzard_api.get_character_profile(character.region_name,
+        #             character.realm_name, character.name, locale='en_US',
+        #             fields='statistics,talents,reputation,items,achievements,audit,professions,quests')
+        #     character.process_blizzard(response)
+            # Do the same for rio and wcl
