@@ -109,6 +109,14 @@ class TestAuditInit:
         assert factions[2] == 'Horde'
         assert factions[3] == 'Neutral'
 
+    def test_factions_remade(self, db_session):
+        db_session.add(Faction('junk', id=4))
+        db_session.commit()
+        self.audit._create_factions(db_session)
+
+        assert db_session.query(Faction).count() == 3
+        assert db_session.query(Faction).filter_by(name='junk').first() == None
+
     def test_classes_retrieved(self, db_session):
         query = db_session.query(Class)
         classes = {c.id : c.name for c in query.all()}
@@ -126,6 +134,14 @@ class TestAuditInit:
         assert classes[10] == 'Monk'
         assert classes[11] == 'Druid'
         assert classes[12] == 'Demon Hunter'
+
+    def test_old_classes_deleted(self, db_session):
+        db_session.add(Class('Tinkerer', id=14))
+        db_session.commit()
+        self.audit._create_classes(db_session)
+
+        assert db_session.query(Class).count() == 12
+        assert db_session.query(Class).filter_by(name='Tinkerer').first() == None
 
     def test_races_retrieved(self, db_session):
         query = db_session.query(Race)
@@ -156,6 +172,16 @@ class TestAuditInit:
         assert races[34] == ['Dark Iron Dwarf', 'Alliance']
         assert races[36] == ["Mag'har Orc", 'Horde']
 
+    def test_old_races_deleted(self, db_session):
+        db_session.add(Race('Voldunai',
+            id=14,
+            faction=db_session.query(Faction).filter_by(name='Horde').first()))
+        db_session.commit()
+        self.audit._create_races(db_session)
+
+        assert db_session.query(Race).count() == 23
+        assert db_session.query(Race).filter_by(name='Voldunai').first() == None
+
     def test_regions_added(self, db_session):
         query = db_session.query(Region).all()
         regions = [r.name for r in query]
@@ -184,3 +210,19 @@ class TestAuditInit:
         assert {'name' : 'tali', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
         assert {'name' : 'jack', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
         assert {'name' : 'bill', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
+
+    def test_remove_old_characters(self, db_session):
+        db_session.add(Character('jack',
+            realm=db_session.query(Realm).filter_by(name='kiljaeden').first()))
+        db_session.commit()
+        self.audit._remove_old_characters(db_session, self.config['characters'])
+
+        assert db_session.query(Character).filter_by(name='jack').first() == None
+
+    def test_add_missing_characters(self, db_session):
+        clegg = db_session.query(Character).filter_by(name='clegg').join(Realm).filter_by(name='kiljaeden').first()
+        db_session.delete(clegg)
+        db_session.commit()
+        self.audit._add_missing_characters(db_session, self.config['characters'])
+
+        assert db_session.query(Character).filter_by(name='clegg').join(Realm).filter_by(name='kiljaeden').first().name == 'clegg'
