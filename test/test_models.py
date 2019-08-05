@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from charfetch.models import Base, Faction, Class, Race, Region, Realm, Character, Year, Week, Snapshot
+from altaudit.models import Base, Faction, Class, Race, Region, Realm, Character, Year, Week, Snapshot
 
 @pytest.fixture
 def db():

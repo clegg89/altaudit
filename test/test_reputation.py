@@ -8,7 +8,7 @@ Unit Tests for Reputations
 """
 import pytest
 
-from charfetch import get_reputation_info
+from altaudit import get_reputation_info
 
 def test_reputation_info_proudmoore():
     data = [{'id' : 2160, 'name' : "Proudmoore Admiralty", 'standing' : 7, 'value' : 0, 'max' : 0}]

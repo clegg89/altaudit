@@ -8,8 +8,8 @@ Unit tests for character Azerite info
 """
 import pytest
 
-from charfetch import get_azerite_info
-from charfetch.character import _get_trait_info, _get_item_traits, _get_azerite_item_info
+from altaudit import get_azerite_info
+from altaudit.character import _get_trait_info, _get_item_traits, _get_azerite_item_info
 
 def test_get_trait_info_None():
     result = _get_trait_info(None, None)
@@ -165,14 +165,14 @@ def mock_get_trait_info(mocker):
     def _fake_get_trait_info(trait, api, region='us'):
         return str(trait['id'])
 
-    mock = mocker.patch('charfetch.character._get_trait_info')
+    mock = mocker.patch('altaudit.character._get_trait_info')
     mock.side_effect = _fake_get_trait_info
 
     return mock
 
 @pytest.fixture
 def mock_get_item_traits(mocker, fake_azerite_item_class_powers):
-    mock = mocker.patch('charfetch.character._get_item_traits')
+    mock = mocker.patch('altaudit.character._get_item_traits')
     mock.return_value = fake_azerite_item_class_powers['azeriteClassPowers']['9']
 
     return mock
@@ -233,7 +233,7 @@ def test_get_azerite_info_neck_no_azerite_items(empty_azerite_item):
 
 @pytest.fixture
 def mock_get_azerite_item_info(mocker):
-     mock = mocker.patch('charfetch.character._get_azerite_item_info')
+     mock = mocker.patch('altaudit.character._get_azerite_item_info')
      mock.return_value = [
             ['13','13'],
             ['208|15','15'],

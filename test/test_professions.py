@@ -8,7 +8,7 @@ Unit Tests for Professions
 """
 import pytest
 
-from charfetch import get_profession_info
+from altaudit import get_profession_info
 
 def test_profession_info_simple_primaries():
     data = { 'primary' : [

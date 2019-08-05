@@ -14,8 +14,8 @@ testing them is moot. As long as that stays the same no further tests are needed
 
 import pytest
 
-import charfetch
-from charfetch import get_audit_info
+import altaudit
+from altaudit import get_audit_info
 
 def test_audit_info_mainhand():
     profile = { 'audit' : { 'emptySockets' : 0 }, 'faction' : 1, 'items' : {

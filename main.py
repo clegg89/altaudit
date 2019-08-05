@@ -9,6 +9,6 @@
 """
 
 """
-import charfetch
+import altaudit
 
-charfetch.main()
+altaudit.main()

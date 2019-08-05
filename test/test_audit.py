@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 from sqlalchemy.orm import sessionmaker
 
-from charfetch.audit import Audit
+from altaudit.audit import Audit
 
-from charfetch.models import Faction, Class, Race, Region, Realm, Character
+from altaudit.models import Faction, Class, Race, Region, Realm, Character
 
 wow_classes = {'classes': [
     {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
@@ -68,7 +68,7 @@ class TestAuditInit:
                 'server' : 'localhost:/var/www/html'}
 
     def setup_method(self, method):
-        with patch('charfetch.audit.WowApi') as MockApiClass:
+        with patch('altaudit.audit.WowApi') as MockApiClass:
             mock_api = MockApiClass.return_value
             mock_api.get_character_classes.return_value = wow_classes
             mock_api.get_character_races.return_value = wow_races

@@ -11,8 +11,8 @@ Unit Tests for Item related code
 """
 import pytest
 
-from charfetch import get_all_items
-from charfetch.character import _get_item
+from altaudit import get_all_items
+from altaudit.character import _get_item
 
 @pytest.fixture
 def fake_hoa():

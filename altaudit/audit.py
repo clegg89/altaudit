@@ -116,6 +116,7 @@ class Audit:
             session.delete(r)
 
     def refresh(self):
+        pass
         # "Refresh each character"
         # session = sessionmaker(self.engine)()
         # characters = session.query(AuditCharacter).all()

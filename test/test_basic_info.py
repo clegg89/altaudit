@@ -10,7 +10,7 @@ import pytest
 
 import datetime
 
-from charfetch import get_basic_info
+from altaudit import get_basic_info
 
 @pytest.fixture(scope="module")
 def classes():

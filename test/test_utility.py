@@ -4,13 +4,13 @@
 #
 # Distributed under terms of the MIT license.
 """
-Unit Tests for charfetch.utility
+Unit Tests for altaudit.utility
 """
 import pytest
 
 import datetime
 
-from charfetch.utility import *
+from altaudit.utility import *
 
 def test_flatten_list():
     expected_result = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -19,13 +19,13 @@ def test_flatten_list():
 
 @pytest.fixture
 def mock_yaml(mocker):
-    return mocker.patch('charfetch.utility.yaml')
+    return mocker.patch('altaudit.utility.yaml')
 
 def test_load_yaml_file_valid(fake_char_yaml, mock_yaml, mocker):
     test_file = 'test.yaml'
 
     mock_yaml.safe_load.return_value = fake_char_yaml
-    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    m = mocker.patch('altaudit.utility.open', mocker.mock_open())
     result = load_yaml_file(test_file)
 
     m.assert_called_once_with(test_file, 'r')
@@ -181,7 +181,7 @@ def test_get_races_return_value_coerced(mock_api):
 
 @pytest.fixture
 def mock_pickle(mocker):
-    return mocker.patch('charfetch.utility.pickle')
+    return mocker.patch('altaudit.utility.pickle')
 
 # TODO refactor - lots of duplicate code in following tests
 
@@ -194,7 +194,7 @@ def test_load_or_fetch_use_stored_old(mock_pickle, mocker):
     stored = { 'timestamp' : stored_time, 'data' : expected_result }
 
     mock_pickle.load.return_value = stored
-    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    m = mocker.patch('altaudit.utility.open', mocker.mock_open())
     result = load_or_fetch(test_file, None, load_time)
 
     m.assert_called_once_with(test_file, 'rb')
@@ -213,7 +213,7 @@ def test_load_or_fetch_fetch(mock_pickle, mocker):
     expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
 
     mock_pickle.load.return_value = stored
-    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    m = mocker.patch('altaudit.utility.open', mocker.mock_open())
     result = load_or_fetch(test_file, fake_fetch, load_time)
 
     mock_pickle.load.assert_called_once_with(m.return_value)
@@ -235,7 +235,7 @@ def test_load_or_fetch_fetch_file_not_created(mock_pickle, mocker):
 
     expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
 
-    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    m = mocker.patch('altaudit.utility.open', mocker.mock_open())
     m.side_effect = _raise_on_read
     result = load_or_fetch(test_file, fake_fetch, load_time)
 
@@ -259,7 +259,7 @@ def test_load_or_fetch_fetch_args_and_kwargs(mock_pickle, mocker):
     expected_saved = { 'timestamp' : load_time, 'data' : fetch_result }
 
     mock_pickle.load.return_value = stored
-    m = mocker.patch('charfetch.utility.open', mocker.mock_open())
+    m = mocker.patch('altaudit.utility.open', mocker.mock_open())
     result = load_or_fetch(test_file, mock_fetcher, load_time, *args, **kwargs)
 
     mock_pickle.load.assert_called_once_with(m.return_value)

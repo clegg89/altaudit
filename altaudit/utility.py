@@ -4,7 +4,7 @@
 #
 # Distributed under terms of the MIT license.
 """
-Utility functions used throughout charfetch
+Utility functions used throughout altaudit
 """
 import datetime
 import yaml
