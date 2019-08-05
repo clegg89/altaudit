@@ -1,10 +1,46 @@
 """Unit Tests for Snapshot models"""
 import pytest
 
-from sqlalchemy.exc import IntegrityError
-
 from altaudit.models import Character, Snapshot
 from altaudit.models.snapshot import Year, Week
+
+def test_create_year_table(db):
+    assert db.has_table('years')
+
+def test_create_week_table(db):
+    assert db.has_table('weeks')
+
+def test_create_snapshot_table(db):
+    assert db.has_table('snapshots')
+
+def test_no_duplicate_years(db_session_integrityerror):
+    clegg = Character('clegg')
+    y1 = Year(2019, clegg)
+    y2 = Year(2019, clegg)
+
+    db_session_integrityerror.add(y1)
+    db_session_integrityerror.add(y2)
+
+def test_no_duplicate_weeks(db_session_integrityerror):
+    clegg = Character('clegg')
+    y = Year(2019, clegg)
+    w1 = Week(2, y)
+    w2 = Week(2, y)
+
+    db_session_integrityerror.add(w1)
+    db_session_integrityerror.add(w2)
+
+def test_no_duplicate_snapshots(db_session_integrityerror):
+    clegg = Character('clegg')
+    y = Year(2019, clegg)
+    w = Week(2, y)
+    s1 = Snapshot()
+    s2 = Snapshot()
+    s1.week = w
+    s2.week = w
+
+    db_session_integrityerror.add(s1)
+    db_session_integrityerror.add(s2)
 
 def test_add_snapshots_to_character(db_session):
     clegg = Character(name='clegg')

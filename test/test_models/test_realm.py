@@ -1,8 +1,6 @@
 """Unit Tests for Realm model"""
 import pytest
 
-from sqlalchemy.exc import IntegrityError
-
 from altaudit.models import Region, Realm
 
 def test_create_realm_table(db):
@@ -33,17 +31,13 @@ def test_add_realm_region(db_session):
     db_session.add(kj)
     assert us == db_session.query(Region).filter_by(name='US').join(Realm).filter_by(name="kiljaeden").first()
 
-def test_no_duplicate_realms(db_session):
+def test_no_duplicate_realms(db_session_integrityerror):
     us = Region('us')
     kj = Realm('kiljaeden', us)
     okj = Realm('kiljaeden', us)
 
-    db_session.add(kj)
-    db_session.add(okj)
-    with pytest.raises(IntegrityError):
-        db_session.commit()
-
-    db_session.rollback()
+    db_session_integrityerror.add(kj)
+    db_session_integrityerror.add(okj)
 
 def test_delete_region_cascade_realms(db_session):
     us = Region('us')

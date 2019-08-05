@@ -26,8 +26,10 @@ class Year(Base):
     snapshots = association_proxy('weeks', 'snapshot',
             creator=_creator)
 
-    def __init__(self, year):
+    def __init__(self, year, character=None):
         self.year = year
+        if character:
+            self.character = character
 
 class Week(Base):
     __tablename__ = 'weeks'
@@ -40,13 +42,15 @@ class Week(Base):
     snapshot = relationship("Snapshot", uselist=False, backref='week',
             cascade='all, delete, delete-orphan')
 
-    def __init__(self, week):
+    def __init__(self, week, year=None):
         self.week = week
+        if year:
+            self.year = year
 
 class Snapshot(Base):
     __tablename__ = 'snapshots'
 
-    week_id = Column(Integer, ForeignKey('weeks.id'), nullable=False)
+    week_id = Column(Integer, ForeignKey('weeks.id'), nullable=False, unique=True)
     world_quests = Column(Integer)
     dungeons = Column(Integer)
     azerite_power = Column(Integer)
