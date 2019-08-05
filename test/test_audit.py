@@ -226,3 +226,17 @@ class TestAuditInit:
         self.audit._add_missing_characters(db_session, self.config['characters'])
 
         assert db_session.query(Character).filter_by(name='clegg').join(Realm).filter_by(name='kiljaeden').first().name == 'clegg'
+
+    def test_remove_empty_realms(self, db_session):
+        db_session.add(Realm('nonexistent'))
+        db_session.commit()
+        self.audit._remove_empty_realms(db_session)
+
+        assert None == db_session.query(Realm).filter_by(name='nonexistent').first()
+
+    def test_remove_empty_regions(self, db_session):
+        db_session.add(Region('nz'))
+        db_session.commit()
+        self.audit._remove_empty_regions(db_session)
+
+        assert None == db_session.query(Region).filter_by(name='nz').first()

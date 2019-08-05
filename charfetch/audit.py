@@ -21,7 +21,6 @@ class Audit:
 
         self.server = config['server']
 
-        print(self.engine.has_table('factions'))
         Base.metadata.create_all(self.engine)
 
         session = sessionmaker(self.engine)()
@@ -32,6 +31,9 @@ class Audit:
 
         self._remove_old_characters(session, config['characters'])
         self._add_missing_characters(session, config['characters'])
+
+        self._remove_empty_realms(session)
+        self._remove_empty_regions(session)
 
         session.commit()
         session.close()
@@ -91,6 +93,16 @@ class Audit:
                     if not character_model:
                         character_model = Character(character, realm=realm_model, region=region_model)
                         session.add(character_model)
+
+    def _remove_empty_realms(self, session):
+        empty = session.query(Realm).filter(~Realm.characters.any()).all()
+        for r in empty:
+            session.delete(r)
+
+    def _remove_empty_regions(self, session):
+        empty = session.query(Region).filter(~Region.realms.any()).all()
+        for r in empty:
+            session.delete(r)
 
     def refresh(self):
         "Refresh each character and write the result to the server"
