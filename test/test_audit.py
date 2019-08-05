@@ -58,12 +58,12 @@ class TestAuditInit:
                 'characters' : {
                     'us' : {
                         'kiljaeden' : [
-                            'clegg', 'salvorhardin', 'darksidemoon'],
+                            'clegg', 'salvorhardin'],
                         'lightbringer' : [
-                            'clegg', 'klegg', 'ingsok']},
+                            'clegg']},
                     'eu' : {
-                        'argentdawn' : [
-                            'tali', 'jack', 'bill']}},
+                        'kiljaeden' : [
+                            'clegg']}},
                 'database' : 'sqlite://',
                 'server' : 'localhost:/var/www/html'}
 
@@ -195,7 +195,7 @@ class TestAuditInit:
 
         assert {'name' : 'kiljaeden', 'region' : 'us'} in realms
         assert {'name' : 'lightbringer', 'region' : 'us'} in realms
-        assert {'name' : 'argentdawn', 'region' : 'eu'} in realms
+        assert {'name' : 'kiljaeden', 'region' : 'eu'} in realms
 
     def test_characters_added(self, db_session):
         query = db_session.query(Character).all()
@@ -203,13 +203,8 @@ class TestAuditInit:
 
         assert {'name' : 'clegg', 'realm' : 'kiljaeden', 'region' : 'us'} in characters
         assert {'name' : 'salvorhardin', 'realm' : 'kiljaeden', 'region' : 'us'} in characters
-        assert {'name' : 'darksidemoon', 'realm' : 'kiljaeden', 'region' : 'us'} in characters
         assert {'name' : 'clegg', 'realm' : 'lightbringer', 'region' : 'us'} in characters
-        assert {'name' : 'klegg', 'realm' : 'lightbringer', 'region' : 'us'} in characters
-        assert {'name' : 'ingsok', 'realm' : 'lightbringer', 'region' : 'us'} in characters
-        assert {'name' : 'tali', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
-        assert {'name' : 'jack', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
-        assert {'name' : 'bill', 'realm' : 'argentdawn', 'region' : 'eu'} in characters
+        assert {'name' : 'clegg', 'realm' : 'kiljaeden', 'region' : 'eu'} in characters
 
     def test_remove_old_characters(self, db_session):
         db_session.add(Character('jack',
@@ -220,12 +215,13 @@ class TestAuditInit:
         assert db_session.query(Character).filter_by(name='jack').first() == None
 
     def test_add_missing_characters(self, db_session):
-        clegg = db_session.query(Character).filter_by(name='clegg').join(Realm).filter_by(name='kiljaeden').first()
+        query = db_session.query(Character).filter_by(name='clegg').join(Realm).filter_by(name='kiljaeden').join(Region).filter_by(name='us')
+        clegg = query.first()
         db_session.delete(clegg)
         db_session.commit()
         self.audit._add_missing_characters(db_session, self.config['characters'])
 
-        assert db_session.query(Character).filter_by(name='clegg').join(Realm).filter_by(name='kiljaeden').first().name == 'clegg'
+        assert query.first().name == 'clegg'
 
     def test_remove_empty_realms(self, db_session):
         db_session.add(Realm('nonexistent'))

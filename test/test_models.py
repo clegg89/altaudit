@@ -3,12 +3,15 @@ import pytest
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 
-from altaudit.models import Base, Faction, Class, Race, Region, Realm, Character, Year, Week, Snapshot
+from altaudit.models import Base, Faction, Class, Race, Region, Realm, Character, Snapshot
+from altaudit.models.snapshot import Year, Week
 
 @pytest.fixture
 def db():
     engine = create_engine("sqlite://")
+    print('here')
     Base.metadata.create_all(engine)
     yield engine
     Base.metadata.drop_all(engine)
@@ -102,6 +105,18 @@ def test_add_realm_region(db_session):
 
     db_session.add(kj)
     assert us == db_session.query(Region).filter_by(name='US').join(Realm).filter_by(name="kiljaeden").first()
+
+def test_no_duplicate_realms(db_session):
+    us = Region('us')
+    kj = Realm('kiljaeden', us)
+    okj = Realm('kiljaeden', us)
+
+    db_session.add(kj)
+    db_session.add(okj)
+    with pytest.raises(IntegrityError):
+        db_session.commit()
+
+    db_session.rollback()
 
 def test_add_realm_character(db_session):
     kj = Realm('kiljaeden')
