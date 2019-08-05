@@ -7,8 +7,52 @@
 Utility functions used throughout altaudit
 """
 import datetime
+import time
 import yaml
 import pickle
+
+from .constants import WEEKLY_RESETS
+
+class Utility:
+    "Convenience class to hold static variables and functions"
+
+    @classmethod
+    def set_refresh_timestamp(cls):
+        """
+        Save Timestamp at beginning of a new refresh operation.
+
+        This will help prevent odd behavior around reset times
+
+        @note We can still get some odd behavior as some of the API
+        requests may occur before the reset and others after the reset.
+        This will make some things (like the island weekly) seem off.
+        Luckily it should all work out on the next refresh, and working
+        trying to work around it is too complicated for the pay off
+        """
+        cls._now = datetime.datetime.utcnow()
+
+        cls.year = reset_time.year
+        cls.week = reset_time.isocalendar()[1]
+
+    @classmethod
+    def year_week(cls, region):
+        """
+        Get the year and week the current reset belongs to,
+        returned as a tuple
+        """
+        # Go back to the last hour mark
+        reset_time = datetime.datetime.combine(now.date(), datetime.time(now.hour))
+
+        # Go back in hours until we get to 15:00 UTC
+        while reset_time.hour != WEEKLY_RESETS[region]['hour']:
+            reset_time -= datetime.timedelta(hours=1)
+
+        # Go back in days until we get to Tuesday
+        while reset_time.weekday() != time.strptime(WEEKLY_RESETS, '%A').tm_wday:
+            reset_time -= datetime.timedelta(1)
+
+        return (reset_time.year, reset_time.isocalendar()[1])
+
 
 def flatten(l):
     """ Recursively convert a list of lists to a single flat list """

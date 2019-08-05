@@ -51,6 +51,6 @@ class Snapshot(Base):
     __tablename__ = 'snapshots'
 
     week_id = Column(Integer, ForeignKey('weeks.id'), nullable=False, unique=True)
-    world_quests = Column(Integer)
-    dungeons = Column(Integer)
-    azerite_power = Column(Integer)
+    world_quests = Column(Integer, default=0)
+    dungeons = Column(Integer, default=0)
+    azerite_power = Column(Integer, default=0)

@@ -57,3 +57,20 @@ def test_add_snapshots_to_character(db_session):
                                 .join(Week).filter_by(week=3)\
                                 .join(Year).filter_by(year=2019)\
                                 .join(Character).filter_by(name='clegg').first()
+
+def test_snapshot_default_values(db_session):
+    clegg = Character(name='clegg')
+
+    db_session.add(clegg)
+    db_session.commit()
+
+    clegg.snapshots[2019] = {}
+    clegg.snapshots[2019][3] = Snapshot()
+
+    db_session.flush()
+    snapshot = clegg.snapshots[2019][3]
+
+    assert snapshot.world_quests == 0
+    assert snapshot.dungeons == 0
+    assert snapshot.azerite_power == 0
+

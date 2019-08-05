@@ -1,5 +1,19 @@
 """Charfetch Program Constants"""
 
+"""
+Reset days and times.
+
+All values are in UTC time to avoid daylight savings issues
+
+use time.strptime(day, "%A").tm_wday to convert day string to weekday
+"""
+WEEKLY_RESETS = {
+    'us' : { 'hour' : 15, 'day' : 'Tuesday' },
+    'eu' : { 'hour' : 7, 'day' : 'Wednesday' },
+    'kr' : { 'hour' : 7, 'day' : 'Wednesday' },
+    'tw' : { 'hour' : 7, 'day' : 'Wednesday' }
+}
+
 "Item slots tracked"
 ITEM_SLOTS = [
     'head', 'neck', 'shoulder', 'back',
@@ -13,6 +27,20 @@ EXPACS = [
     'classic', 'burning_crusade', 'wrath_of_the_lich_king',
     'cataclysm', 'mists_of_pandaria', 'warlords_of_draenor',
     'legion', 'battle_for_azeroth'
+]
+
+"Locale to use when fetching"
+BLIZZARD_LOCALE = 'en_US'
+
+"Fields to use in character profile fetch"
+BLIZZARD_CHARACTER_FIELDS = [
+    'items',
+    'reputation',
+    'audit',
+    'statistics'
+    'achievements',
+    'professions',
+    'quests'
 ]
 
 "Column Headers and their database types"

@@ -7,17 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from wowapi import WowApi
 
 from .models import Base, Class, Faction, Race, Region, Realm, Character
-
-# class AuditCharacter(Character):
-#     "Extends the Character class to add in methods to process API responses"
-#     def process_blizzard(self, response, api):
-#         """
-#         Processes the response from blizzard's API for this character
-
-#         @param response The response from blizzard's api
-
-#         @param api The api object used to make the request
-#         """
+from .constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS
 
 class Audit:
     """
@@ -57,12 +47,12 @@ class Audit:
 
     def _create_classes(self, session):
         session.query(Class).delete()
-        classes = self.blizzard_api.get_character_classes('us', locale='en_US')['classes']
+        classes = self.blizzard_api.get_character_classes('us', locale=BLIZZARD_LOCALE)['classes']
         session.add_all([Class(c['name'], id=c['id']) for c in classes])
 
     def _create_races(self, session):
         session.query(Race).delete()
-        races = self.blizzard_api.get_character_races('us', locale='en_US')['races']
+        races = self.blizzard_api.get_character_races('us', locale=BLIZZARD_LOCALE)['races']
 
         fquery = session.query(Faction)
         session.add_all([
@@ -116,13 +106,13 @@ class Audit:
             session.delete(r)
 
     def refresh(self):
-        pass
-        # "Refresh each character"
-        # session = sessionmaker(self.engine)()
-        # characters = session.query(AuditCharacter).all()
-        # for character in characters:
-        #     response = self.blizzard_api.get_character_profile(character.region_name,
-        #             character.realm_name, character.name, locale='en_US',
-        #             fields='statistics,talents,reputation,items,achievements,audit,professions,quests')
-        #     character.process_blizzard(response)
-            # Do the same for rio and wcl
+        "Refresh each character"
+        session = sessionmaker(self.engine)()
+        characters = session.query(Character).all()
+        for character in characters:
+            character.update_snapshot()
+            session.flush() # Needed to load snapshot defaults if new snapshot created
+            response = self.blizzard_api.get_character_profile(character.region_name,
+                    character.realm_name, character.name, locale=BLIZZARD_LOCALE,
+                    fields=','.join(BLIZZARD_CHARACTER_FIELDS))
+            character.process_blizzard(response, self.blizzard_api)

@@ -7,7 +7,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from ..constants import CHARACTER_HEADER_FIELDS
 
 from .base import Base
-from .snapshot import Year
+from .snapshot import Year, Snapshot
 
 class Character(Base):
     __tablename__ = 'characters'
@@ -44,3 +44,25 @@ class Character(Base):
             if k in CHARACTER_HEADER_FIELDS or \
             hasattr(self, k):
                 self.__setattr__(k, v)
+
+    def update_snapshot(self):
+        pass
+        # if Util.year not in self.snapshots:
+        #     self.snapshots[Util.year] = {}
+
+        # if Util.week not in self.snapshots[Util.year]:
+        #     self.snapshots[Util.year][Util.week] = Snapshot()
+
+    def process_blizzard(self, response, api):
+        """
+        Processes the response from blizzard's API for this character
+
+        @param response The response from blizzard's api
+
+        @param api The api object used to make the request
+
+        @returns True if the character needs to be updated, False otherwise
+        """
+        if response['lastModified'] == self.lastmodified:
+            # Already up-to-date
+            return False
