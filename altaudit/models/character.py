@@ -1,5 +1,5 @@
 """Model representing Characters"""
-from sqlalchemy import Column, Integer, Float, String, ForeignKey
+from sqlalchemy import Column, UniqueConstraint, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -22,6 +22,8 @@ class Character(Base):
 
     for k,v in CHARACTER_HEADER_FIELDS.items():
         exec('{} = {}'.format(k,v))
+
+    __table_args__ = (UniqueConstraint('realm_id', 'name'),)
 
     years = relationship("Year", backref='character',
             collection_class=attribute_mapped_collection('year'),

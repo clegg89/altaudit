@@ -152,6 +152,19 @@ def test_character_realm_region(db_session):
 
     assert clegg.region_name == 'us'
 
+def test_no_duplicate_characters(db_session):
+    us = Region('us')
+    kj = Realm('kiljaeden', us)
+    clegg = Character('clegg', realm=kj)
+    oclegg = Character('clegg', realm=kj)
+
+    db_session.add(clegg)
+    db_session.add(oclegg)
+    with pytest.raises(IntegrityError):
+        db_session.commit()
+
+    db_session.rollback()
+
 def test_add_character_class(db_session):
     clegg = Character('clegg', character_class=Class('Warlock'))
 
