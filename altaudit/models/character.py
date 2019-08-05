@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from altaudit.constants import CHARACTER_HEADER_FIELDS
+from ..constants import CHARACTER_HEADER_FIELDS
 
 from .base import Base
 from .snapshot import Year
