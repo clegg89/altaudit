@@ -1,122 +1,19 @@
-"""Unit Tests for all models"""
+"""Unit Tests for the Character Model"""
 import pytest
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-from altaudit.models import Base, Faction, Class, Race, Region, Realm, Character, Snapshot
-from altaudit.models.snapshot import Year, Week
-
-@pytest.fixture
-def db():
-    engine = create_engine("sqlite://")
-    print('here')
-    Base.metadata.create_all(engine)
-    yield engine
-    Base.metadata.drop_all(engine)
-
-@pytest.fixture
-def db_session(db):
-    Session = sessionmaker(db)
-    session = Session()
-    yield session
-    session.commit()
-    session.close()
-
-def test_create_class_table(db):
-    assert db.has_table('classes')
-
-def test_create_faction_table(db):
-    assert db.has_table('factions')
-
-def test_create_race_table(db):
-    assert db.has_table('races')
-
-def test_create_region_table(db):
-    assert db.has_table('regions')
-
-def test_create_realm_table(db):
-    assert db.has_table('realms')
+from altaudit.models import Faction, Class, Race, Region, Realm, Character
 
 def test_create_character_table(db):
     assert db.has_table('characters')
 
-def test_create_class(db_session):
-    warlock = Class('Warlock', id=9)
+def test_add_character(db_session):
+    clegg = Character(name='clegg')
 
-    db_session.add(warlock)
+    db_session.add(clegg)
 
-    assert warlock == db_session.query(Class).filter_by(id=9).first()
-
-def test_create_faction(db_session):
-    horde = Faction('horde')
-
-    db_session.add(horde)
-
-    assert horde == db_session.query(Faction).first()
-
-def test_create_race(db_session):
-    undead = Race('Undead', id=5)
-
-    db_session.add(undead)
-
-    assert undead == db_session.query(Race).filter_by(id=5).first()
-
-def test_race_faction(db_session):
-    horde = Faction('horde', id=1)
-    undead = Race('undead', faction=horde)
-
-    db_session.add(horde)
-    db_session.add(undead)
-    db_session.commit()
-
-    assert 1 == db_session.query(Race).first().faction_id
-
-def test_add_region(db_session):
-    us = Region(name='US')
-    db_session.add(us)
-
-    assert us == db_session.query(Region).filter(Region.name=='US').first()
-
-    db_session.delete(us)
-
-def test_add_region_realm(db_session):
-    us = Region(name='US')
-    kj = Realm('kiljaeden')
-
-    us.realms.append(kj)
-
-    db_session.add(us)
-
-    assert kj == db_session.query(Realm).filter_by(name="kiljaeden").join(Region).filter_by(name='US').first()
-
-def test_add_realm(db_session):
-    kj = Realm('kiljaeden')
-    db_session.add(kj)
-
-    assert kj == db_session.query(Realm).filter_by(name='kiljaeden').first()
-
-def test_add_realm_region(db_session):
-    kj = Realm('kiljaeden')
-    us = Region(name='US')
-
-    kj.region = us
-
-    db_session.add(kj)
-    assert us == db_session.query(Region).filter_by(name='US').join(Realm).filter_by(name="kiljaeden").first()
-
-def test_no_duplicate_realms(db_session):
-    us = Region('us')
-    kj = Realm('kiljaeden', us)
-    okj = Realm('kiljaeden', us)
-
-    db_session.add(kj)
-    db_session.add(okj)
-    with pytest.raises(IntegrityError):
-        db_session.commit()
-
-    db_session.rollback()
+    assert clegg == db_session.query(Character).filter_by(name='clegg').first()
 
 def test_add_realm_character(db_session):
     kj = Realm('kiljaeden')
@@ -127,13 +24,6 @@ def test_add_realm_character(db_session):
     db_session.add(kj)
 
     assert clegg == db_session.query(Character).filter_by(name="clegg").join(Realm).filter_by(name="kiljaeden").first()
-
-def test_add_character(db_session):
-    clegg = Character(name='clegg')
-
-    db_session.add(clegg)
-
-    assert clegg == db_session.query(Character).filter_by(name='clegg').first()
 
 def test_add_character_realm(db_session):
     clegg = Character(name='clegg')
@@ -256,40 +146,6 @@ def test_add_character_constructor(db_session):
     db_session.add(clegg)
 
     assert db_session.query(Character).filter_by(name="clegg").filter_by(level=120).first()
-
-
-def test_add_snapshots_to_character(db_session):
-    clegg = Character(name='clegg')
-    s1 = Snapshot()
-    s1.world_quests = 10
-    s1.dungeons = 20
-    s1.azerite_power = 1500
-    clegg.snapshots[2019] = {}
-    clegg.snapshots[2019][3] = s1
-
-    db_session.add(clegg)
-
-    assert s1 == db_session.query(Snapshot)\
-                                .join(Week).filter_by(week=3)\
-                                .join(Year).filter_by(year=2019)\
-                                .join(Character).filter_by(name='clegg').first()
-
-def test_delete_region_cascade_realms(db_session):
-    us = Region('us')
-    eu = Region('eu')
-
-    db_session.add(us)
-    db_session.add(eu)
-
-    kj = Realm('kiljaeden', us)
-    lb = Realm('lightbringer', us)
-    ad = Realm('argentdawn', eu)
-
-    db_session.commit()
-
-    db_session.delete(us)
-
-    assert [ad] == db_session.query(Realm).all()
 
 def test_delete_region_cascade_characters(db_session):
     us = Region('us')
