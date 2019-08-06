@@ -264,8 +264,29 @@ class TestAuditRefresh:
             self.audit = Audit(self.config)
 
     def test_blizzard_api_called(self, mock_character_process):
-        self.audit.blizzard_api.get_character_profile.return_value = 5
         self.audit.refresh(datetime.datetime)
         self.audit.blizzard_api.get_character_profile.assert_called_once_with('us', 'kiljaeden',
                 'clegg', locale=BLIZZARD_LOCALE,
                 fields=','.join(BLIZZARD_CHARACTER_FIELDS))
+
+    def test_timestamp_set(self, mock_character_process, mocker):
+        mock_utility = mocker.patch('altaudit.audit.Utility')
+        dt = mocker.MagicMock()
+        dt.utcnow.return_value = 5
+
+        self.audit.refresh(dt)
+
+        mock_utility.set_refresh_timestamp.assert_called_once_with(5)
+
+    def test_character_snapsotupdated(self, mock_character_process, mocker):
+        mock_update_snapshot = mocker.patch('altaudit.audit.Character.update_snapshot')
+        self.audit.refresh(datetime.datetime)
+
+        mock_update_snapshot.assert_called_once()
+
+    def test_character_process(self, mock_character_process):
+        self.audit.blizzard_api.get_character_profile.return_value = 5
+
+        self.audit.refresh(datetime.datetime)
+
+        mock_character_process.assert_called_once_with(5, self.audit.blizzard_api)
