@@ -265,8 +265,8 @@ class TestAuditRefresh:
 
     def test_blizzard_api_called(self, mock_character_process):
         self.audit.refresh(datetime.datetime)
-        self.audit.blizzard_api.get_character_profile.assert_called_once_with('us', 'kiljaeden',
-                'clegg', locale=BLIZZARD_LOCALE,
+        self.audit.blizzard_api.get_character_profile.assert_called_once_with(region='us', realm='kiljaeden',
+                character_name='clegg', locale=BLIZZARD_LOCALE,
                 fields=','.join(BLIZZARD_CHARACTER_FIELDS))
 
     def test_timestamp_set(self, mock_character_process, mocker):

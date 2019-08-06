@@ -4,11 +4,20 @@ import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+import requests
+# We'll need this if we want to setup retries
+# from requests.packages.urllib3.util.retry import Retry
+
 from wowapi import WowApi
 
 from .utility import Utility
 from .models import Base, Class, Faction, Race, Region, Realm, Character
 from .constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS
+
+def _character_as_dict(character):
+    return {'character_name' : character.name,
+            'realm' : character.realm_slug,
+            'region' : character.region_name}
 
 class Audit:
     """
@@ -19,7 +28,10 @@ class Audit:
 
     def __init__(self, config):
         self.engine = create_engine(config['database'])
+        # TODO: Should we set retry_conn_failure here?
         self.blizzard_api = WowApi(**config['api']['blizzard'])
+        # self.wcl_key = config['api']['wcl']['public_key']
+        # self.request_session = requests.Session()
 
         self.server = config['server']
 
@@ -117,12 +129,21 @@ class Audit:
         session = sessionmaker(self.engine)()
         characters = session.query(Character).all()
 
-        blizz_resp = {c : self.blizzard_api.get_character_profile(c.region_name,
-            c.realm_slug, c.name, locale=BLIZZARD_LOCALE,
+        blizz_resp = {c : self.blizzard_api.get_character_profile(**_character_as_dict(c),
+            locale=BLIZZARD_LOCALE,
             fields=','.join(BLIZZARD_CHARACTER_FIELDS))
             for c in characters}
+
+        # rio_resp = {c : self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(c))).json()
+        #         for c in characters}
+
+        # TODO Need to get proper metric and perhaps different zones?
+        # wcl_resp = {c : self.request_session.get(WCL_URL.format(**_character_as_dict(c),
+        #     zone=23, metric='dps')).json() for c in characters}
 
         for character in characters:
             character.update_snapshot()
             session.flush() # Needed to load snapshot defaults if new snapshot created
             character.process_blizzard(blizz_resp[character], self.blizzard_api)
+            # character.process_rio(rio_resp[character])
+            # character.process_wcl(wcl_resp[character])
