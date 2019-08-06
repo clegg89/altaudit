@@ -5,6 +5,7 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from ..constants import CHARACTER_HEADER_FIELDS
+from ..utility import Utility
 
 from .base import Base
 from .snapshot import Year, Snapshot
@@ -46,12 +47,13 @@ class Character(Base):
                 self.__setattr__(k, v)
 
     def update_snapshot(self):
-        pass
-        # if Util.year not in self.snapshots:
-        #     self.snapshots[Util.year] = {}
+        year = Utility.year[self.region_name]
+        week = Utility.week[self.region_name]
+        if year not in self.snapshots:
+            self.snapshots[year] = {}
 
-        # if Util.week not in self.snapshots[Util.year]:
-        #     self.snapshots[Util.year][Util.week] = Snapshot()
+        if week not in self.snapshots[year]:
+            self.snapshots[year][week] = Snapshot()
 
     def process_blizzard(self, response, api):
         """

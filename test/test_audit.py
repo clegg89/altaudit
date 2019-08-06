@@ -3,11 +3,12 @@ import pytest
 
 from unittest.mock import patch
 
+import datetime
 from sqlalchemy.orm import sessionmaker
 
 from altaudit.audit import Audit
-
 from altaudit.models import Faction, Class, Race, Region, Realm, Character
+from altaudit.constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS
 
 wow_classes = {'classes': [
     {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
@@ -47,6 +48,10 @@ wow_races = {'races': [
     {'id': 32, 'mask': -2147483648, 'side': 'alliance', 'name': 'Kul Tiran'},
     {'id': 34, 'mask': 2, 'side': 'alliance', 'name': 'Dark Iron Dwarf'},
     {'id': 36, 'mask': 8, 'side': 'horde', 'name': "Mag'har Orc"}]}
+
+@pytest.fixture
+def mock_character_process(mocker):
+    return mocker.patch('altaudit.audit.Character.process_blizzard')
 
 class TestAuditInit:
     @classmethod
@@ -236,3 +241,31 @@ class TestAuditInit:
         self.audit._remove_empty_regions(db_session)
 
         assert None == db_session.query(Region).filter_by(name='nz').first()
+
+class TestAuditRefresh:
+    @classmethod
+    def setup_class(cls):
+        cls.config = {
+                'api' : { 'blizzard' : {
+                    'client_id' : 'MY_CLIENT_ID',
+                    'client_secret' : 'MY_CLIENT_SECRET' }},
+                'characters' : { 'us' : { 'kiljaeden' : ['clegg'] }},
+                'database' : 'sqlite://',
+                'server' : 'localhost:/var/www/html'}
+
+    def setup_method(self, method):
+        with patch('altaudit.audit.WowApi') as MockApiClass:
+            mock_api = MockApiClass.return_value
+            mock_api.get_character_classes.return_value = wow_classes
+            mock_api.get_character_races.return_value = wow_races
+
+            self.mock_blizzard_api = mock_api
+
+            self.audit = Audit(self.config)
+
+    def test_blizzard_api_called(self, mock_character_process):
+        self.audit.blizzard_api.get_character_profile.return_value = 5
+        self.audit.refresh(datetime.datetime)
+        self.audit.blizzard_api.get_character_profile.assert_called_once_with('us', 'kiljaeden',
+                'clegg', locale=BLIZZARD_LOCALE,
+                fields=','.join(BLIZZARD_CHARACTER_FIELDS))

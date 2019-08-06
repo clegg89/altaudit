@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from wowapi import WowApi
 
+from .utility import Utility
 from .models import Base, Class, Faction, Race, Region, Realm, Character
 from .constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS
 
@@ -105,14 +106,23 @@ class Audit:
         for r in empty:
             session.delete(r)
 
-    def refresh(self):
-        "Refresh each character"
+    def refresh(self, dt):
+        """
+        Refresh each character
+
+        @param dt The datetime.datetime module
+        """
+        Utility.set_refresh_timestamp(dt.utcnow())
+
         session = sessionmaker(self.engine)()
         characters = session.query(Character).all()
+
+        blizz_resp = {c : self.blizzard_api.get_character_profile(c.region_name,
+            c.realm_slug, c.name, locale=BLIZZARD_LOCALE,
+            fields=','.join(BLIZZARD_CHARACTER_FIELDS))
+            for c in characters}
+
         for character in characters:
             character.update_snapshot()
             session.flush() # Needed to load snapshot defaults if new snapshot created
-            response = self.blizzard_api.get_character_profile(character.region_name,
-                    character.realm_name, character.name, locale=BLIZZARD_LOCALE,
-                    fields=','.join(BLIZZARD_CHARACTER_FIELDS))
-            character.process_blizzard(response, self.blizzard_api)
+            character.process_blizzard(blizz_resp[character], self.blizzard_api)
