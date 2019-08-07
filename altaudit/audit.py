@@ -26,17 +26,19 @@ class Audit:
     This class will hold all necessary data across multiple refreshes
     """
 
-    def __init__(self, config, retry_conn_failures=False):
+    def __init__(self, config, setup_database=True, retry_conn_failures=False):
         self.engine = create_engine(config['database'])
-        # TODO: Should we set retry_conn_failure here?
         self.blizzard_api = WowApi(**config['api']['blizzard'],
                 retry_conn_failures=retry_conn_failures)
-        # self.wcl_key = config['api']['wcl']['public_key']
         self.request_session = requests.Session()
 
         self.server = config['server']
 
-        Base.metadata.create_all(self.engine)
+        if setup_database:
+            self._setup_database(config['characters'])
+
+    def _setup_database(self, characters):
+        self._create_tables()
 
         session = sessionmaker(self.engine)()
 
@@ -44,14 +46,17 @@ class Audit:
         self._create_classes(session)
         self._create_races(session)
 
-        self._remove_old_characters(session, config['characters'])
-        self._add_missing_characters(session, config['characters'])
+        self._remove_old_characters(session, characters)
+        self._add_missing_characters(session, characters)
 
         self._remove_empty_realms(session)
         self._remove_empty_regions(session)
 
         session.commit()
         session.close()
+
+    def _create_tables(self):
+        Base.metadata.create_all(self.engine)
 
     def _create_factions(self, session):
         session.query(Faction).delete()

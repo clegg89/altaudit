@@ -92,7 +92,8 @@ class TestAuditInit:
 
             self.mock_blizzard_api = mock_api
 
-            self.audit = Audit(self.config)
+            self.audit = Audit(self.config, setup_database=False)
+            self.audit._create_tables()
 
     @pytest.fixture
     def db_session(self):
@@ -123,6 +124,8 @@ class TestAuditInit:
         assert self.audit.engine.has_table('snapshots')
 
     def test_factions_made(self, db_session):
+        self.audit._create_factions(db_session)
+
         query = db_session.query(Faction)
         factions = {f.id : f.name for f in query.all()}
 
@@ -132,14 +135,19 @@ class TestAuditInit:
         assert factions[3] == 'Neutral'
 
     def test_factions_remade(self, db_session):
+        self.audit._create_factions(db_session)
+
         db_session.add(Faction('junk', id=4))
         db_session.commit()
+
         self.audit._create_factions(db_session)
 
         assert db_session.query(Faction).count() == 3
         assert db_session.query(Faction).filter_by(name='junk').first() == None
 
     def test_classes_retrieved(self, db_session):
+        self.audit._create_classes(db_session)
+
         query = db_session.query(Class)
         classes = {c.id : c.name for c in query.all()}
 
@@ -158,14 +166,20 @@ class TestAuditInit:
         assert classes[12] == 'Demon Hunter'
 
     def test_old_classes_deleted(self, db_session):
+        self.audit._create_classes(db_session)
+
         db_session.add(Class('Tinkerer', id=14))
         db_session.commit()
+
         self.audit._create_classes(db_session)
 
         assert db_session.query(Class).count() == 12
         assert db_session.query(Class).filter_by(name='Tinkerer').first() == None
 
     def test_races_retrieved(self, db_session):
+        self.audit._create_factions(db_session)
+        self.audit._create_races(db_session)
+
         query = db_session.query(Race)
         races = {r.id : [r.name, r.faction_name] for r in query.all()}
 
@@ -195,16 +209,22 @@ class TestAuditInit:
         assert races[36] == ["Mag'har Orc", 'Horde']
 
     def test_old_races_deleted(self, db_session):
+        self.audit._create_factions(db_session)
+        self.audit._create_races(db_session)
+
         db_session.add(Race('Voldunai',
             id=14,
             faction=db_session.query(Faction).filter_by(name='Horde').first()))
         db_session.commit()
+
         self.audit._create_races(db_session)
 
         assert db_session.query(Race).count() == 23
         assert db_session.query(Race).filter_by(name='Voldunai').first() == None
 
     def test_regions_added(self, db_session):
+        self.audit._add_missing_characters(db_session, self.config['characters'])
+
         query = db_session.query(Region).all()
         regions = [r.name for r in query]
 
@@ -212,6 +232,8 @@ class TestAuditInit:
         assert 'eu' in regions
 
     def test_realms_added(self, db_session):
+        self.audit._add_missing_characters(db_session, self.config['characters'])
+
         query = db_session.query(Realm).all()
         realms = [{'name' : r.name, 'region' : r.region_name} for r in query]
 
@@ -220,6 +242,8 @@ class TestAuditInit:
         assert {'name' : 'kiljaeden', 'region' : 'eu'} in realms
 
     def test_characters_added(self, db_session):
+        self.audit._add_missing_characters(db_session, self.config['characters'])
+
         query = db_session.query(Character).all()
         characters = [{'name' : c.name, 'realm' : c.realm_slug, 'region' : c.region_name} for c in query]
 
@@ -232,15 +256,19 @@ class TestAuditInit:
         db_session.add(Character('jack',
             realm=db_session.query(Realm).filter_by(name='kiljaeden').first()))
         db_session.commit()
+
         self.audit._remove_old_characters(db_session, self.config['characters'])
 
         assert db_session.query(Character).filter_by(name='jack').first() == None
 
     def test_add_missing_characters(self, db_session):
+        self.audit._add_missing_characters(db_session, self.config['characters'])
+
         query = db_session.query(Character).filter_by(name='clegg').join(Realm).filter_by(name='kiljaeden').join(Region).filter_by(name='us')
         clegg = query.first()
         db_session.delete(clegg)
         db_session.commit()
+
         self.audit._add_missing_characters(db_session, self.config['characters'])
 
         assert query.first().name == 'clegg'
@@ -248,6 +276,7 @@ class TestAuditInit:
     def test_remove_empty_realms(self, db_session):
         db_session.add(Realm('nonexistent'))
         db_session.commit()
+
         self.audit._remove_empty_realms(db_session)
 
         assert None == db_session.query(Realm).filter_by(name='nonexistent').first()
@@ -255,6 +284,7 @@ class TestAuditInit:
     def test_remove_empty_regions(self, db_session):
         db_session.add(Region('nz'))
         db_session.commit()
+
         self.audit._remove_empty_regions(db_session)
 
         assert None == db_session.query(Region).filter_by(name='nz').first()
@@ -340,7 +370,7 @@ class TestAuditRefresh:
 
         mock_process_blizzard.assert_called_once_with(5, self.audit.blizzard_api)
 
-    def test_character_process_blizzard(self, mock_process_raiderio):
+    def test_character_process_raiderio(self, mock_process_raiderio):
         self.audit.refresh(datetime.datetime)
 
         mock_process_raiderio.assert_called_once_with(self.mock_get.return_value.json())
