@@ -3,9 +3,9 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from .base import Base
+from .base import Base, IdMixin
 
-class Class(Base):
+class Class(IdMixin, Base):
     __tablename__ = 'classes'
 
     name = Column(String)
@@ -15,7 +15,7 @@ class Class(Base):
         if id:
             self.id = id
 
-class Faction(Base):
+class Faction(IdMixin, Base):
     __tablename__ = 'factions'
 
     name = Column(String)
@@ -25,7 +25,7 @@ class Faction(Base):
         if id:
             self.id = id
 
-class Race(Base):
+class Race(IdMixin, Base):
     __tablename__ = 'races'
 
     faction_id = Column(Integer, ForeignKey('factions.id'))

@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from .base import Base
+from .base import Base, IdMixin
 
-class Year(Base):
+class Year(IdMixin, Base):
     __tablename__ = 'years'
 
     character_id = Column(Integer, ForeignKey('characters.id'), nullable=False)
@@ -31,7 +31,7 @@ class Year(Base):
         if character:
             self.character = character
 
-class Week(Base):
+class Week(IdMixin, Base):
     __tablename__ = 'weeks'
 
     year_id = Column(Integer, ForeignKey('years.id'), nullable=False)
@@ -47,7 +47,7 @@ class Week(Base):
         if year:
             self.year = year
 
-class Snapshot(Base):
+class Snapshot(IdMixin, Base):
     __tablename__ = 'snapshots'
 
     week_id = Column(Integer, ForeignKey('weeks.id'), nullable=False, unique=True)

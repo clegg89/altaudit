@@ -1,9 +1,9 @@
 """Model representing Azerite Traits"""
 from sqlalchemy import Column, Integer, String
 
-from .base import Base
+from .base import Base, IdMixin
 
-class AzeriteTrait(Base):
+class AzeriteTrait(IdMixin, Base):
     __tablename__ = 'azerite_traits'
 
     spell_id = Column(Integer)

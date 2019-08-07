@@ -94,7 +94,7 @@ CHARACTER_HEADER_FIELDS = {
 
     'empty_sockets' : 'Column(Integer)',
 
-    **{'gem_{}'.format(field) : 'Column(String)'
+    **{'gem_{}'.format(field) : "''" # Composite from gems table
         for field in ['ids', 'qualities', 'names', 'icons', 'stats', 'slots']},
 
     **{'{}_{}'.format(prof, field[0]) : field[1]

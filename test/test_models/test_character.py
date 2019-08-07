@@ -3,7 +3,7 @@ import pytest
 
 from sqlalchemy.exc import IntegrityError
 
-from altaudit.models import Faction, Class, Race, Region, Realm, Character, AzeriteTrait
+from altaudit.models import Faction, Class, Race, Region, Realm, Character, AzeriteTrait, GemSlotAssociation, Gem
 
 def test_create_character_table(db):
     assert db.has_table('characters')
@@ -215,4 +215,15 @@ def test_assign_available_azerite_traits(db_session):
 
     assert len(traits) == 2
     assert 'Azerite Empowered' in [t.name for t in traits]
-    assert 'Made Up Trait' in [t.name] for t in traits]
+    assert 'Made Up Trait' in [t.name for t in traits]
+
+def test_add_character_gems(db_session):
+    clegg = Character('clegg')
+    gemslot = GemSlotAssociation('wrist', Gem(168641, 5, 'Quick Sand Spinel', 'inv_misc_gem_x4_uncommon_perfectcut_yellow', '+50 Haste'))
+    clegg.gems.append(gemslot)
+
+    db_session.add(clegg)
+    db_session.flush()
+
+    assert clegg.gems[0].slot == 'wrist'
+    assert clegg.gems[0].gem.name == 'Quick Sand Spinel'

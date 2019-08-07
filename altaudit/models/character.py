@@ -7,8 +7,9 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from ..constants import CHARACTER_HEADER_FIELDS, AZERITE_ITEM_SLOTS, AZERITE_TIERS
 from ..utility import Utility
 
-from .base import Base
+from .base import Base, IdMixin
 from .azerite_trait import AzeriteTrait
+from .gem import Gem
 from .snapshot import Year, Snapshot
 
 """
@@ -39,7 +40,21 @@ for slot in AZERITE_ITEM_SLOTS:
     Column('character_id', Integer, ForeignKey('characters.id')),
     Column('azerite_trait_id', Integer, ForeignKey('azerite_traits.id')))""".format(var_name, table_name))
 
-class Character(Base):
+class GemSlotAssociation(Base):
+    "AssocaitionObject pattern used to store the slot of the gem"
+    __tablename__ = 'characters_gems'
+    character_id = Column(Integer, ForeignKey('characters.id'), primary_key=True)
+    gem_id = Column(Integer, ForeignKey('gems.id'), primary_key=True)
+    slot = Column(String)
+
+    gem = relationship('Gem')
+
+    def __init__(self, slot, gem=None):
+        self.slot=slot
+        if gem:
+            self.gem = gem
+
+class Character(IdMixin, Base):
     __tablename__ = 'characters'
 
     realm_id = Column(Integer, ForeignKey('realms.id'))
@@ -62,6 +77,8 @@ class Character(Base):
             exec("{} = Column(Integer, ForeignKey('azerite_traits.id'))".format(selected_fk))
             exec("{} = relationship('AzeriteTrait', foreign_keys=[{}])".format(selected_rel, selected_fk))
             exec("{} = relationship('AzeriteTrait', secondary={})".format(available_rel, available_sec))
+
+    gems = relationship('GemSlotAssociation')
 
     for k,v in CHARACTER_HEADER_FIELDS.items():
         exec('{} = {}'.format(k,v))
