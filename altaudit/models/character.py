@@ -68,3 +68,12 @@ class Character(Base):
         if response['lastModified'] == self.lastmodified:
             # Already up-to-date
             return False
+
+    def process_raiderio(self, response):
+        """
+        Processes the response from raider.io API for this character
+
+        @param response The response from raider.io's API
+
+        """
+        pass

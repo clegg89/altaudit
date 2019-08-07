@@ -7,8 +7,9 @@ import datetime
 from sqlalchemy.orm import sessionmaker
 
 from altaudit.audit import Audit
+from altaudit.utility import Utility
 from altaudit.models import Faction, Class, Race, Region, Realm, Character
-from altaudit.constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS
+from altaudit.constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
 
 wow_classes = {'classes': [
     {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
@@ -50,16 +51,26 @@ wow_races = {'races': [
     {'id': 36, 'mask': 8, 'side': 'horde', 'name': "Mag'har Orc"}]}
 
 @pytest.fixture
-def mock_character_process(mocker):
+def mock_session_get(mocker):
+    return mocker.patch('altaudit.audit.requests.Session.get')
+
+@pytest.fixture
+def mock_process_blizzard(mocker):
     return mocker.patch('altaudit.audit.Character.process_blizzard')
+
+@pytest.fixture
+def mock_process_raiderio(mocker):
+    return mocker.patch('altaudit.audit.Character.process_raiderio')
 
 class TestAuditInit:
     @classmethod
     def setup_class(cls):
         cls.config = {
-                'api' : { 'blizzard' : {
-                    'client_id' : 'MY_CLIENT_ID',
-                    'client_secret' : 'MY_CLIENT_SECRET' }},
+                'api' : {
+                    'blizzard' : {
+                        'client_id' : 'MY_CLIENT_ID',
+                        'client_secret' : 'MY_CLIENT_SECRET' },
+                    'wcl' : { 'public_key' : 'MY_WCL_KEY' }},
                 'characters' : {
                     'us' : {
                         'kiljaeden' : [
@@ -74,6 +85,7 @@ class TestAuditInit:
 
     def setup_method(self, method):
         with patch('altaudit.audit.WowApi') as MockApiClass:
+            self.mock_wowapi = MockApiClass
             mock_api = MockApiClass.return_value
             mock_api.get_character_classes.return_value = wow_classes
             mock_api.get_character_races.return_value = wow_races
@@ -91,6 +103,11 @@ class TestAuditInit:
     def test_engine_created(self):
         assert self.audit.engine.name == 'sqlite'
 
+    def test_blizzard_api_created(self):
+        self.mock_wowapi.assert_called_once_with(client_id='MY_CLIENT_ID',
+                client_secret='MY_CLIENT_SECRET', retry_conn_failures=False)
+
+    @pytest.mark.skip(reason='Unnecessary, should be checked where server is used')
     def test_server(self):
         assert self.audit.server == self.config['server']
 
@@ -246,47 +263,84 @@ class TestAuditRefresh:
     @classmethod
     def setup_class(cls):
         cls.config = {
-                'api' : { 'blizzard' : {
-                    'client_id' : 'MY_CLIENT_ID',
-                    'client_secret' : 'MY_CLIENT_SECRET' }},
+                'api' : {
+                    'blizzard' : {
+                        'client_id' : 'MY_CLIENT_ID',
+                        'client_secret' : 'MY_CLIENT_SECRET' },
+                    'wcl' : { 'public_key' : 'MY_WCL_KEY' }},
                 'characters' : { 'us' : { 'kiljaeden' : ['clegg'] }},
                 'database' : 'sqlite://',
                 'server' : 'localhost:/var/www/html'}
 
     def setup_method(self, method):
+        Utility.year = {}
+        Utility.week = {}
         with patch('altaudit.audit.WowApi') as MockApiClass:
-            mock_api = MockApiClass.return_value
-            mock_api.get_character_classes.return_value = wow_classes
-            mock_api.get_character_races.return_value = wow_races
+            with patch('altaudit.audit.requests.Session') as MockSessionClass:
+                mock_api = MockApiClass.return_value
+                mock_get = MockSessionClass.return_value.get
+                mock_api.get_character_classes.return_value = wow_classes
+                mock_api.get_character_races.return_value = wow_races
+                mock_api.get_character_profile.return_value = { 'lastModified' : 10 }
 
-            self.mock_blizzard_api = mock_api
+                self.mock_blizzard_api = mock_api
+                self.mock_get = mock_get
 
-            self.audit = Audit(self.config)
+                self.audit = Audit(self.config)
 
-    def test_blizzard_api_called(self, mock_character_process):
+        session = sessionmaker(self.audit.engine)()
+        chars = session.query(Character).all()
+
+        for c in chars:
+            c.lastmodified = 10
+
+        session.commit()
+        session.close()
+
+    def test_timestamp_set(self, mock_process_blizzard, mocker):
+        Utility.set_refresh_timestamp(datetime.datetime.utcnow()) # Prevent update_snapshots from failing
+        mock_utility = mocker.patch('altaudit.audit.Utility')
+        dt = mocker.MagicMock()
+        dt.utcnow.return_value = datetime.datetime(2019, 8, 5)
+
+        self.audit.refresh(dt)
+
+        mock_utility.set_refresh_timestamp.assert_called_once_with(datetime.datetime(2019, 8, 5))
+
+    def test_blizzard_api_called(self):
         self.audit.refresh(datetime.datetime)
         self.audit.blizzard_api.get_character_profile.assert_called_once_with(region='us', realm='kiljaeden',
                 character_name='clegg', locale=BLIZZARD_LOCALE,
                 fields=','.join(BLIZZARD_CHARACTER_FIELDS))
 
-    def test_timestamp_set(self, mock_character_process, mocker):
-        mock_utility = mocker.patch('altaudit.audit.Utility')
-        dt = mocker.MagicMock()
-        dt.utcnow.return_value = 5
+    def test_raiderio_called(self):
 
-        self.audit.refresh(dt)
+        self.audit.refresh(datetime.datetime)
 
-        mock_utility.set_refresh_timestamp.assert_called_once_with(5)
+        self.mock_get.assert_called_once_with(RAIDERIO_URL.format(
+            region='us', realm='kiljaeden', character_name='clegg'))
 
-    def test_character_snapsotupdated(self, mock_character_process, mocker):
+    @pytest.mark.skip(reason='WCL layout is not yet designed')
+    def test_wcl_called(self):
+        self.audit.refresh(datetime.datetime)
+
+        self.mock_get.assert_called_once_with(WCL_URL.format(region='us', realm='kiljaeden',
+            character_name='clegg', zone=23, metric='dps'))
+
+    def test_character_snapsotupdated(self, mocker):
         mock_update_snapshot = mocker.patch('altaudit.audit.Character.update_snapshot')
         self.audit.refresh(datetime.datetime)
 
         mock_update_snapshot.assert_called_once()
 
-    def test_character_process(self, mock_character_process):
+    def test_character_process_blizzard(self, mock_process_blizzard):
         self.audit.blizzard_api.get_character_profile.return_value = 5
 
         self.audit.refresh(datetime.datetime)
 
-        mock_character_process.assert_called_once_with(5, self.audit.blizzard_api)
+        mock_process_blizzard.assert_called_once_with(5, self.audit.blizzard_api)
+
+    def test_character_process_blizzard(self, mock_process_raiderio):
+        self.audit.refresh(datetime.datetime)
+
+        mock_process_raiderio.assert_called_once_with(self.mock_get.return_value.json())

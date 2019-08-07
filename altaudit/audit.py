@@ -12,7 +12,7 @@ from wowapi import WowApi
 
 from .utility import Utility
 from .models import Base, Class, Faction, Race, Region, Realm, Character
-from .constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS
+from .constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
 
 def _character_as_dict(character):
     return {'character_name' : character.name,
@@ -26,12 +26,13 @@ class Audit:
     This class will hold all necessary data across multiple refreshes
     """
 
-    def __init__(self, config):
+    def __init__(self, config, retry_conn_failures=False):
         self.engine = create_engine(config['database'])
         # TODO: Should we set retry_conn_failure here?
-        self.blizzard_api = WowApi(**config['api']['blizzard'])
+        self.blizzard_api = WowApi(**config['api']['blizzard'],
+                retry_conn_failures=retry_conn_failures)
         # self.wcl_key = config['api']['wcl']['public_key']
-        # self.request_session = requests.Session()
+        self.request_session = requests.Session()
 
         self.server = config['server']
 
@@ -134,8 +135,8 @@ class Audit:
             fields=','.join(BLIZZARD_CHARACTER_FIELDS))
             for c in characters}
 
-        # rio_resp = {c : self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(c))).json()
-        #         for c in characters}
+        rio_resp = {c : self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(c))).json()
+                for c in characters}
 
         # TODO Need to get proper metric and perhaps different zones?
         # wcl_resp = {c : self.request_session.get(WCL_URL.format(**_character_as_dict(c),
@@ -145,5 +146,5 @@ class Audit:
             character.update_snapshot()
             session.flush() # Needed to load snapshot defaults if new snapshot created
             character.process_blizzard(blizz_resp[character], self.blizzard_api)
-            # character.process_rio(rio_resp[character])
+            character.process_raiderio(rio_resp[character])
             # character.process_wcl(wcl_resp[character])
