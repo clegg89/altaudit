@@ -11,8 +11,9 @@ import requests
 from wowapi import WowApi
 
 from .utility import Utility
-from .models import Base, Class, Faction, Race, Region, Realm, Character
+from .models import Base, Class, Faction, Race, Region, Realm, Character, Gem
 from .constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
+from .gem_enchant import gem_lookup
 
 def _character_as_dict(character):
     return {'character_name' : character.name,
@@ -45,6 +46,7 @@ class Audit:
         self._create_factions(session)
         self._create_classes(session)
         self._create_races(session)
+        self._create_gems(session)
 
         self._remove_old_characters(session, characters)
         self._add_missing_characters(session, characters)
@@ -78,6 +80,12 @@ class Audit:
             Race(r['name'], id=r['id'],
                 faction=fquery.filter_by(name=r['side'].capitalize()).first())
             for r in races])
+
+    def _create_gems(self, session):
+        for id, details in gem_lookup.items():
+            if session.query(Gem).filter_by(id=id).first() == None:
+                g = Gem(id, **details)
+                session.add(g)
 
     def _remove_old_characters(self, session, config):
         config_characters = [{'name' : character, 'realm' : realm, 'region' : region}

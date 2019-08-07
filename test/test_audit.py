@@ -8,8 +8,9 @@ from sqlalchemy.orm import sessionmaker
 
 from altaudit.audit import Audit
 from altaudit.utility import Utility
-from altaudit.models import Faction, Class, Race, Region, Realm, Character
+from altaudit.models import Faction, Class, Race, Region, Realm, Character, Gem
 from altaudit.constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
+from altaudit.gem_enchant import gem_lookup
 
 wow_classes = {'classes': [
     {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
@@ -221,6 +222,33 @@ class TestAuditInit:
 
         assert db_session.query(Race).count() == 23
         assert db_session.query(Race).filter_by(name='Voldunai').first() == None
+
+    def test_create_gems(self, db_session):
+        self.audit._create_gems(db_session)
+        test_gem_id = list(gem_lookup.keys())[0]
+
+        test = db_session.query(Gem).filter_by(id=test_gem_id).first()
+
+        assert test.quality == gem_lookup[test_gem_id]['quality']
+        assert test.name == gem_lookup[test_gem_id]['name']
+        assert test.icon == gem_lookup[test_gem_id]['icon']
+        assert test.stat == gem_lookup[test_gem_id]['stat']
+
+    def test_create_gems_does_not_delete(self, db_session):
+        g = Gem(14330, 1, 'Fake Stone', 'inv_fake', '+20 BS')
+        db_session.add(g)
+        db_session.commit()
+        db_session.close()
+
+        self.audit._create_gems(db_session)
+
+        result = db_session.query(Gem).filter_by(id=14330).first()
+
+        assert result != None
+        assert result.quality == 1
+        assert result.name == 'Fake Stone'
+        assert result.icon == 'inv_fake'
+        assert result.stat == '+20 BS'
 
     def test_regions_added(self, db_session):
         self.audit._add_missing_characters(db_session, self.config['characters'])
