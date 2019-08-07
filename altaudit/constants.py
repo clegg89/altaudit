@@ -2,8 +2,6 @@
 
 RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm}&name={character_name}&fields=mythic_plus_scores_by_season,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
 
-WCL_URL="https://www.warcraftlogs.com:443/v1/rankings/character/{character_name}/{realm}/{region}?zone={zone}&metric={metric}&timeframe=historical&api_key={key}"
-
 """
 Reset days and times.
 
@@ -25,6 +23,12 @@ ITEM_SLOTS = [
     'legs', 'feet', 'finger1', 'finger2',
     'trinket1', 'trinket2', 'mainHand', 'offHand'
 ]
+
+"Azerite piece item slots"
+AZERITE_ITEM_SLOTS = [ 'head', 'shoulder', 'chest' ]
+
+"Number of Azerite Tiers"
+AZERITE_TIERS = 5
 
 "WoW expansions"
 EXPACS = [
@@ -77,11 +81,11 @@ CHARACTER_HEADER_FIELDS = {
     'hoa_level' : 'Column(Integer)',
     'azerite_experience' : 'Column(Integer)',
     'azerite_experience_remaining' : 'Column(Integer)',
-    'azerite_this_week' : 'Column(Integer)',
+    'azerite_this_week' : "''", # Obtained of snapshots
 
-    **{'{}_tier{}_{}'.format(piece, tier, field) : 'Column(String)'
-        for piece in ['head', 'shoulder', 'chest']
-        for tier in range(5)
+    **{'{}_tier{}_{}'.format(piece, tier, field) : "''" # Composite from azerite_traits table
+        for piece in AZERITE_ITEM_SLOTS
+        for tier in range(AZERITE_TIERS)
         for field in ['available', 'selected']},
 
     **{'{}_enchant_{}'.format(slot, field[0]) : field[1]
@@ -106,11 +110,11 @@ CHARACTER_HEADER_FIELDS = {
     'island_weekly_done' : 'Column(String)',
     'islands_total' : 'Column(Integer)',
     'world_quests_total' : 'Column(Integer)',
-    'world_quests_weekly' : 'Column(Integer)',
+    'world_quests_weekly' : "''", # Obtained from snapshots
     'weekly_event_done' : 'Column(String)',
     'dungeons_total' : 'Column(Integer)',
     'dungeons_each_total' : 'Column(String)',
-    'dungeons_weekly' : 'Column(Integer)',
+    'dungeons_weekly' : "''", # Obtained from snapshots
     'raiderio_score' : 'Column(Float)',
     'mplus_weekly_highest' : 'Column(Integer)',
     'mplus_season_highest' : 'Column(Integer)',

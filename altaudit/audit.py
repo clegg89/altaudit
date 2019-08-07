@@ -119,6 +119,7 @@ class Audit:
         for r in empty:
             session.delete(r)
 
+    # TODO Add force refresh
     def refresh(self, dt):
         """
         Refresh each character
@@ -138,13 +139,8 @@ class Audit:
         rio_resp = {c : self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(c))).json()
                 for c in characters}
 
-        # TODO Need to get proper metric and perhaps different zones?
-        # wcl_resp = {c : self.request_session.get(WCL_URL.format(**_character_as_dict(c),
-        #     zone=23, metric='dps')).json() for c in characters}
-
         for character in characters:
             character.update_snapshot()
             session.flush() # Needed to load snapshot defaults if new snapshot created
             character.process_blizzard(blizz_resp[character], self.blizzard_api)
             character.process_raiderio(rio_resp[character])
-            # character.process_wcl(wcl_resp[character])
