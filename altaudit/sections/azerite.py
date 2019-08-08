@@ -7,7 +7,7 @@ def azerite(character, response, db_session, api):
     # TODO make a Item->Trait table so we can avoid always querying the API
     items_response = response['items']
 
-    if neck in items_response and items_response['neck']['quality'] == 6:
+    if 'neck' in items_response and items_response['neck']['quality'] == 6:
         hoa = items_response['neck']['azeriteItem']
         character.hoa_level = hoa['azeriteLevel']
         character.azerite_experience = hoa['azeriteExperience']
@@ -20,8 +20,9 @@ def azerite(character, response, db_session, api):
 def _azerite_item(character, item, db_session, api, slot):
     item_traits = item['azeriteEmpoweredItem']['azeritePowers']
 
-    setattr(character, '_{}_tier{}_selected'.format(slot, tier), None)
-    setattr(character, '_{}_tier{}_available'.format(slot, tier), [])
+    for tier in range(AZERITE_TIERS):
+        setattr(character, '_{}_tier{}_selected'.format(slot, tier), None)
+        setattr(character, '_{}_tier{}_available'.format(slot, tier), [])
 
     if not item_traits:
         for tier in range(AZERITE_TIERS):

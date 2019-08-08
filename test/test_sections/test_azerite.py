@@ -4,11 +4,15 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from altaudit.models import Base, Character, AzeriteTrait
+from altaudit.models import Base, Class, Character, AzeriteTrait
 
 import altaudit.sections as Section
 
-fake_azerite_item_class_powers = {
+hoa_item_info = {'id': 158075, 'name': 'Heart of Azeroth', 'icon': 'inv_heartofazeroth', 'quality': 6, 'itemLevel': 427, 'azeriteItem': {'azeriteLevel': 47, 'azeriteExperience': 1062, 'azeriteExperienceRemaining': 22815}}
+
+non_hoa_neck_item_info = {'id': 122666, 'name': 'Eternal Woven Ivy Necklace', 'icon': 'inv_misc_herb_15', 'quality': 7, 'itemLevel': 65}
+
+fake_azerite_item_class_powers_in_db = {
     '5': [
         {'id': 560, 'tier': 3, 'spellId': 288802},
         {'id': 113, 'tier': 3, 'spellId': 272775},
@@ -61,6 +65,34 @@ fake_azerite_item_class_powers = {
         {'id': 232, 'tier': 4, 'spellId': 275425},
         {'id': 460, 'tier': 4, 'spellId': 279909}]}
 
+fake_azerite_item_class_powers_not_in_db = {
+    '9': [
+        {'id': 561, 'tier': 3, 'spellId': 288802},
+        {'id': 124, 'tier': 3, 'spellId': 272891},
+        {'id': 132, 'tier': 3, 'spellId': 272944},
+        {'id': 133, 'tier': 3, 'spellId': 287637},
+        {'id': 33, 'tier': 2, 'spellId': 266180},
+        {'id': 465, 'tier': 2, 'spellId': 279926},
+        {'id': 22, 'tier': 2, 'spellId': 263984},
+        {'id': 209, 'tier': 1, 'spellId': 274418},
+        {'id': 16, 'tier': 1, 'spellId': 263962},
+        {'id': 19, 'tier': 0, 'spellId': 263978},
+        {'id': 231, 'tier': 4, 'spellId': 275372},
+        {'id': 185, 'tier': 4, 'spellId': 273521},
+        {'id': 239, 'tier': 4, 'spellId': 275395},
+        {'id': 192, 'tier': 4, 'spellId': 273523},
+        {'id': 234, 'tier': 4, 'spellId': 275425},
+        {'id': 463, 'tier': 4, 'spellId': 279909}]}
+
+fake_azerite_item_traits_in_db = {
+        'id' : 165822,
+        'azeriteEmpoweredItem' : { 'azeritePowers' : [
+                 {'id': 13, 'tier': 0, 'spellId': 263978},
+                 {'id': 15, 'tier': 1, 'spellId': 263962},
+                 {'id': 30, 'tier': 2, 'spellId': 266180},
+                 {'id': 123, 'tier': 3, 'spellId': 272891},
+                 {'id': 183, 'tier': 4, 'spellId': 273521}]}}
+
 @pytest.fixture(scope='module')
 def db():
     engine = create_engine('sqlite://')
@@ -69,6 +101,11 @@ def db():
     session = sessionmaker(engine)()
 
     # TODO add some AzeriteTrait models here
+    session.add(Class('Warlock', id=9))
+
+    for trait in fake_azerite_item_class_powers_in_db['9']:
+        session.add(AzeriteTrait(trait['id'], trait['spellId'],
+            'Fake Azerite Name', 'inv_fake_icon'))
 
     session.commit()
     session.close()
@@ -85,15 +122,51 @@ def db_session(db):
 
 @pytest.fixture
 def mock_api(mocker):
-    return mocker.MagicMock()
+    mock = mocker.MagicMock()
+
+    mock.get_item.return_value = { 'azeriteClassPowers' :
+            fake_azerite_item_class_powers_in_db }
+
+    return mock
 
 """
 Tests:
-    - hoa info with valid HOA (no azerite pieces to save exec time)
-    - hoa info None with no HOA (no azerite pieces to save exec time)
     - Valid Selected and Available traits for single AP slot
     - Valid Selected and Available traits for all AP slot
     - Traits filled in from database when present (use single AP slot)
     - Traits fetched from API when not present (use single AP slot)
     - Traits are None and empty when no slot
 """
+
+def test_hoa_info():
+    jack = Character('jack')
+    response = { 'items' : { 'neck' : hoa_item_info } }
+    Section.azerite(jack, response, None, None)
+    assert jack.hoa_level == 47
+    assert jack.azerite_experience == 1062
+    assert jack.azerite_experience_remaining == 22815
+
+def test_hoa_info_no_neck():
+    jack = Character('jack')
+    response = { 'items' : {} }
+    Section.azerite(jack, response, None, None)
+    assert jack.hoa_level == None
+    assert jack.azerite_experience == None
+    assert jack.azerite_experience_remaining ==  None
+
+def test_hoa_info_non_hoa_neck():
+    jack = Character('jack')
+    response = { 'items' : { 'neck' : non_hoa_neck_item_info } }
+    Section.azerite(jack, response, None, None)
+    assert jack.hoa_level == None
+    assert jack.azerite_experience == None
+    assert jack.azerite_experience_remaining ==  None
+
+def test_azerite_item_in_db(db_session, mock_api):
+    jack = Character('jack', class_id=9)
+    response = { 'items' : { 'head' : fake_azerite_item_traits_in_db } }
+    Section.azerite(jack, response, db_session, mock_api)
+    assert jack._head_tier0_selected.id == 13
+    assert jack._head_tier0_selected.spell_id == 263978
+    assert jack._head_tier0_selected.name == 'Fake Azerite Name'
+    assert jack._head_tier0_selected.icon == 'inv_fake_icon'
