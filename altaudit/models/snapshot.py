@@ -53,4 +53,3 @@ class Snapshot(IdMixin, Base):
     week_id = Column(Integer, ForeignKey('weeks.id'), nullable=False, unique=True)
     world_quests = Column(Integer, default=0)
     dungeons = Column(Integer, default=0)
-    azerite_power = Column(Integer, default=0)

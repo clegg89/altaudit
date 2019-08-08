@@ -68,6 +68,7 @@ class Character(IdMixin, Base):
 
     for slot in AZERITE_ITEM_SLOTS:
         for tier in range(AZERITE_TIERS):
+            # Relationships are _SLOT_tierNUMBER_selected and _SLOT_tierNUMBER_available
             slot_tier = '{}_tier{}'.format(slot, tier)
             selected = '{}_selected'.format(slot_tier)
             selected_fk = '{}_id'.format(selected)

@@ -23,7 +23,6 @@ def test_no_overwrite_existing():
     clegg.snapshots[2019][31] = Snapshot()
     clegg.snapshots[2019][31].world_quests = 5
     clegg.snapshots[2019][31].dungeons = 10
-    clegg.snapshots[2019][31].azerite_power = 30
 
     Utility.set_refresh_timestamp(now)
 
@@ -31,4 +30,3 @@ def test_no_overwrite_existing():
 
     assert clegg.snapshots[2019][31].world_quests == 5
     assert clegg.snapshots[2019][31].dungeons == 10
-    assert clegg.snapshots[2019][31].azerite_power == 30

@@ -94,7 +94,6 @@ CHARACTER_HEADER_FIELDS = {
     'hoa_level' : 'Column(Integer)',
     'azerite_experience' : 'Column(Integer)',
     'azerite_experience_remaining' : 'Column(Integer)',
-    'azerite_this_week' : "''", # Obtained of snapshots
 
     **{'{}_tier{}_{}'.format(piece, tier, field) : "''" # Composite from azerite_traits table
         for piece in AZERITE_ITEM_SLOTS

@@ -47,7 +47,6 @@ def test_add_snapshots_to_character(db_session):
     s1 = Snapshot()
     s1.world_quests = 10
     s1.dungeons = 20
-    s1.azerite_power = 1500
     clegg.snapshots[2019] = {}
     clegg.snapshots[2019][3] = s1
 
@@ -72,5 +71,4 @@ def test_snapshot_default_values(db_session):
 
     assert snapshot.world_quests == 0
     assert snapshot.dungeons == 0
-    assert snapshot.azerite_power == 0
 
