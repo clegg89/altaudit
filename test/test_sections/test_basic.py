@@ -101,3 +101,71 @@ def test_basic_info_name(fake_response_maker, db_session):
     response = fake_response_maker(name='Jack')
     Section.basic(jack, response, db_session)
     assert jack.name_api == 'Jack'
+
+def test_basic_info_realm(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(realm="Zin'azshara")
+    Section.basic(jack, response, db_session)
+    assert jack.realm_name == "Zin'azshara"
+
+def test_basic_info_timestamp(fake_response_maker, db_session):
+    jack = Character('jack')
+    now = datetime.datetime.now().timestamp()*1000
+    response = fake_response_maker(timestamp=now)
+    Section.basic(jack, response, db_session)
+    assert jack.lastmodified == now
+
+def test_basic_info_class(fake_response_maker, db_session):
+    jack = Character('jack')
+    kls = 10
+    response = fake_response_maker(kls=kls)
+    Section.basic(jack, response, db_session)
+    assert jack.class_name == 'Monk'
+
+def test_basic_info_level(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(level=45)
+    Section.basic(jack, response, db_session)
+    assert jack.level == 45
+
+def test_basic_info_mainspec(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(mainspec='Shadow')
+    Section.basic(jack, response, db_session)
+    assert jack.mainspec == 'Shadow'
+
+def test_basic_info_faction(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker()
+    Section.basic(jack, response, db_session)
+    assert jack.faction_name == 'Alliance'
+
+def test_basic_info_gender(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(gender=1)
+    Section.basic(jack, response, db_session)
+    assert jack.gender == 'Female'
+
+def test_basic_info_race(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(race=32)
+    Section.basic(jack, response, db_session)
+    assert jack.race_name == "Kul Tiran"
+
+def test_basic_info_avatar(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker()
+    Section.basic(jack, response, db_session)
+    assert jack.avatar == 'realm1/96/184987488-avatar.jpg'
+
+def test_basic_info_bust(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker()
+    Section.basic(jack, response, db_session)
+    assert jack.bust == 'realm1/96/184987488-inset.jpg'
+
+def test_basic_info_render(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker()
+    Section.basic(jack, response, db_session)
+    assert jack.render == 'realm1/96/184987488-main.jpg'
