@@ -77,7 +77,7 @@ fake_azerite_item_class_powers_not_in_db = {
         {'id': 209, 'tier': 1, 'spellId': 274418},
         {'id': 16, 'tier': 1, 'spellId': 263962},
         {'id': 19, 'tier': 0, 'spellId': 263978},
-        {'id': 231, 'tier': 4, 'spellId': 275372},
+        {'id': 238, 'tier': 4, 'spellId': 275372},
         {'id': 185, 'tier': 4, 'spellId': 273521},
         {'id': 239, 'tier': 4, 'spellId': 275395},
         {'id': 192, 'tier': 4, 'spellId': 273523},
@@ -92,6 +92,15 @@ fake_azerite_item_traits_in_db = {
                  {'id': 30, 'tier': 2, 'spellId': 266180},
                  {'id': 123, 'tier': 3, 'spellId': 272891},
                  {'id': 183, 'tier': 4, 'spellId': 273521}]}}
+
+fake_azerite_item_traits_not_in_db = {
+        'id' : 165822,
+        'azeriteEmpoweredItem' : { 'azeritePowers' : [
+                 {'id': 19, 'tier': 0, 'spellId': 263978},
+                 {'id': 16, 'tier': 1, 'spellId': 263962},
+                 {'id': 33, 'tier': 2, 'spellId': 266180},
+                 {'id': 124, 'tier': 3, 'spellId': 272891},
+                 {'id': 185, 'tier': 4, 'spellId': 273521}]}}
 
 @pytest.fixture(scope='module')
 def db():
@@ -129,15 +138,6 @@ def mock_api(mocker):
 
     return mock
 
-"""
-Tests:
-    - Valid Selected and Available traits for single AP slot
-    - Valid Selected and Available traits for all AP slot
-    - Traits filled in from database when present (use single AP slot)
-    - Traits fetched from API when not present (use single AP slot)
-    - Traits are None and empty when no slot
-"""
-
 def test_hoa_info():
     jack = Character('jack')
     response = { 'items' : { 'neck' : hoa_item_info } }
@@ -166,7 +166,59 @@ def test_azerite_item_in_db(db_session, mock_api):
     jack = Character('jack', class_id=9)
     response = { 'items' : { 'head' : fake_azerite_item_traits_in_db } }
     Section.azerite(jack, response, db_session, mock_api)
+
+    # TODO probably should verify more than one trait
     assert jack._head_tier0_selected.id == 13
     assert jack._head_tier0_selected.spell_id == 263978
     assert jack._head_tier0_selected.name == 'Fake Azerite Name'
     assert jack._head_tier0_selected.icon == 'inv_fake_icon'
+    assert jack._head_tier0_available[0].id == 13
+    assert jack._head_tier0_available[0].spell_id == 263978
+    assert jack._head_tier0_available[0].name == 'Fake Azerite Name'
+    assert jack._head_tier0_available[0].icon == 'inv_fake_icon'
+
+def test_azerite_item_not_in_db(db_session, mock_api):
+    mock_api.get_item.return_value = { 'azeriteClassPowers' :
+            fake_azerite_item_class_powers_not_in_db }
+
+    def _get_spell(region, spellId, locale=None):
+        assert region == 'us'
+        assert locale == 'en_US'
+        return { 'id' : spellId, 'name' : 'Fake Name', 'icon' : 'inv_fake' }
+
+    mock_api.get_spell.side_effect = _get_spell
+
+    jack = Character('jack', class_id=9)
+    response = { 'items' : { 'head' : fake_azerite_item_traits_not_in_db } }
+    Section.azerite(jack, response, db_session, mock_api)
+
+    # TODO probably should verify more than one trait
+    assert jack._head_tier0_selected.id == 19
+    assert mock_api.get_spell.call_count == 16
+    assert jack._head_tier0_selected.spell_id == 263978
+    assert jack._head_tier0_selected.name == 'Fake Name'
+    assert jack._head_tier0_selected.icon == 'inv_fake'
+    assert jack._head_tier0_available[0].id == 19
+    assert jack._head_tier0_available[0].spell_id == 263978
+    assert jack._head_tier0_available[0].name == 'Fake Name'
+    assert jack._head_tier0_available[0].icon == 'inv_fake'
+
+def test_azerite_item_no_item():
+    jack = Character('jack')
+    response = { 'items' : {} }
+
+    Section.azerite(jack, response, None, None)
+
+    # TODO probably should verify more than one trait
+    assert jack._head_tier0_selected == None
+    assert jack._head_tier0_available == []
+
+def test_azerite_item_no_traits():
+    jack = Character('jack')
+    response = { 'items' : { 'head' : { 'id' : 165822, 'azeriteEmpoweredItem' : { 'azeritePowers' : [] } } } }
+
+    Section.azerite(jack, response, None, None)
+
+    # TODO probably should verify more than one trait
+    assert jack._head_tier0_selected == None
+    assert jack._head_tier0_available == []
