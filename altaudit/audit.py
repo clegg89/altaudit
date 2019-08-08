@@ -12,7 +12,7 @@ from wowapi import WowApi
 
 from .utility import Utility
 from .models import Base, Class, Faction, Race, Region, Realm, Character, Gem
-from .constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
+from .constants import BLIZZARD_REGION, BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
 from .gem_enchant import gem_lookup
 
 def _character_as_dict(character):
@@ -68,12 +68,12 @@ class Audit:
 
     def _create_classes(self, session):
         session.query(Class).delete()
-        classes = self.blizzard_api.get_character_classes('us', locale=BLIZZARD_LOCALE)['classes']
+        classes = self.blizzard_api.get_character_classes(BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['classes']
         session.add_all([Class(c['name'], id=c['id']) for c in classes])
 
     def _create_races(self, session):
         session.query(Race).delete()
-        races = self.blizzard_api.get_character_races('us', locale=BLIZZARD_LOCALE)['races']
+        races = self.blizzard_api.get_character_races(BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['races']
 
         fquery = session.query(Faction)
         session.add_all([

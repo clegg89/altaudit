@@ -37,6 +37,9 @@ EXPACS = [
     'legion', 'battle_for_azeroth'
 ]
 
+"Region to use when fetching game data"
+BLIZZARD_REGION = 'us'
+
 "Locale to use when fetching"
 BLIZZARD_LOCALE = 'en_US'
 
@@ -53,7 +56,8 @@ BLIZZARD_CHARACTER_FIELDS = [
 
 "Column Headers and their database types"
 CHARACTER_HEADER_FIELDS = {
-    'name' : 'Column(Integer)',
+    # Basic Info
+    'name_api' : 'Column(String)',
     'realm_name' : "Column(Integer)",
     'realm_slug' : "association_proxy('realm', 'name')",
     'region_name' : "association_proxy('realm', 'region_name')",
@@ -67,6 +71,8 @@ CHARACTER_HEADER_FIELDS = {
     'avatar' : 'Column(String)',
     'bust' : 'Column(String)',
     'render' : 'Column(String)',
+
+    # Item Info
     'estimated_ilvl' : 'Column(Float)',
 
     **{'{}_{}'.format(slot, item[0]) : item[1]
@@ -78,6 +84,7 @@ CHARACTER_HEADER_FIELDS = {
             ('icon', 'Column(String)'),
             ('quality', 'Column(Integer)')]},
 
+    # Azerite Info
     'hoa_level' : 'Column(Integer)',
     'azerite_experience' : 'Column(Integer)',
     'azerite_experience_remaining' : 'Column(Integer)',
@@ -88,6 +95,7 @@ CHARACTER_HEADER_FIELDS = {
         for tier in range(AZERITE_TIERS)
         for field in ['available', 'selected']},
 
+    # Gear Audit
     **{'{}_enchant_{}'.format(slot, field[0]) : field[1]
         for slot in ['mainHand', 'offHand', 'finger1', 'finger2', 'hand', 'wrist']
         for field in [('id', 'Column(Integer)'), ('quality', 'Column(Integer)'), ('name', 'Column(String)'), ('description', 'Column(String)')]},
@@ -97,6 +105,7 @@ CHARACTER_HEADER_FIELDS = {
     **{'gem_{}'.format(field) : "''" # Composite from gems table
         for field in ['ids', 'qualities', 'names', 'icons', 'stats', 'slots']},
 
+    # Profession Info
     **{'{}_{}'.format(prof, field[0]) : field[1]
         for prof in ['primary1', 'primary2', 'cooking', 'fishing']
         for field in [('name', 'Column(String)'), ('icon', 'Column(String)'),
@@ -106,7 +115,10 @@ CHARACTER_HEADER_FIELDS = {
     **{'archaeology_{}'.format(field[0]) : field[1] for field in
         [('name', 'Column(String)'), ('icon', 'Column(String)'), ('level', 'Column(Integer)'), ('max', 'Column(Integer)')]},
 
+    # Reputations
     'reputations' : 'Column(String)',
+
+    # PvE and RaiderIO
     'island_weekly_done' : 'Column(String)',
     'islands_total' : 'Column(Integer)',
     'world_quests_total' : 'Column(Integer)',

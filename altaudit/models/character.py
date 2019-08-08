@@ -57,6 +57,7 @@ class GemSlotAssociation(Base):
 class Character(IdMixin, Base):
     __tablename__ = 'characters'
 
+    name = Column(String)
     realm_id = Column(Integer, ForeignKey('realms.id'))
     class_id = Column(Integer, ForeignKey('classes.id'))
     faction_id = Column(Integer, ForeignKey('factions.id'))
