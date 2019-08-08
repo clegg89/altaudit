@@ -24,6 +24,17 @@ ITEM_SLOTS = [
     'trinket1', 'trinket2', 'mainHand', 'offHand'
 ]
 
+"Item Fields to use in Character Model"
+ITEM_FIELD_COLUMNS = [
+    ('itemLevel','Column(Integer)'),
+    ('id', 'Column(Integer)'),
+    ('name', 'Column(String)'),
+    ('icon', 'Column(String)'),
+    ('quality', 'Column(Integer)')]
+
+"Item Fields"
+ITEM_FIELDS = [field[0] for field in ITEM_FIELD_COLUMNS]
+
 "Azerite piece item slots"
 AZERITE_ITEM_SLOTS = [ 'head', 'shoulder', 'chest' ]
 
@@ -77,12 +88,7 @@ CHARACTER_HEADER_FIELDS = {
 
     **{'{}_{}'.format(slot, item[0]) : item[1]
         for slot in ITEM_SLOTS
-        for item in [
-            ('ilvl','Column(Integer)'),
-            ('id', 'Column(Integer)'),
-            ('name', 'Column(String)'),
-            ('icon', 'Column(String)'),
-            ('quality', 'Column(Integer)')]},
+        for item in ITEM_FIELD_COLUMNS},
 
     # Azerite Info
     'hoa_level' : 'Column(Integer)',
