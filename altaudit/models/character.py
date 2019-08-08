@@ -114,13 +114,17 @@ class Character(IdMixin, Base):
         if week not in self.snapshots[year]:
             self.snapshots[year][week] = Snapshot()
 
-    def process_blizzard(self, response, api):
+    def process_blizzard(self, response, db_session, api, force_refresh):
         """
         Processes the response from blizzard's API for this character
 
         @param response The response from blizzard's api
 
+        @param db_session The database session to use for queries
+
         @param api The api object used to make the request
+
+        @param force_refresh If True will force the Character to update data
 
         @returns True if the character needs to be updated, False otherwise
         """
@@ -128,11 +132,13 @@ class Character(IdMixin, Base):
             # Already up-to-date
             return False
 
-    def process_raiderio(self, response):
+    def process_raiderio(self, response, db_session):
         """
         Processes the response from raider.io API for this character
 
         @param response The response from raider.io's API
+
+        @param db_session The database session to use for queries
 
         """
         pass

@@ -132,8 +132,7 @@ class Audit:
         for r in empty:
             session.delete(r)
 
-    # TODO Add force refresh
-    def refresh(self, dt):
+    def refresh(self, dt, force_refresh=False):
         """
         Refresh each character
 
@@ -155,5 +154,6 @@ class Audit:
         for character in characters:
             character.update_snapshot()
             session.flush() # Needed to load snapshot defaults if new snapshot created
-            character.process_blizzard(blizz_resp[character], self.blizzard_api)
-            character.process_raiderio(rio_resp[character])
+
+            character.process_blizzard(blizz_resp[character], session, self.blizzard_api, force_refresh)
+            character.process_raiderio(rio_resp[character], session)

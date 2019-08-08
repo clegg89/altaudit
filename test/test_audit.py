@@ -396,9 +396,9 @@ class TestAuditRefresh:
 
         self.audit.refresh(datetime.datetime)
 
-        mock_process_blizzard.assert_called_once_with(5, self.audit.blizzard_api)
+        mock_process_blizzard.assert_called_once()
 
     def test_character_process_raiderio(self, mock_process_raiderio):
         self.audit.refresh(datetime.datetime)
 
-        mock_process_raiderio.assert_called_once_with(self.mock_get.return_value.json())
+        mock_process_raiderio.assert_called_once()
