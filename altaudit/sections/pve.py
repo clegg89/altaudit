@@ -23,10 +23,13 @@ def _island_expeditions(character, response):
             character.islands_total += achiev_crit_quantity[achiev_crit.index(criteria)]
 
 def _world_quests(character, response):
-    wq_criteria_index = response['achievements']['criteria'].index(33094)
-    achiev_crit_quantity = response['achievements']['criteriaQuantity']
-    wq_total = achiev_crit_quantity[wq_criteria_index] if wq_criteria_index in achiev_crit_quantity else 0
-    character.world_quests_total = wq_total
+    try:
+        wq_criteria_index = response['achievements']['criteria'].index(33094)
+        achiev_crit_quantity = response['achievements']['criteriaQuantity']
+        wq_total = achiev_crit_quantity[wq_criteria_index]
+        character.world_quests_total = wq_total
+    except ValueError:
+        character.world_quests_total = 0
 
 def _weekly_event(character, response):
     character.weekly_event_done = 'FALSE'
@@ -67,7 +70,7 @@ def _raids(character, response):
                 if sub['name'] == "Dungeons & Raids")['subCategories']
             if stat['name'] == 'Battle for Azeroth')['statistics']
     encounters = [encounter['raid_ids'] for raid in VALID_RAIDS for encounter in raid['encounters']]
-    boss_ids = [i for encounter in encounters for ids for encounter.values() for i in ids]
+    boss_ids = [i for encounter in encounters for ids in encounter.values() for i in ids]
 
     for instance in instance_stats:
         if instance['id'] in boss_ids:
