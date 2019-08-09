@@ -1,5 +1,4 @@
 """Pull Gear Audit Data from API Response"""
-
 import copy
 
 from ..constants import BLIZZARD_REGION, BLIZZARD_LOCALE, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELDS, ITEM_SLOTS

@@ -54,12 +54,42 @@ ENCHANT_ITEM_FIELD_COLUMNS = [
 "Item Enchant Fields"
 ENCHANT_ITEM_FIELDS = [field[0] for field in ENCHANT_ITEM_FIELD_COLUMNS]
 
+"Professions, excluding Archaeology"
+PROFESSIONS = ['primary1', 'primary2', 'cooking', 'fishing']
+
+"List of all expacs and their profession prefix"
+PROFESSION_EXPACS = {
+    '' : 'classic',
+    'Outland' : 'burning_crusade',
+    'Northrend' : 'wrath_of_the_lich_king',
+    'Cataclysm' : 'cataclysm',
+    'Pandaria' : 'mists_of_pandaria',
+    'Draenor' : 'warlords_of_draenor',
+    'Legion' : 'legion',
+    'Kul Tiran' : 'battle_for_azeroth'}
+
 "WoW expansions"
-EXPACS = [
-    'classic', 'burning_crusade', 'wrath_of_the_lich_king',
-    'cataclysm', 'mists_of_pandaria', 'warlords_of_draenor',
-    'legion', 'battle_for_azeroth'
-]
+EXPACS = [v for v in PROFESSION_EXPACS.values()]
+
+"Profession Field Columns excluding Archaeology"
+PROFESSION_FIELD_COLUMNS = [
+    ('name', 'Column(String)'),
+    ('icon', 'Column(String)'),
+    *[('{}_{}'.format(expac, f), 'Column(Integer)')
+        for expac in EXPACS for f in ['level', 'max']]]
+
+"Profession Fields"
+PROFESSION_FIELDS = [f[0] for f in PROFESSION_FIELD_COLUMNS]
+
+"Archaeology Field Columns"
+ARCHAEOLOGY_FIELD_COLUMNS = [
+    ('name', 'Column(String)'),
+    ('icon', 'Column(String)'),
+    ('level', 'Column(Integer)'),
+    ('max', 'Column(Integer)')]
+
+"Archaeology Fields"
+ARCHAEOLOGY_FIELDS = [f[0] for f in ARCHAEOLOGY_FIELD_COLUMNS]
 
 "Region to use when fetching game data"
 BLIZZARD_REGION = 'us'
@@ -125,13 +155,11 @@ CHARACTER_HEADER_FIELDS = {
 
     # Profession Info
     **{'{}_{}'.format(prof, field[0]) : field[1]
-        for prof in ['primary1', 'primary2', 'cooking', 'fishing']
-        for field in [('name', 'Column(String)'), ('icon', 'Column(String)'),
-            *[('{}_{}'.format(expac, f), 'Column(Integer)')
-                for expac in EXPACS for f in ['level', 'max']]]},
+        for prof in PROFESSIONS
+        for field in PROFESSION_FIELD_COLUMNS},
 
     **{'archaeology_{}'.format(field[0]) : field[1] for field in
-        [('name', 'Column(String)'), ('icon', 'Column(String)'), ('level', 'Column(Integer)'), ('max', 'Column(Integer)')]},
+        ARCHAEOLOGY_FIELD_COLUMNS},
 
     # Reputations
     'reputations' : 'Column(String)',
