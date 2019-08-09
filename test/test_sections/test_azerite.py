@@ -109,7 +109,6 @@ def db():
 
     session = sessionmaker(engine)()
 
-    # TODO add some AzeriteTrait models here
     session.add(Class('Warlock', id=9))
 
     for trait in fake_azerite_item_class_powers_in_db['9']:

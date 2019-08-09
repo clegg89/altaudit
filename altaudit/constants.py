@@ -41,6 +41,19 @@ AZERITE_ITEM_SLOTS = [ 'head', 'shoulder', 'chest' ]
 "Number of Azerite Tiers"
 AZERITE_TIERS = 5
 
+"Item slots that can be enchanted (for BfA)"
+ENCHANTED_ITEM_SLOTS = [ 'mainHand', 'offHand', 'finger1', 'finger2', 'hand', 'wrist' ]
+
+"Item Enchant filds for use in Character Model"
+ENCHANT_ITEM_FIELD_COLUMNS = [
+        ('id', 'Column(Integer)'),
+        ('quality', 'Column(Integer)'),
+        ('name', 'Column(String)'),
+        ('description', 'Column(String)')]
+
+"Item Enchant Fields"
+ENCHANT_ITEM_FIELDS = [field[0] for field in ENCHANT_ITEM_FIELD_COLUMNS]
+
 "WoW expansions"
 EXPACS = [
     'classic', 'burning_crusade', 'wrath_of_the_lich_king',
@@ -102,8 +115,8 @@ CHARACTER_HEADER_FIELDS = {
 
     # Gear Audit
     **{'{}_enchant_{}'.format(slot, field[0]) : field[1]
-        for slot in ['mainHand', 'offHand', 'finger1', 'finger2', 'hand', 'wrist']
-        for field in [('id', 'Column(Integer)'), ('quality', 'Column(Integer)'), ('name', 'Column(String)'), ('description', 'Column(String)')]},
+        for slot in ENCHANTED_ITEM_SLOTS
+        for field in ENCHANT_ITEM_FIELD_COLUMNS},
 
     'empty_sockets' : 'Column(Integer)',
 
