@@ -50,6 +50,10 @@ class Week(IdMixin, Base):
 class Snapshot(IdMixin, Base):
     __tablename__ = 'snapshots'
 
+    # This data is a 'snapshot' of what these values were when the week began
+    # They are not an indication of how many have been done this week, but
+    # rather how many were done when this week started. We can then subtract
+    # the total from this number
     week_id = Column(Integer, ForeignKey('weeks.id'), nullable=False, unique=True)
     world_quests = Column(Integer, default=0)
     dungeons = Column(Integer, default=0)
