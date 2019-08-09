@@ -6,17 +6,17 @@ import datetime
 from altaudit.models import Region, Realm, Character, Snapshot
 from altaudit.utility import Utility
 
-def test_add_new_snapshot():
+def test_update_snapshot_add_new_snapshot():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
     Utility.set_refresh_timestamp(now)
 
-    clegg.update_snapshot()
+    clegg._update_snapshots()
 
     assert 2019 in clegg.snapshots
     assert 31 in clegg.snapshots[2019]
 
-def test_no_overwrite_existing():
+def test_update_snapshot_no_overwrite_existing():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
     clegg.snapshots[2019] = {}
@@ -26,7 +26,20 @@ def test_no_overwrite_existing():
 
     Utility.set_refresh_timestamp(now)
 
-    clegg.update_snapshot()
+    clegg._update_snapshots()
 
     assert clegg.snapshots[2019][31].world_quests == 5
     assert clegg.snapshots[2019][31].dungeons == 10
+
+def test_update_snapshot_capture_existing_totals():
+    clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 5)
+    clegg.world_quests_total = 300
+    clegg.dungeons_total = 40
+
+    Utility.set_refresh_timestamp(now)
+
+    clegg._update_snapshots()
+
+    assert clegg.snapshots[2019][31].world_quests == 300
+    assert clegg.snapshots[2019][31].dungeons == 40

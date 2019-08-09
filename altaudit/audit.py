@@ -152,8 +152,5 @@ class Audit:
                 for c in characters}
 
         for character in characters:
-            character.update_snapshot()
-            session.flush() # Needed to load snapshot defaults if new snapshot created
-
             character.process_blizzard(blizz_resp[character], session, self.blizzard_api, force_refresh)
             character.process_raiderio(rio_resp[character], session)

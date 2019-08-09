@@ -107,7 +107,7 @@ class Character(IdMixin, Base):
             hasattr(self, k):
                 self.__setattr__(k, v)
 
-    def update_snapshot(self):
+    def _update_snapshots(self):
         year = Utility.year[self.region_name]
         week = Utility.week[self.region_name]
         if year not in self.snapshots:
@@ -115,6 +115,8 @@ class Character(IdMixin, Base):
 
         if week not in self.snapshots[year]:
             self.snapshots[year][week] = Snapshot()
+            self.snapshots[year][week].world_quests = self.world_quests_total
+            self.snapshots[year][week].dungeons = self.dungeons_total
 
     def process_blizzard(self, response, db_session, api, force_refresh):
         """
@@ -130,9 +132,12 @@ class Character(IdMixin, Base):
 
         @returns True if the character needs to be updated, False otherwise
         """
-        if response['lastModified'] == self.lastmodified:
+        result = True
+        if response['lastModified'] == self.lastmodified or force_refresh:
             # Already up-to-date
-            return False
+            result = False
+        self._update_snapshots() # always update snapshots as we may go weeks without playing a character
+        return result
 
     def process_raiderio(self, response, db_session):
         """

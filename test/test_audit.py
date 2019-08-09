@@ -385,12 +385,6 @@ class TestAuditRefresh:
         self.mock_get.assert_called_once_with(WCL_URL.format(region='us', realm='kiljaeden',
             character_name='clegg', zone=23, metric='dps'))
 
-    def test_character_snapsotupdated(self, mocker):
-        mock_update_snapshot = mocker.patch('altaudit.audit.Character.update_snapshot')
-        self.audit.refresh(datetime.datetime)
-
-        mock_update_snapshot.assert_called_once()
-
     def test_character_process_blizzard(self, mock_process_blizzard):
         self.audit.blizzard_api.get_character_profile.return_value = 5
 

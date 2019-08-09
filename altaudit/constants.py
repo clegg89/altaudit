@@ -1,5 +1,22 @@
 """Charfetch Program Constants"""
 
+"Region to use when fetching game data"
+BLIZZARD_REGION = 'us'
+
+"Locale to use when fetching"
+BLIZZARD_LOCALE = 'en_US'
+
+"Fields to use in character profile fetch"
+BLIZZARD_CHARACTER_FIELDS = [
+    'items',
+    'reputation',
+    'audit',
+    'statistics'
+    'achievements',
+    'professions',
+    'quests'
+]
+
 RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm}&name={character_name}&fields=mythic_plus_scores_by_season,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
 
 """
@@ -115,21 +132,18 @@ REPUTATION_FACTION_ID = {
     ]
 }
 
-"Region to use when fetching game data"
-BLIZZARD_REGION = 'us'
-
-"Locale to use when fetching"
-BLIZZARD_LOCALE = 'en_US'
-
-"Fields to use in character profile fetch"
-BLIZZARD_CHARACTER_FIELDS = [
-    'items',
-    'reputation',
-    'audit',
-    'statistics'
-    'achievements',
-    'professions',
-    'quests'
+"Weekly Event Quest IDs"
+WEEKLY_EVENT_QUESTS = [
+  53032, # Burning Crusade timewalking
+  53036, # 4 Battleground matches
+  53033, # Lich King timewalking
+  53034, # Cataclysm timewalking
+  53035, # Pandaria timewalking
+  53037, # Emissary of war
+  53039, # Arena calls
+  53038, # Pet battles
+  53030, # World quests
+  54995, # Draenor timewalking
 ]
 
 "Column Headers and their database types"
