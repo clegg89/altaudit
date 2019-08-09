@@ -73,6 +73,16 @@ def test_utility_region_times_use_isocalendar():
     assert Utility.week['kr'] == 1
     assert Utility.week['tw'] == 1
 
+def test_utility_region_timestamps():
+    now = datetime.datetime(2019, 8, 8, 20, 31, 44, 0)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Utility.timestamp['us'] == 1565103600
+    assert Utility.timestamp['eu'] == 1565161200
+    assert Utility.timestamp['kr'] == 1565161200
+    assert Utility.timestamp['tw'] == 1565161200
+
 def test_flatten_list():
     expected_result = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     inlist = [1, [2, [3, [4, 5, 6]], 7], [8, 9], 10]

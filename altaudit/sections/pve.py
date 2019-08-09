@@ -1,6 +1,7 @@
 """Pull PvE Data from API"""
 
-from ..constants import WEEKLY_EVENT_QUESTS
+from ..constants import WEEKLY_EVENT_QUESTS, MYTHIC_DUNGEONS, VALID_RAIDS
+from ..utility import Utility
 
 def pve(character, response):
     _island_expeditions(character, response)
@@ -35,3 +36,40 @@ def _weekly_event(character, response):
             break
 
 def _dungeons(character, response):
+    dungeon_total = 0
+    achiev_crit = response['achievements']['criteria']
+    achiev_crit_quantity = response['achievements']['criteriaQuantity']
+    instance_stats = next(stat for stat in
+            next(sub for sub in response['statistics']['subCategories']
+                if sub['name'] == "Dungeons & Raids")['subCategories']
+            if stat['name'] == 'Battle for Azeroth')['statistics']
+
+    dungeon_count = 0
+    dungeon_list = {}
+    for name,(criteria,statistic) in MYTHIC_DUNGEONS.items():
+        amount = 0
+        if criteria and criteria in achiev_crit:
+            amount = achiev_crit_quantity[achiev_crit.index(criteria)]
+        if statistic:
+            stat = next((s for s in instance_stats if s['id'] == statistic), 0)
+            amount = max(amount, stat)
+
+        dungeon_count += amount
+        dungeon_list[name] = amount
+
+    character.dungeons_total = dungeon_count
+    character.dungeons_each_total = '|'.join(('{}+{}'.format(n,a) for n,a in dungeon_list.items()))
+
+def _raids(character, response):
+    raid_list = {}
+    instance_stats = next(stat for stat in
+            next(sub for sub in response['statistics']['subCategories']
+                if sub['name'] == "Dungeons & Raids")['subCategories']
+            if stat['name'] == 'Battle for Azeroth')['statistics']
+    encounters = [encounter['raid_ids'] for raid in VALID_RAIDS for encounter in raid['encounters']]
+    boss_ids = [i for encounter in encounters for ids for encounter.values() for i in ids]
+
+    for instance in instance_stats:
+        if instance['id'] in boss_ids:
+            raid_list[instance['id']] = (instance['quantity'],
+                    1 if (instance['lastUpdated'] / 1000) > Utility.timestamp[character.region_name] else 0)

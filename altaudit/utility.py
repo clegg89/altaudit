@@ -17,6 +17,7 @@ class Utility:
     "Convenience class to hold static variables and functions"
     year = {}
     week = {}
+    timestamp = {}
 
     @classmethod
     def set_refresh_timestamp(cls, now):
@@ -47,6 +48,7 @@ class Utility:
 
             cls.year[region] = reset_time.isocalendar()[0]
             cls.week[region] = reset_time.isocalendar()[1]
+            cls.timestamp[region] = int((reset_time - datetime.datetime.utcfromtimestamp(0)).total_seconds())
 
 
 def flatten(l):
