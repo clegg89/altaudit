@@ -17,14 +17,14 @@ def professions(character, response):
             name = prof_name[-1]
             expac = PROFESSION_EXPACS[' '.join(prof_name[:-1])]
             rank = prof['rank']
-            max_rank = prof['max'] if not expac == 'Kul Tiran' else 175
+            max_rank = prof['max'] if not expac == 'battle_for_azeroth' else 175
 
             if name not in professions[prof_type]:
                 professions[prof_type][name] = {
                         'name' : name,
-                        'icon' : prof['icon'] if 'icon' in prof else ''}
+                        'icon' : prof['icon'] if 'icon' in prof else None}
 
-            if 'icon' in prof and professions[prof_type][name]['icon'] == '':
+            if 'icon' in prof and not professions[prof_type][name]['icon']:
                 professions[prof_type][name]['icon'] = prof['icon']
 
             professions[prof_type][name]['{}_level'.format(expac)] = rank
