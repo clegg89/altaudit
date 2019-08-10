@@ -134,16 +134,16 @@ REPUTATION_FACTION_ID = {
 
 "Weekly Event Quest IDs"
 WEEKLY_EVENT_QUESTS = [
-  53032, # Burning Crusade timewalking
-  53036, # 4 Battleground matches
-  53033, # Lich King timewalking
-  53034, # Cataclysm timewalking
-  53035, # Pandaria timewalking
-  53037, # Emissary of war
-  53039, # Arena calls
-  53038, # Pet battles
-  53030, # World quests
-  54995, # Draenor timewalking
+    53032, # Burning Crusade timewalking
+    53036, # 4 Battleground matches
+    53033, # Lich King timewalking
+    53034, # Cataclysm timewalking
+    53035, # Pandaria timewalking
+    53037, # Emissary of war
+    53039, # Arena calls
+    53038, # Pet battles
+    53030, # World quests
+    54995, # Draenor timewalking
 ]
 
 "Mythic Dungeon Information"
@@ -156,7 +156,7 @@ MYTHIC_DUNGEONS = {
     'Siege of Boralus'     : (43355, 12773),
     'Temple of Sethraliss' : (40191, 12776),
     'Tol Dagor'            : (40944, 12782),
-    'Underrot'             : (12745, 12745),
+    'Underrot'             : (40184, 12745),
     'Waycrest Manor'       : (40144, 12785),
     'Operation: Mechagon'  : (None, 13620)
 }

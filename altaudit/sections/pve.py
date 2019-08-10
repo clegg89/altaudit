@@ -54,7 +54,7 @@ def _dungeons(character, response):
         if criteria and criteria in achiev_crit:
             amount = achiev_crit_quantity[achiev_crit.index(criteria)]
         if statistic:
-            stat = next((s for s in instance_stats if s['id'] == statistic), 0)
+            stat = next((s['quantity'] for s in instance_stats if s['id'] == statistic), 0)
             amount = max(amount, stat)
 
         dungeon_count += amount
