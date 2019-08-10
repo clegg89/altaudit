@@ -17,7 +17,7 @@ BLIZZARD_CHARACTER_FIELDS = [
     'quests'
 ]
 
-RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm}&name={character_name}&fields=mythic_plus_scores_by_season,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
+RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm}&name={character_name}&fields=mythic_plus_scores_by_season:current,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
 
 """
 Reset days and times.
@@ -362,11 +362,9 @@ CHARACTER_HEADER_FIELDS = {
     'mplus_weekly_highest' : 'Column(Integer)',
     'mplus_season_highest' : 'Column(Integer)',
 
-    **{'raids_{}'.format(difficulty) : 'Column(String)'
-        for difficulty in RAID_DIFFICULTIES},
-
-    **{'raids_{}_weekly'.format(difficulty) : 'Column(String)'
-        for difficulty in RAID_DIFFICULTIES}
+    **{'raids_{}{}'.format(difficulty,postfix) : 'Column(String)'
+            for difficulty in RAID_DIFFICULTIES
+            for postfix in ('','_weekly')}
 }
 
 HEADERS = [k for k in CHARACTER_HEADER_FIELDS.keys()]

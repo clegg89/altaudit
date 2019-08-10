@@ -66,9 +66,7 @@ def _dungeons(character, response):
 
 def _raids(character, response):
     raid_list = {}
-    raid_output = {
-            **{difficulty : [] for difficulty in RAID_DIFFICULTIES},
-            **{'{}_weekly'.format(difficulty) : [] for difficulty in RAID_DIFFICULTIES}}
+    raid_output = {'{}{}'.format(difficulty,postfix) : [] for difficulty in RAID_DIFFICULTIES for postfix in ('','_weekly')}
     instance_stats = next(stat for stat in
             next(sub for sub in response['statistics']['subCategories']
                 if sub['name'] == "Dungeons & Raids")['subCategories']
