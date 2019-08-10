@@ -1,6 +1,6 @@
 """Pull PvE Data from API"""
 
-from ..constants import WEEKLY_EVENT_QUESTS, MYTHIC_DUNGEONS, VALID_RAIDS
+from ..constants import WEEKLY_EVENT_QUESTS, MYTHIC_DUNGEONS, RAID_DIFFICULTIES, VALID_RAIDS
 from ..utility import Utility
 
 def pve(character, response):
@@ -8,6 +8,7 @@ def pve(character, response):
     _world_quests(character, response)
     _weekly_event(character, response)
     _dungeons(character, response)
+    _raids(character, response)
 
 def _island_expeditions(character, response):
     if 53435 in response['quests'] or 53436 in response['quests']:
@@ -65,6 +66,9 @@ def _dungeons(character, response):
 
 def _raids(character, response):
     raid_list = {}
+    raid_output = {
+            **{difficulty : [] for difficulty in RAID_DIFFICULTIES},
+            **{'{}_weekly'.format(difficulty) : [] for difficulty in RAID_DIFFICULTIES}}
     instance_stats = next(stat for stat in
             next(sub for sub in response['statistics']['subCategories']
                 if sub['name'] == "Dungeons & Raids")['subCategories']
@@ -76,3 +80,11 @@ def _raids(character, response):
         if instance['id'] in boss_ids:
             raid_list[instance['id']] = (instance['quantity'],
                     1 if (instance['lastUpdated'] / 1000) > Utility.timestamp[character.region_name] else 0)
+
+    for encounter in encounters:
+        for difficulty,ids in encounter.items():
+            raid_output[difficulty].append(max([raid_list[id][0] for id in ids if id in raid_list] + [0]))
+            raid_output['{}_weekly'.format(difficulty)].append(max([raid_list[id][1] for id in ids if id in raid_list] + [0]))
+
+    for metric,data in raid_output.items():
+        setattr(character, 'raids_{}'.format(metric), '|'.join(str(d) for d in data))
