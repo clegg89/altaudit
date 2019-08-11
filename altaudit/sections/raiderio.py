@@ -7,5 +7,6 @@ def raiderio(character, response):
             'season_highest' : response['mythic_plus_highest_level_runs']
             }
 
+    print(character.name)
     for metric,data in mplus.items():
         setattr(character, 'mplus_{}'.format(metric), data[0]['mythic_level'] if len(data) > 0 else 0)

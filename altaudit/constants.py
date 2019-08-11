@@ -8,10 +8,11 @@ BLIZZARD_LOCALE = 'en_US'
 
 "Fields to use in character profile fetch"
 BLIZZARD_CHARACTER_FIELDS = [
+    'talents',
     'items',
     'reputation',
     'audit',
-    'statistics'
+    'statistics',
     'achievements',
     'professions',
     'quests'

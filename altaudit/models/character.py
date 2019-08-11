@@ -138,14 +138,15 @@ class Character(IdMixin, Base):
 
         @param force_refresh If True will force the Character to update data
         """
+        Section.basic(self, response, db_session)
+        Section.items(self, response)
+
         if response['lastModified'] != self.lastmodified or force_refresh:
             # Only update if things have changed. API calls are expensive
             Section.azerite(self, response, db_session, api)
             Section.audit(self, response, db_session, api)
 
         # Below sections do not make api calls so no harm calling them
-        Section.basic(self, response, db_session)
-        Section.items(self, response)
         Section.professions(self, response)
         Section.reputations(self, response)
         Section.pve(self, response)
@@ -157,11 +158,15 @@ class Character(IdMixin, Base):
 
         @param response The response from raider.io's API
         """
-        Section.raiderio(self, response)
+        if not response.ok:
+            self.raiderio_score = 0
+            self.mplus_weekly_highest = 0
+            self.mplus_season_highest = 0
+        else:
+            Section.raiderio(self, response.json())
 
     def serialize(self):
         self._serialize_azerite()
         self._serialize_gems()
         self._get_snapshots()
-        print(HEADERS)
         return [getattr(self, field) for field in HEADERS]

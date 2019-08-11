@@ -104,7 +104,7 @@ class TestAuditInit:
 
             self.mock_blizzard_api = mock_api
 
-            self.audit = Audit(self.config, setup_database=False)
+            self.audit = Audit(self.config)
             self.audit._create_tables()
 
     @pytest.fixture
@@ -262,7 +262,7 @@ class TestAuditInit:
         assert result.stat == '+20 BS'
 
     def test_regions_added(self, db_session):
-        self.audit._add_missing_characters(db_session, self.config['characters'])
+        self.audit._add_missing_characters(db_session)
 
         query = db_session.query(Region).all()
         regions = [r.name for r in query]
@@ -271,7 +271,7 @@ class TestAuditInit:
         assert 'eu' in regions
 
     def test_realms_added(self, db_session):
-        self.audit._add_missing_characters(db_session, self.config['characters'])
+        self.audit._add_missing_characters(db_session)
 
         query = db_session.query(Realm).all()
         realms = [{'name' : r.name, 'region' : r.region_name} for r in query]
@@ -281,7 +281,7 @@ class TestAuditInit:
         assert {'name' : 'kiljaeden', 'region' : 'eu'} in realms
 
     def test_characters_added(self, db_session):
-        self.audit._add_missing_characters(db_session, self.config['characters'])
+        self.audit._add_missing_characters(db_session)
 
         query = db_session.query(Character).all()
         characters = [{'name' : c.name, 'realm' : c.realm_slug, 'region' : c.region_name} for c in query]
@@ -296,19 +296,19 @@ class TestAuditInit:
             realm=db_session.query(Realm).filter_by(name='kiljaeden').first()))
         db_session.commit()
 
-        self.audit._remove_old_characters(db_session, self.config['characters'])
+        self.audit._remove_old_characters(db_session)
 
         assert db_session.query(Character).filter_by(name='jack').first() == None
 
     def test_add_missing_characters(self, db_session):
-        self.audit._add_missing_characters(db_session, self.config['characters'])
+        self.audit._add_missing_characters(db_session)
 
         query = db_session.query(Character).filter_by(name='clegg').join(Realm).filter_by(name='kiljaeden').join(Region).filter_by(name='us')
         clegg = query.first()
         db_session.delete(clegg)
         db_session.commit()
 
-        self.audit._add_missing_characters(db_session, self.config['characters'])
+        self.audit._add_missing_characters(db_session)
 
         assert query.first().name == 'clegg'
 
@@ -356,6 +356,7 @@ class TestAuditRefresh:
                 self.mock_get = mock_get
 
                 self.audit = Audit(self.config)
+                self.audit.setup_database()
 
         session = sessionmaker(self.audit.engine)()
         chars = session.query(Character).all()

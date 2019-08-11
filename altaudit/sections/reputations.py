@@ -4,7 +4,7 @@ from ..constants import REPUTATION_FACTION_ID
 
 def reputations(character, response):
     reputation_response = response['reputation']
-    faction = character.faction_name
+    faction = character.faction_name.lower()
 
     result = ''
     for rep in REPUTATION_FACTION_ID[faction]:

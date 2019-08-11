@@ -15,6 +15,7 @@ def basic(character, response, db_session):
     character.avatar = response['thumbnail']
     character.bust = response['thumbnail'].replace('avatar', 'inset')
     character.render = response['thumbnail'].replace('avatar', 'main')
+    # db_session.flush()
 
 def _find_mainspec(response):
     mainspec = None

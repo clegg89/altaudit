@@ -27,18 +27,14 @@ class Audit:
     This class will hold all necessary data across multiple refreshes
     """
 
-    def __init__(self, config, setup_database=True, retry_conn_failures=False):
+    def __init__(self, config, retry_conn_failures=False):
         self.engine = create_engine(config['database'])
         self.blizzard_api = WowApi(**config['api']['blizzard'],
                 retry_conn_failures=retry_conn_failures)
         self.request_session = requests.Session()
+        self.config_characters = config['characters']
 
-        self.server = config['server']
-
-        if setup_database:
-            self._setup_database(config['characters'])
-
-    def _setup_database(self, characters):
+    def setup_database(self):
         self._create_tables()
 
         session = sessionmaker(self.engine)()
@@ -48,8 +44,8 @@ class Audit:
         self._create_races(session)
         self._create_gems(session)
 
-        self._remove_old_characters(session, characters)
-        self._add_missing_characters(session, characters)
+        self._remove_old_characters(session)
+        self._add_missing_characters(session)
 
         self._remove_empty_realms(session)
         self._remove_empty_regions(session)
@@ -87,9 +83,9 @@ class Audit:
                 g = Gem(id, **details)
                 session.add(g)
 
-    def _remove_old_characters(self, session, config):
+    def _remove_old_characters(self, session):
         config_characters = [{'name' : character, 'realm' : realm, 'region' : region}
-                for region,realms in config.items()
+                for region,realms in self.config_characters.items()
                 for realm,characters in realms.items()
                 for character in characters]
 
@@ -99,8 +95,8 @@ class Audit:
             if not {'name' : char.name, 'realm' : char.realm_name, 'region' : char.region_name} in config_characters:
                 session.delete(char)
 
-    def _add_missing_characters(self, session, config):
-        for region,realms in config.items():
+    def _add_missing_characters(self, session):
+        for region,realms in self.config_characters.items():
             region_model = session.query(Region).filter_by(name=region).first()
             if not region_model:
                 region_model = Region(region)
@@ -143,18 +139,18 @@ class Audit:
         session = sessionmaker(self.engine)()
         characters = session.query(Character).all()
 
-        blizz_resp = {c : self.blizzard_api.get_character_profile(**_character_as_dict(c),
-            locale=BLIZZARD_LOCALE,
-            fields=','.join(BLIZZARD_CHARACTER_FIELDS))
-            for c in characters}
-
-        rio_resp = {c : self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(c)))
-                for c in characters}
-
         output = []
         for character in characters:
-            character.process_blizzard(blizz_resp[character], session, self.blizzard_api, force_refresh)
-            character.process_raiderio(rio_resp[character])
+            blizz_resp = self.blizzard_api.get_character_profile(**_character_as_dict(character),
+                locale=BLIZZARD_LOCALE,
+                fields=','.join(BLIZZARD_CHARACTER_FIELDS))
+            rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
+
+            character.process_blizzard(blizz_resp, session, self.blizzard_api, force_refresh)
+            character.process_raiderio(rio_resp)
             output.append(character.serialize())
 
         writer.writerows(output)
+
+        session.commit()
+        session.close()

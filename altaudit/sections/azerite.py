@@ -39,6 +39,8 @@ def _azerite_item(character, item, db_session, api, slot):
             setattr(character, '_{}_tier{}_selected'.format(slot, tier), trait_model)
 
 def _item_traits(item, class_id, api):
+    print(item)
+    print(class_id)
     return api.get_item(BLIZZARD_REGION, item['id'], locale=BLIZZARD_LOCALE)['azeriteClassPowers'][str(class_id)]
 
 def _trait(trait, db_session, api):

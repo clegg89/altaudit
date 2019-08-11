@@ -1,3 +1,4 @@
+-e git+git@github.com:clegg89/altaudit.git@649d438cf16ce342614397a8f03998bd94f8f5f5#egg=AltAudit
 atomicwrites==1.3.0
 attrs==19.1.0
 certifi==2019.6.16

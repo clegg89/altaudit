@@ -53,6 +53,7 @@ def test_update_snapshot_capture_existing_totals():
     assert clegg.snapshots[2019][31].world_quests == 300
     assert clegg.snapshots[2019][31].dungeons == 40
 
+#TODO we need to check for call order using Mock and attach_mock
 def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapshots):
     jack = Character('jack', lastmodified=5)
     fake_response = { 'lastModified' : 10 }
@@ -98,12 +99,14 @@ def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, 
     mock_section.reputations.assert_called_once_with(jack, fake_response)
     mock_section.pve.assert_called_once_with(jack, fake_response)
 
-def test_process_raiderio(mock_section):
+# TODO Test for bad response (not response.ok)
+def test_process_raiderio(mock_section, mocker):
     jack = Character('jack')
+    mock_response = mocker.MagicMock()
 
-    jack.process_raiderio(4)
+    jack.process_raiderio(mock_response)
 
-    mock_section.raiderio.assert_called_once_with(jack, 4)
+    mock_section.raiderio.assert_called_once_with(jack, mock_response.json.return_value)
 
 def test_serialize_azerite():
     jack = Character('jack')
