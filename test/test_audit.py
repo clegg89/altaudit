@@ -63,6 +63,17 @@ def mock_process_blizzard(mocker):
 def mock_process_raiderio(mocker):
     return mocker.patch('altaudit.audit.Character.process_raiderio')
 
+@pytest.fixture
+def mock_serialize(mocker):
+    mock = mocker.patch('altaudit.audit.Character.serialize')
+    mock.return_value = [1, 2, 3, 4]
+
+    return mock
+
+@pytest.fixture
+def mock_writer(mocker):
+    return mocker.MagicMock()
+
 class TestAuditInit:
     @classmethod
     def setup_class(cls):
@@ -358,37 +369,42 @@ class TestAuditRefresh:
     # TODO mock_process_* have to be included below due to no error handling
     # When better error handling is added these can be removed
 
-    def test_timestamp_set(self, mock_process_blizzard, mock_process_raiderio, mocker):
+    def test_timestamp_set(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize, mocker):
         Utility.set_refresh_timestamp(datetime.datetime.utcnow()) # Prevent update_snapshots from failing
         mock_utility = mocker.patch('altaudit.audit.Utility')
         dt = mocker.MagicMock()
         dt.utcnow.return_value = datetime.datetime(2019, 8, 5)
 
-        self.audit.refresh(dt)
+        self.audit.refresh(dt, mock_writer)
 
         mock_utility.set_refresh_timestamp.assert_called_once_with(datetime.datetime(2019, 8, 5))
 
-    def test_blizzard_api_called(self, mock_process_blizzard, mock_process_raiderio):
-        self.audit.refresh(datetime.datetime)
+    def test_blizzard_api_called(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
+        self.audit.refresh(datetime.datetime, mock_writer)
         self.audit.blizzard_api.get_character_profile.assert_called_once_with(region='us', realm='kiljaeden',
                 character_name='clegg', locale=BLIZZARD_LOCALE,
                 fields=','.join(BLIZZARD_CHARACTER_FIELDS))
 
-    def test_raiderio_called(self, mock_process_blizzard, mock_process_raiderio):
+    def test_raiderio_called(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
 
-        self.audit.refresh(datetime.datetime)
+        self.audit.refresh(datetime.datetime, mock_writer)
 
         self.mock_get.assert_called_once_with(RAIDERIO_URL.format(
             region='us', realm='kiljaeden', character_name='clegg'))
 
-    def test_character_process_blizzard(self, mock_process_blizzard, mock_process_raiderio):
+    def test_character_process_blizzard(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
         self.audit.blizzard_api.get_character_profile.return_value = 5
 
-        self.audit.refresh(datetime.datetime)
+        self.audit.refresh(datetime.datetime, mock_writer)
 
         mock_process_blizzard.assert_called_once()
 
-    def test_character_process_raiderio(self, mock_process_blizzard, mock_process_raiderio):
-        self.audit.refresh(datetime.datetime)
+    def test_character_process_raiderio(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
+        self.audit.refresh(datetime.datetime, mock_writer)
 
         mock_process_raiderio.assert_called_once()
+
+    def test_refresh_returns_list(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
+        self.audit.refresh(datetime.datetime, mock_writer)
+
+        mock_writer.writerows.assert_called_once_with([mock_serialize.return_value])

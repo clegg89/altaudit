@@ -132,7 +132,7 @@ class Audit:
         for r in empty:
             session.delete(r)
 
-    def refresh(self, dt, force_refresh=False):
+    def refresh(self, dt, writer, force_refresh=False):
         """
         Refresh each character
 
@@ -151,6 +151,10 @@ class Audit:
         rio_resp = {c : self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(c)))
                 for c in characters}
 
+        output = []
         for character in characters:
             character.process_blizzard(blizz_resp[character], session, self.blizzard_api, force_refresh)
             character.process_raiderio(rio_resp[character])
+            output.append(character.serialize())
+
+        writer.writerows(output)
