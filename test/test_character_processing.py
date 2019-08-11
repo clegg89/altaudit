@@ -53,8 +53,7 @@ def test_update_snapshot_capture_existing_totals():
     assert clegg.snapshots[2019][31].world_quests == 300
     assert clegg.snapshots[2019][31].dungeons == 40
 
-#TODO we need to check for call order using Mock and attach_mock
-def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapshots):
+def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapshots, mocker):
     jack = Character('jack', lastmodified=5)
     fake_response = { 'lastModified' : 10 }
 
@@ -99,7 +98,34 @@ def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, 
     mock_section.reputations.assert_called_once_with(jack, fake_response)
     mock_section.pve.assert_called_once_with(jack, fake_response)
 
-# TODO Test for bad response (not response.ok)
+def test_process_blizzard_basic_before_azerite(mock_section, mock_update_snapshots, mocker):
+    jack = Character('jack', lastmodified=5)
+    fake_response = { 'lastModified' : 10 }
+    manager = mocker.Mock()
+    manager.attach_mock(mock_section.basic, 'basic')
+    manager.attach_mock(mock_section.azerite, 'azerite')
+
+    jack.process_blizzard(fake_response, 3, 4, False)
+
+    mock_update_snapshots.assert_called_once()
+    manager.assert_has_calls([
+        mocker.call.basic(jack, fake_response, 3),
+        mocker.call.azerite(jack, fake_response, 3, 4)])
+
+def test_process_blizzard_basic_before_audit(mock_section, mock_update_snapshots, mocker):
+    jack = Character('jack', lastmodified=5)
+    fake_response = { 'lastModified' : 10 }
+    manager = mocker.Mock()
+    manager.attach_mock(mock_section.basic, 'basic')
+    manager.attach_mock(mock_section.audit, 'audit')
+
+    jack.process_blizzard(fake_response, 3, 4, False)
+
+    mock_update_snapshots.assert_called_once()
+    manager.assert_has_calls([
+        mocker.call.basic(jack, fake_response, 3),
+        mocker.call.audit(jack, fake_response, 3, 4)])
+
 def test_process_raiderio(mock_section, mocker):
     jack = Character('jack')
     mock_response = mocker.MagicMock()
@@ -107,6 +133,19 @@ def test_process_raiderio(mock_section, mocker):
     jack.process_raiderio(mock_response)
 
     mock_section.raiderio.assert_called_once_with(jack, mock_response.json.return_value)
+
+def test_process_raiderio_bad_response(mock_section, mocker):
+    jack = Character('jack')
+    mock_response = mocker.MagicMock()
+
+    mock_response.ok = False
+
+    jack.process_raiderio(mock_response)
+
+    mock_section.raiderio.assert_not_called()
+    assert jack.raiderio_score == 0
+    assert jack.mplus_weekly_highest == 0
+    assert jack.mplus_season_highest == 0
 
 def test_serialize_azerite():
     jack = Character('jack')
