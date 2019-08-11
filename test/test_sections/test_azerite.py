@@ -166,7 +166,6 @@ def test_azerite_item_in_db(db_session, mock_api):
     response = { 'items' : { 'head' : fake_azerite_item_traits_in_db } }
     Section.azerite(jack, response, db_session, mock_api)
 
-    # TODO probably should verify more than one trait
     assert jack._head_tier0_selected.id == 13
     assert jack._head_tier0_selected.spell_id == 263978
     assert jack._head_tier0_selected.name == 'Fake Azerite Name'
@@ -175,6 +174,7 @@ def test_azerite_item_in_db(db_session, mock_api):
     assert jack._head_tier0_available[0].spell_id == 263978
     assert jack._head_tier0_available[0].name == 'Fake Azerite Name'
     assert jack._head_tier0_available[0].icon == 'inv_fake_icon'
+    assert len(jack._head_tier0_available) == 1
 
 def test_azerite_item_not_in_db(db_session, mock_api):
     mock_api.get_item.return_value = { 'azeriteClassPowers' :
@@ -191,7 +191,6 @@ def test_azerite_item_not_in_db(db_session, mock_api):
     response = { 'items' : { 'head' : fake_azerite_item_traits_not_in_db } }
     Section.azerite(jack, response, db_session, mock_api)
 
-    # TODO probably should verify more than one trait
     assert jack._head_tier0_selected.id == 19
     assert mock_api.get_spell.call_count == 16
     assert jack._head_tier0_selected.spell_id == 263978
@@ -208,7 +207,6 @@ def test_azerite_item_no_item():
 
     Section.azerite(jack, response, None, None)
 
-    # TODO probably should verify more than one trait
     assert jack._head_tier0_selected == None
     assert jack._head_tier0_available == []
 
@@ -218,6 +216,5 @@ def test_azerite_item_no_traits():
 
     Section.azerite(jack, response, None, None)
 
-    # TODO probably should verify more than one trait
     assert jack._head_tier0_selected == None
     assert jack._head_tier0_available == []
