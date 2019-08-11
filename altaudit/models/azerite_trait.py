@@ -15,3 +15,6 @@ class AzeriteTrait(IdMixin, Base):
         self.spell_id = spell_id
         self.name = name
         self.icon = icon
+
+    def __str__(self):
+        return '+'.join(str(x) for x in [self.id, self.spell_id, self.name, self.icon])

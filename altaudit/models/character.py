@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from ..constants import CHARACTER_HEADER_FIELDS, AZERITE_ITEM_SLOTS, AZERITE_TIERS
+from ..constants import CHARACTER_HEADER_FIELDS, HEADERS, AZERITE_ITEM_SLOTS, AZERITE_TIERS
 from ..utility import Utility
 from .. import sections as Section
 
@@ -106,6 +106,26 @@ class Character(IdMixin, Base):
             self.snapshots[year][week].world_quests = self.world_quests_total
             self.snapshots[year][week].dungeons = self.dungeons_total
 
+    def _serialize_azerite(self):
+        for slot in AZERITE_ITEM_SLOTS:
+            for tier in range(AZERITE_TIERS):
+                selected = str(getattr(self, '_{}_tier{}_selected'.format(slot, tier)))
+                setattr(self, '{}_tier{}_selected'.format(slot, tier), selected)
+                available = '|'.join([str(x) for x in getattr(self, '_{}_tier{}_available'.format(slot, tier))])
+                setattr(self, '{}_tier{}_available'.format(slot, tier), available)
+
+    def _serialize_gems(self):
+        self.gem_ids = '|'.join([str(g.gem.id) for g in self.gems])
+        self.gem_qualities = '|'.join([str(g.gem.quality) for g in self.gems])
+        self.gem_names = '|'.join([str(g.gem.name) for g in self.gems])
+        self.gem_icons = '|'.join([str(g.gem.icon) for g in self.gems])
+        self.gem_stats = '|'.join([str(g.gem.stat) for g in self.gems])
+        self.gem_slots = '|'.join([g.slot for g in self.gems])
+
+    def _get_snapshots(self):
+        self.world_quests_weekly = self.world_quests_total - self.snapshots[Utility.year[self.region_name]][Utility.week[self.region_name]].world_quests
+        self.dungeons_weekly = self.dungeons_total - self.snapshots[Utility.year[self.region_name]][Utility.week[self.region_name]].dungeons
+
     def process_blizzard(self, response, db_session, api, force_refresh):
         """
         Processes the response from blizzard's API for this character
@@ -138,3 +158,10 @@ class Character(IdMixin, Base):
         @param response The response from raider.io's API
         """
         Section.raiderio(self, response)
+
+    def serialize(self):
+        self._serialize_azerite()
+        self._serialize_gems()
+        self._get_snapshots()
+        print(HEADERS)
+        return [getattr(self, field) for field in HEADERS]

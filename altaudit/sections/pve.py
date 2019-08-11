@@ -40,7 +40,6 @@ def _weekly_event(character, response):
             break
 
 def _dungeons(character, response):
-    dungeon_total = 0
     achiev_crit = response['achievements']['criteria']
     achiev_crit_quantity = response['achievements']['criteriaQuantity']
     instance_stats = next(stat for stat in

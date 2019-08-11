@@ -3,7 +3,8 @@ import pytest
 
 import datetime
 
-from altaudit.models import Region, Realm, Character, Snapshot
+import altaudit
+from altaudit.models import Region, Realm, Character, Snapshot, AzeriteTrait, Gem, GemSlotAssociation
 from altaudit.utility import Utility
 
 @pytest.fixture
@@ -103,3 +104,63 @@ def test_process_raiderio(mock_section):
     jack.process_raiderio(4)
 
     mock_section.raiderio.assert_called_once_with(jack, 4)
+
+def test_serialize_azerite():
+    jack = Character('jack')
+    jack._head_tier0_selected = AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard')
+    jack._head_tier0_available = [
+            AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'),
+            AzeriteTrait(12, 234444, 'Made Up Trait', 'inv_fakeicon')]
+
+    jack._serialize_azerite()
+
+    assert jack.head_tier0_selected == '13+263978+Azerite Empowered+inv_smallazeriteshard'
+    assert jack.head_tier0_available == '13+263978+Azerite Empowered+inv_smallazeriteshard|12+234444+Made Up Trait+inv_fakeicon'
+
+def test_serialize_gems():
+    jack = Character('jack')
+    jack.gems = [
+        GemSlotAssociation('wrist',
+            Gem(168641, 5, 'Quick Sand Spinel', 'inv_misc_gem_x4_uncommon_perfectcut_yellow', '+50 Haste')),
+        GemSlotAssociation('waist',
+            Gem(168645, 5, 'Masterful Name', 'inv_misc_gem_x5_uncommon_perfectcut_purple', '+50 Mastery'))
+        ]
+
+    jack._serialize_gems()
+
+    assert jack.gem_ids == '168641|168645'
+    assert jack.gem_qualities == '5|5'
+    assert jack.gem_names == 'Quick Sand Spinel|Masterful Name'
+    assert jack.gem_icons == 'inv_misc_gem_x4_uncommon_perfectcut_yellow|inv_misc_gem_x5_uncommon_perfectcut_purple'
+    assert jack.gem_stats == '+50 Haste|+50 Mastery'
+    assert jack.gem_slots == 'wrist|waist'
+
+def test_get_snapshots():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots = { 2019 : { 32 : Snapshot() } }
+    jack.snapshots[2019][32].world_quests = 300
+    jack.snapshots[2019][32].dungeons = 20
+    jack.world_quests_total = 320
+    jack.dungeons_total = 24
+    now = datetime.datetime(2019, 8, 7)
+    Utility.set_refresh_timestamp(now)
+
+    jack._get_snapshots()
+
+    assert jack.world_quests_weekly == 20
+    assert jack.dungeons_weekly == 4
+
+def test_serialzie(mocker):
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    mock_serialize_azerite = mocker.patch('altaudit.models.character.Character._serialize_azerite')
+    mock_serialize_gems = mocker.patch('altaudit.models.character.Character._serialize_gems')
+    mock_get_snapshots = mocker.patch('altaudit.models.character.Character._get_snapshots')
+
+    altaudit.models.character.HEADERS = [ 'name', 'region_name', 'realm_slug' ]
+
+    result = jack.serialize()
+
+    assert result == ['jack', 'us', 'kiljaeden']
+    mock_serialize_azerite.assert_called_once()
+    mock_serialize_gems.assert_called_once()
+    mock_get_snapshots.assert_called_once()
