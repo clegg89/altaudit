@@ -18,6 +18,7 @@ class Utility:
     year = {}
     week = {}
     timestamp = {}
+    refresh_time = None
 
     @classmethod
     def set_refresh_timestamp(cls, now):
@@ -32,6 +33,9 @@ class Utility:
         Luckily it should all work out on the next refresh, and working
         trying to work around it is too complicated for the pay off
         """
+        # Store the actual refresh timestamp
+        cls.refresh_time = now
+
         # Go back to the last hour mark
         time_now = datetime.datetime.combine(now.date(), datetime.time(now.hour))
 

@@ -10,8 +10,7 @@ import pytest
 
 import datetime
 
-from altaudit.utility import *
-# from altaudit.utility import Utility
+from altaudit.utility import Utility
 
 def test_utility_region_times_before_reset():
     now = datetime.datetime(2019, 8, 5, 20, 32, 34, 85)
@@ -82,3 +81,10 @@ def test_utility_region_timestamps():
     assert Utility.timestamp['eu'] == 1565161200
     assert Utility.timestamp['kr'] == 1565161200
     assert Utility.timestamp['tw'] == 1565161200
+
+def test_utility_refresh_time():
+    now = datetime.datetime(2019, 8, 8, 20, 31, 44, 0)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Utility.refresh_time == now

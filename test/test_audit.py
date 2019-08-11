@@ -11,6 +11,7 @@ from altaudit.utility import Utility
 from altaudit.models import Faction, Class, Race, Region, Realm, Character, Gem
 from altaudit.constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
 from altaudit.gem_enchant import gem_lookup
+import altaudit.sections as Section
 
 wow_classes = {'classes': [
     {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
@@ -408,7 +409,7 @@ class TestAuditRefresh:
     def test_refresh_returns_list(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
         self.audit.refresh(datetime.datetime, mock_writer)
 
-        mock_writer.writerows.assert_called_once_with([mock_serialize.return_value])
+        mock_writer.writerows.assert_called_once_with([Section.metadata(), mock_serialize.return_value])
 
     def tes_refresh_commit_data(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize, mocker):
         mock_commit = mocker.patch('altaudit.audit.sqlalchemy.orm.session.Session.commit')

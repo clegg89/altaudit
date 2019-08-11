@@ -1,5 +1,11 @@
 """Charfetch Program Constants"""
 
+"""Software Version"""
+VERSION = '0.0.1'
+
+"""Targetted WoW Patch"""
+WOW_PATCH = '8.2.0'
+
 "Region to use when fetching game data"
 BLIZZARD_REGION = 'us'
 

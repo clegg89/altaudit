@@ -14,6 +14,7 @@ from .utility import Utility
 from .models import Base, Class, Faction, Race, Region, Realm, Character, Gem
 from .constants import BLIZZARD_REGION, BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
 from .gem_enchant import gem_lookup
+from . import sections as Section
 
 def _character_as_dict(character):
     return {'character_name' : character.name,
@@ -139,7 +140,7 @@ class Audit:
         session = sessionmaker(self.engine)()
         characters = session.query(Character).all()
 
-        output = []
+        output = [Section.metadata()]
         for character in characters:
             blizz_resp = self.blizzard_api.get_character_profile(**_character_as_dict(character),
                 locale=BLIZZARD_LOCALE,
