@@ -409,3 +409,5 @@ class TestAuditRefresh:
         self.audit.refresh(datetime.datetime, mock_writer)
 
         mock_writer.writerows.assert_called_once_with([mock_serialize.return_value])
+
+    # TODO test to make sure new data was committed
