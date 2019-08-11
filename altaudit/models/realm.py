@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from .base import Base, IdMixin
-from .character import Character
 
 class Realm(IdMixin, Base):
     __tablename__ = 'realms'

@@ -355,7 +355,10 @@ class TestAuditRefresh:
         session.commit()
         session.close()
 
-    def test_timestamp_set(self, mock_process_blizzard, mocker):
+    # TODO mock_process_* have to be included below due to no error handling
+    # When better error handling is added these can be removed
+
+    def test_timestamp_set(self, mock_process_blizzard, mock_process_raiderio, mocker):
         Utility.set_refresh_timestamp(datetime.datetime.utcnow()) # Prevent update_snapshots from failing
         mock_utility = mocker.patch('altaudit.audit.Utility')
         dt = mocker.MagicMock()
@@ -365,34 +368,27 @@ class TestAuditRefresh:
 
         mock_utility.set_refresh_timestamp.assert_called_once_with(datetime.datetime(2019, 8, 5))
 
-    def test_blizzard_api_called(self):
+    def test_blizzard_api_called(self, mock_process_blizzard, mock_process_raiderio):
         self.audit.refresh(datetime.datetime)
         self.audit.blizzard_api.get_character_profile.assert_called_once_with(region='us', realm='kiljaeden',
                 character_name='clegg', locale=BLIZZARD_LOCALE,
                 fields=','.join(BLIZZARD_CHARACTER_FIELDS))
 
-    def test_raiderio_called(self):
+    def test_raiderio_called(self, mock_process_blizzard, mock_process_raiderio):
 
         self.audit.refresh(datetime.datetime)
 
         self.mock_get.assert_called_once_with(RAIDERIO_URL.format(
             region='us', realm='kiljaeden', character_name='clegg'))
 
-    @pytest.mark.skip(reason='WCL layout is not yet designed')
-    def test_wcl_called(self):
-        self.audit.refresh(datetime.datetime)
-
-        self.mock_get.assert_called_once_with(WCL_URL.format(region='us', realm='kiljaeden',
-            character_name='clegg', zone=23, metric='dps'))
-
-    def test_character_process_blizzard(self, mock_process_blizzard):
+    def test_character_process_blizzard(self, mock_process_blizzard, mock_process_raiderio):
         self.audit.blizzard_api.get_character_profile.return_value = 5
 
         self.audit.refresh(datetime.datetime)
 
         mock_process_blizzard.assert_called_once()
 
-    def test_character_process_raiderio(self, mock_process_raiderio):
+    def test_character_process_raiderio(self, mock_process_blizzard, mock_process_raiderio):
         self.audit.refresh(datetime.datetime)
 
         mock_process_raiderio.assert_called_once()

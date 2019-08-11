@@ -148,9 +148,9 @@ class Audit:
             fields=','.join(BLIZZARD_CHARACTER_FIELDS))
             for c in characters}
 
-        rio_resp = {c : self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(c))).json()
+        rio_resp = {c : self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(c)))
                 for c in characters}
 
         for character in characters:
             character.process_blizzard(blizz_resp[character], session, self.blizzard_api, force_refresh)
-            character.process_raiderio(rio_resp[character], session)
+            character.process_raiderio(rio_resp[character])

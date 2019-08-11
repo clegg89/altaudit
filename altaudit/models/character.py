@@ -6,10 +6,12 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from ..constants import CHARACTER_HEADER_FIELDS, AZERITE_ITEM_SLOTS, AZERITE_TIERS
 from ..utility import Utility
+from .. import sections as Section
 
 from .base import Base, IdMixin
 from .azerite_trait import AzeriteTrait
 from .gem import Gem
+from .gem_slot_association import GemSlotAssociation
 from .snapshot import Year, Snapshot
 
 """
@@ -39,20 +41,6 @@ for slot in AZERITE_ITEM_SLOTS:
         exec("""{} = Table('{}', Base.metadata,
     Column('character_id', Integer, ForeignKey('characters.id')),
     Column('azerite_trait_id', Integer, ForeignKey('azerite_traits.id')))""".format(var_name, table_name))
-
-class GemSlotAssociation(Base):
-    "AssocaitionObject pattern used to store the slot of the gem"
-    __tablename__ = 'characters_gems'
-    character_id = Column(Integer, ForeignKey('characters.id'), primary_key=True)
-    gem_id = Column(Integer, ForeignKey('gems.id'), primary_key=True)
-    slot = Column(String)
-
-    gem = relationship('Gem')
-
-    def __init__(self, slot, gem=None):
-        self.slot=slot
-        if gem:
-            self.gem = gem
 
 class Character(IdMixin, Base):
     __tablename__ = 'characters'
@@ -129,23 +117,24 @@ class Character(IdMixin, Base):
         @param api The api object used to make the request
 
         @param force_refresh If True will force the Character to update data
-
-        @returns True if the character needs to be updated, False otherwise
         """
-        result = True
-        if response['lastModified'] == self.lastmodified or force_refresh:
-            # Already up-to-date
-            result = False
-        self._update_snapshots() # always update snapshots as we may go weeks without playing a character
-        return result
+        if response['lastModified'] != self.lastmodified or force_refresh:
+            # Only update if things have changed. API calls are expensive
+            Section.azerite(self, response, db_session, api)
+            Section.audit(self, response, db_session, api)
 
-    def process_raiderio(self, response, db_session):
+        # Below sections do not make api calls so no harm calling them
+        Section.basic(self, response, db_session)
+        Section.items(self, response)
+        Section.professions(self, response)
+        Section.reputations(self, response)
+        Section.pve(self, response)
+        self._update_snapshots() # always update snapshots as we may go weeks without playing a character
+
+    def process_raiderio(self, response):
         """
         Processes the response from raider.io API for this character
 
         @param response The response from raider.io's API
-
-        @param db_session The database session to use for queries
-
         """
-        pass
+        Section.raiderio(self, response)
