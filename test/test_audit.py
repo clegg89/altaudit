@@ -410,4 +410,7 @@ class TestAuditRefresh:
 
         mock_writer.writerows.assert_called_once_with([mock_serialize.return_value])
 
-    # TODO test to make sure new data was committed
+    def tes_refresh_commit_data(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize, mocker):
+        mock_commit = mocker.patch('altaudit.audit.sqlalchemy.orm.session.Session.commit')
+        self.audit.refresh(datetime.datetime, mock_writer)
+        mock_commit.assert_called_once()
