@@ -34,8 +34,6 @@ def _enchant(character, slot, item):
     enchant_id = item['tooltipParams']['enchant']
     info = copy.copy(enchant_lookup[enchant_id]) if enchant_id in enchant_lookup else {'quality' : 0, 'name' : 'None', 'description' : None}
 
-    print(info['name'])
-
     # Handle special case of hands
     if info['description'] and slot == 'hand':
         f = character.faction_name

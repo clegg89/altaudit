@@ -371,47 +371,47 @@ class TestAuditRefresh:
     # TODO mock_process_* have to be included below due to no error handling
     # When better error handling is added these can be removed
 
-    def test_timestamp_set(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize, mocker):
+    def test_timestamp_set(self, mock_process_blizzard, mock_process_raiderio, mock_serialize, mocker):
         Utility.set_refresh_timestamp(datetime.datetime.utcnow()) # Prevent update_snapshots from failing
         mock_utility = mocker.patch('altaudit.audit.Utility')
         dt = mocker.MagicMock()
         dt.utcnow.return_value = datetime.datetime(2019, 8, 5)
 
-        self.audit.refresh(dt, mock_writer)
+        self.audit.refresh(dt)
 
         mock_utility.set_refresh_timestamp.assert_called_once_with(datetime.datetime(2019, 8, 5))
 
-    def test_blizzard_api_called(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
-        self.audit.refresh(datetime.datetime, mock_writer)
+    def test_blizzard_api_called(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
+        self.audit.refresh(datetime.datetime)
         self.audit.blizzard_api.get_character_profile.assert_called_once_with(region='us', realm='kiljaeden',
                 character_name='clegg', locale=BLIZZARD_LOCALE,
                 fields=','.join(BLIZZARD_CHARACTER_FIELDS))
 
-    def test_raiderio_called(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
+    def test_raiderio_called(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
 
-        self.audit.refresh(datetime.datetime, mock_writer)
+        self.audit.refresh(datetime.datetime)
 
         self.mock_get.assert_called_once_with(RAIDERIO_URL.format(
             region='us', realm='kiljaeden', character_name='clegg'))
 
-    def test_character_process_blizzard(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
+    def test_character_process_blizzard(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
         self.audit.blizzard_api.get_character_profile.return_value = 5
 
-        self.audit.refresh(datetime.datetime, mock_writer)
+        self.audit.refresh(datetime.datetime)
 
         mock_process_blizzard.assert_called_once()
 
-    def test_character_process_raiderio(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
-        self.audit.refresh(datetime.datetime, mock_writer)
+    def test_character_process_raiderio(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
+        self.audit.refresh(datetime.datetime)
 
         mock_process_raiderio.assert_called_once()
 
-    def test_refresh_returns_list(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize):
-        self.audit.refresh(datetime.datetime, mock_writer)
+    def test_refresh_returns_list(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
+        result = self.audit.refresh(datetime.datetime)
 
-        mock_writer.writerows.assert_called_once_with([Section.metadata(), mock_serialize.return_value])
+        assert result == [Section.metadata(), mock_serialize.return_value]
 
-    def tes_refresh_commit_data(self, mock_process_blizzard, mock_process_raiderio, mock_writer, mock_serialize, mocker):
+    def tes_refresh_commit_data(self, mock_process_blizzard, mock_process_raiderio, mock_serialize, mocker):
         mock_commit = mocker.patch('altaudit.audit.sqlalchemy.orm.session.Session.commit')
-        self.audit.refresh(datetime.datetime, mock_writer)
+        self.audit.refresh(datetime.datetime)
         mock_commit.assert_called_once()

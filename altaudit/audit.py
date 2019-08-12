@@ -129,7 +129,7 @@ class Audit:
         for r in empty:
             session.delete(r)
 
-    def refresh(self, dt, writer, force_refresh=False):
+    def refresh(self, dt, force_refresh=False):
         """
         Refresh each character
 
@@ -151,7 +151,7 @@ class Audit:
             character.process_raiderio(rio_resp)
             output.append(character.serialize())
 
-        writer.writerows(output)
-
         session.commit()
         session.close()
+
+        return output
