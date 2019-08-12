@@ -204,6 +204,36 @@ def test_get_snapshots():
     assert jack.world_quests_weekly == 20
     assert jack.dungeons_weekly == 4
 
+def test_get_snapshots_negative_world_quests():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots = { 2019 : { 32 : Snapshot() } }
+    jack.snapshots[2019][32].world_quests = 300
+    jack.snapshots[2019][32].dungeons = 20
+    jack.world_quests_total = 280
+    jack.dungeons_total = 24
+    now = datetime.datetime(2019, 8, 7)
+    Utility.set_refresh_timestamp(now)
+
+    jack._get_snapshots()
+
+    assert jack.world_quests_weekly == 0
+    assert jack.snapshots[2019][32].world_quests == 280
+
+def test_get_snapshots_negative_dungeons():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots = { 2019 : { 32 : Snapshot() } }
+    jack.snapshots[2019][32].world_quests = 300
+    jack.snapshots[2019][32].dungeons = 20
+    jack.world_quests_total = 320
+    jack.dungeons_total = 18
+    now = datetime.datetime(2019, 8, 7)
+    Utility.set_refresh_timestamp(now)
+
+    jack._get_snapshots()
+
+    assert jack.dungeons_weekly == 0
+    assert jack.snapshots[2019][32].dungeons == 18
+
 def test_serialzie(mocker):
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
     mock_serialize_azerite = mocker.patch('altaudit.models.character.Character._serialize_azerite')

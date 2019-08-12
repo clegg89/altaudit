@@ -124,8 +124,17 @@ class Character(IdMixin, Base):
         self.gem_slots = '|'.join([g.slot for g in self.gems])
 
     def _get_snapshots(self):
-        self.world_quests_weekly = self.world_quests_total - self.snapshots[Utility.year[self.region_name]][Utility.week[self.region_name]].world_quests
-        self.dungeons_weekly = self.dungeons_total - self.snapshots[Utility.year[self.region_name]][Utility.week[self.region_name]].dungeons
+        weekly_snapshot = self.snapshots[Utility.year[self.region_name]][Utility.week[self.region_name]]
+        self.world_quests_weekly = self.world_quests_total - weekly_snapshot.world_quests
+        self.dungeons_weekly = self.dungeons_total - weekly_snapshot.dungeons
+
+        # If something happened where snapshot total > our total, reset snapshot and set to 0
+        if self.world_quests_weekly < 0:
+            self.world_quests_weekly = 0
+            weekly_snapshot.world_quests = self.world_quests_total
+        if self.dungeons_weekly < 0:
+            self.dungeons_weekly = 0
+            weekly_snapshot.dungeons = self.dungeons_total
 
     def process_blizzard(self, response, db_session, api, force_refresh):
         """
