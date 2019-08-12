@@ -23,7 +23,7 @@ if __name__ == '__main__':
     audit = Audit(config)
     audit.setup_database()
 
-    result = audit.refresh(datetime)
+    result = audit.refresh(datetime, force_refresh=True)
     with open('characters.csv', 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(result)

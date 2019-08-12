@@ -25,15 +25,18 @@ if __name__ == '__main__':
 
     audit = Audit(config)
     audit.setup_database()
+    force_refresh=True
 
     while True:
         try:
-            result = audit.refresh(datetime.datetime)
+            result = audit.refresh(datetime.datetime, force_refresh=force_refresh)
             with open('characters.csv', 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerows(result)
 
             os.system('rsync -razq characters.csv {}'.format(config['server']))
+
+            force_refresh=False
             time.sleep(20)
 
         except Exception:
