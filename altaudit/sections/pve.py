@@ -19,7 +19,7 @@ def _island_expeditions(character, response):
     character.islands_total = 0
     achiev_crit = response['achievements']['criteria']
     achiev_crit_quantity = response['achievements']['criteriaQuantity']
-    for criteria in (40563, 40564, 40565):
+    for criteria in (40564, 40565): # PvE, PvP
         if criteria in achiev_crit:
             character.islands_total += achiev_crit_quantity[achiev_crit.index(criteria)]
 

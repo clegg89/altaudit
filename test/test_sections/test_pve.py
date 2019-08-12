@@ -56,13 +56,13 @@ def test_islands_weekly_quest_not_done():
 
     assert jack.island_weekly_done == 'FALSE'
 
-def test_islands_total_sum_of_three_criteria():
+def test_islands_total_sum_of_two_criteria():
     jack = Character('jack')
     response = {
             'quests' : [],
             'achievements' : {
-                'criteria' : [40563, 40564, 40565],
-                'criteriaQuantity' : [4, 10, 30]},
+                'criteria' : [40564, 40565],
+                'criteriaQuantity' : [10, 30]},
             'statistics' : {
                 'subCategories' : [
                     {'name' : 'Dungeons & Raids', 'subCategories' : [
@@ -70,7 +70,7 @@ def test_islands_total_sum_of_three_criteria():
 
     Section.pve(jack, response)
 
-    assert jack.islands_total == 44
+    assert jack.islands_total == 40
 
 def test_world_quests_total():
     jack = Character('jack')
