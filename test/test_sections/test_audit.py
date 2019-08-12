@@ -104,7 +104,7 @@ def test_audit_item_enchant_offhand_missing():
 def test_audit_item_enchant_offhand_not_enchantable():
     jack = Character('jack')
     response = { 'items' : {
-        'offHand' : {}},
+        'offHand' : {'tooltipParams' : {}}},
         'audit' : { 'emptySockets' : 0 }}
 
     Section.audit(jack, response, None, None)

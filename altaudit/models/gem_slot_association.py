@@ -4,11 +4,11 @@ from sqlalchemy.orm import relationship
 
 from .base import Base, IdMixin
 
-class GemSlotAssociation(Base):
+class GemSlotAssociation(IdMixin, Base):
     "AssocaitionObject pattern used to store the slot of the gem"
     __tablename__ = 'characters_gems'
-    character_id = Column(Integer, ForeignKey('characters.id'), primary_key=True)
-    gem_id = Column(Integer, ForeignKey('gems.id'), primary_key=True)
+    character_id = Column(Integer, ForeignKey('characters.id'))
+    gem_id = Column(Integer, ForeignKey('gems.id'))
     slot = Column(String)
 
     gem = relationship('Gem')

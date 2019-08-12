@@ -227,3 +227,26 @@ def test_add_character_gems(db_session):
 
     assert clegg.gems[0].slot == 'wrist'
     assert clegg.gems[0].gem.name == 'Quick Sand Spinel'
+
+def test_cascade_gem_slot_association_delete(db_session):
+    clegg = Character('clegg')
+    gemslot = GemSlotAssociation('wrist', Gem(168641, 5, 'Quick Sand Spinel', 'inv_misc_gem_x4_uncommon_perfectcut_yellow', '+50 Haste'))
+    clegg.gems.append(gemslot)
+
+    db_session.add(clegg)
+    db_session.flush()
+
+    clegg.gems = []
+
+    assert None == db_session.query(GemSlotAssociation).first()
+
+def test_character_can_have_multiple_gem_in_different_slots(db_session):
+    clegg = Character('clegg')
+    gem = Gem(168641, 5, 'Quick Sand Spinel', 'inv_misc_gem_x4_uncommon_perfectcut_yellow', '+50 Haste')
+    gemslotWrist = GemSlotAssociation('wrist', gem)
+    gemSlotWaist = GemSlotAssociation('waist', gem)
+    clegg.gems.append(gemslotWrist)
+    clegg.gems.append(gemSlotWaist)
+
+    db_session.add(clegg)
+    db_session.flush()

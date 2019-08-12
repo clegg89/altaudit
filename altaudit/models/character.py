@@ -68,7 +68,7 @@ class Character(IdMixin, Base):
             exec("{} = relationship('AzeriteTrait', foreign_keys=[{}])".format(selected_rel, selected_fk))
             exec("{} = relationship('AzeriteTrait', secondary={})".format(available_rel, available_sec))
 
-    gems = relationship('GemSlotAssociation')
+    gems = relationship('GemSlotAssociation', cascade='all, delete, delete-orphan')
 
     for k,v in CHARACTER_HEADER_FIELDS.items():
         exec('{} = {}'.format(k,v))
@@ -109,7 +109,8 @@ class Character(IdMixin, Base):
     def _serialize_azerite(self):
         for slot in AZERITE_ITEM_SLOTS:
             for tier in range(AZERITE_TIERS):
-                selected = str(getattr(self, '_{}_tier{}_selected'.format(slot, tier)))
+                selected = getattr(self, '_{}_tier{}_selected'.format(slot, tier))
+                selected = str(selected) if selected else None
                 setattr(self, '{}_tier{}_selected'.format(slot, tier), selected)
                 available = '|'.join([str(x) for x in getattr(self, '_{}_tier{}_available'.format(slot, tier))])
                 setattr(self, '{}_tier{}_available'.format(slot, tier), available)

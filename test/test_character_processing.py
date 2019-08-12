@@ -159,6 +159,18 @@ def test_serialize_azerite():
     assert jack.head_tier0_selected == '13+263978+Azerite Empowered+inv_smallazeriteshard'
     assert jack.head_tier0_available == '13+263978+Azerite Empowered+inv_smallazeriteshard|12+234444+Made Up Trait+inv_fakeicon'
 
+def test_serialize_azerite_no_selected():
+    jack = Character('jack')
+    jack._head_tier0_selected = None
+    jack._head_tier0_available = [
+            AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'),
+            AzeriteTrait(12, 234444, 'Made Up Trait', 'inv_fakeicon')]
+
+    jack._serialize_azerite()
+
+    assert jack.head_tier0_selected == None
+    assert jack.head_tier0_available == '13+263978+Azerite Empowered+inv_smallazeriteshard|12+234444+Made Up Trait+inv_fakeicon'
+
 def test_serialize_gems():
     jack = Character('jack')
     jack.gems = [

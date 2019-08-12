@@ -19,7 +19,6 @@ def db_session(db):
     Session = sessionmaker(db)
     session = Session()
     yield session
-    session.commit()
     session.close()
 
 @pytest.fixture

@@ -19,7 +19,7 @@ def audit(character, response, db_session, api):
 
 def _enchant(character, slot, item):
     # Handle special case of offHand weapon
-    if slot == 'offHand' and (not item or 'weaponInfo' not in response['items']['offHand']):
+    if slot == 'offHand' and (not item or 'weaponInfo' not in item):
         for field in ENCHANT_ITEM_FIELDS:
             setattr(character, 'offHand_enchant_{}'.format(field), None)
         return
