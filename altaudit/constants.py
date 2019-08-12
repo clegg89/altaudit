@@ -66,7 +66,7 @@ AZERITE_ITEM_SLOTS = [ 'head', 'shoulder', 'chest' ]
 AZERITE_TIERS = 5
 
 "Item slots that can be enchanted (for BfA)"
-ENCHANTED_ITEM_SLOTS = [ 'mainHand', 'offHand', 'finger1', 'finger2', 'hand', 'wrist' ]
+ENCHANTED_ITEM_SLOTS = [ 'mainHand', 'offHand', 'finger1', 'finger2', 'hands', 'wrist' ]
 
 "Item Enchant filds for use in Character Model"
 ENCHANT_ITEM_FIELD_COLUMNS = [

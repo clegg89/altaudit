@@ -115,30 +115,30 @@ def test_audit_item_enchant_offhand_not_enchantable():
     assert jack.offHand_enchant_description == None
 
 def test_audit_item_hand_alliance():
-    jack = Character('jack', faction_name='alliance')
+    jack = Character('jack', faction_name='Alliance')
     response = { 'items' : {
-        'hand' : { 'tooltipParams' : { 'enchant' : 5932 }}},
+        'hands' : { 'tooltipParams' : { 'enchant' : 5932 }}},
         'audit' : { 'emptySockets' : 0 }}
 
     Section.audit(jack, response, None, None)
 
-    assert jack.hand_enchant_id == 5932
-    assert jack.hand_enchant_quality == 4
-    assert jack.hand_enchant_name == "Kul Tiran Herbalism"
-    assert jack.hand_enchant_description == "Increase the speed of herb gathering on Kul Tiras and Zandalar"
+    assert jack.hands_enchant_id == 5932
+    assert jack.hands_enchant_quality == 4
+    assert jack.hands_enchant_name == "Kul Tiran Herbalism"
+    assert jack.hands_enchant_description == "Increase the speed of herb gathering on Kul Tiras and Zandalar"
 
 def test_audit_item_hand_horde():
-    jack = Character('jack', faction_name='horde')
+    jack = Character('jack', faction_name='Horde')
     response = { 'items' : {
-        'hand' : { 'tooltipParams' : { 'enchant' : 5932 }}},
+        'hands' : { 'tooltipParams' : { 'enchant' : 5932 }}},
         'audit' : { 'emptySockets' : 0 }}
 
     Section.audit(jack, response, None, None)
 
-    assert jack.hand_enchant_id == 5932
-    assert jack.hand_enchant_quality == 4
-    assert jack.hand_enchant_name == "Zandalari Herbalism"
-    assert jack.hand_enchant_description == "Increase the speed of herb gathering on Kul Tiras and Zandalar"
+    assert jack.hands_enchant_id == 5932
+    assert jack.hands_enchant_quality == 4
+    assert jack.hands_enchant_name == "Zandalari Herbalism"
+    assert jack.hands_enchant_description == "Increase the speed of herb gathering on Kul Tiras and Zandalar"
 
 def test_audit_empty_sockets():
     jack = Character('jack')

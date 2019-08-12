@@ -35,8 +35,8 @@ def _enchant(character, slot, item):
     info = copy.copy(enchant_lookup[enchant_id]) if enchant_id in enchant_lookup else {'quality' : 0, 'name' : 'None', 'description' : None}
 
     # Handle special case of hands
-    if info['description'] and slot == 'hand':
-        f = character.faction_name
+    if info['description'] and slot == 'hands':
+        f = character.faction_name.lower()
         prefix = 'Kul Tiran ' if f == 'alliance' else 'Zandalari 'if f == 'horde' else ''
 
         info['name'] = prefix + info['name']
