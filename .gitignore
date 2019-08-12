@@ -3,5 +3,5 @@ __pycache__
 *.pkl
 *.pyc
 *.log
-test.db
+*.db
 *.egg-info
