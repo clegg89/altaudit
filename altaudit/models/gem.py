@@ -1,9 +1,9 @@
 """Model for gems"""
 from sqlalchemy import Column, Integer, String
 
-from .base import Base, IdMixin
+from .base import Base
 
-class Gem(IdMixin, Base):
+class Gem(Base):
     __tablename__ = 'gems'
 
     quality = Column(Integer)

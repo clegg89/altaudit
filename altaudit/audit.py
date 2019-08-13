@@ -28,15 +28,17 @@ class Audit:
     This class will hold all necessary data across multiple refreshes
     """
 
-    def __init__(self, config, retry_conn_failures=False):
-        self.engine = create_engine(config['database'])
+    def __init__(self, config, retry_conn_failures=False, sql_echo=False):
+        self.engine = create_engine(config['database'], echo=sql_echo)
         self.blizzard_api = WowApi(**config['api']['blizzard'],
                 retry_conn_failures=retry_conn_failures)
         self.request_session = requests.Session()
         self.config_characters = config['characters']
 
     def setup_database(self):
-        self._create_tables()
+        # Tables should be created via alembic, not here, as that will prevent
+        # database migrations from working
+        # Run 'alembic upgrade head' from command-line to create tables
 
         session = sessionmaker(self.engine)()
 
@@ -53,9 +55,6 @@ class Audit:
 
         session.commit()
         session.close()
-
-    def _create_tables(self):
-        Base.metadata.create_all(self.engine)
 
     def _create_factions(self, session):
         session.query(Faction).delete()

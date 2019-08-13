@@ -3,9 +3,9 @@ from sqlalchemy import Column, UniqueConstraint, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from .base import Base, IdMixin
+from .base import Base
 
-class Realm(IdMixin, Base):
+class Realm(Base):
     __tablename__ = 'realms'
 
     region_id = Column(Integer, ForeignKey('regions.id'))

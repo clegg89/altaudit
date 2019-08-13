@@ -2,9 +2,9 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from .base import Base, IdMixin
+from .base import Base
 
-class GemSlotAssociation(IdMixin, Base):
+class GemSlotAssociation(Base):
     "AssocaitionObject pattern used to store the slot of the gem"
     __tablename__ = 'characters_gems'
     character_id = Column(Integer, ForeignKey('characters.id'))

@@ -8,7 +8,7 @@ from ..constants import CHARACTER_HEADER_FIELDS, HEADERS, AZERITE_ITEM_SLOTS, AZ
 from ..utility import Utility
 from .. import sections as Section
 
-from .base import Base, IdMixin
+from .base import Base
 from .azerite_trait import AzeriteTrait
 from .gem import Gem
 from .gem_slot_association import GemSlotAssociation
@@ -42,7 +42,7 @@ for slot in AZERITE_ITEM_SLOTS:
     Column('character_id', Integer, ForeignKey('characters.id')),
     Column('azerite_trait_id', Integer, ForeignKey('azerite_traits.id')))""".format(var_name, table_name))
 
-class Character(IdMixin, Base):
+class Character(Base):
     __tablename__ = 'characters'
 
     name = Column(String)

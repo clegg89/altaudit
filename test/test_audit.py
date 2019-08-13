@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from altaudit.audit import Audit
 from altaudit.utility import Utility
-from altaudit.models import Faction, Class, Race, Region, Realm, Character, Gem
+from altaudit.models import Base, Faction, Class, Race, Region, Realm, Character, Gem
 from altaudit.constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
 from altaudit.gem_enchant import gem_lookup
 import altaudit.sections as Section
@@ -106,7 +106,7 @@ class TestAuditInit:
             self.mock_blizzard_api = mock_api
 
             self.audit = Audit(self.config)
-            self.audit._create_tables()
+            Base.metadata.create_all(self.audit.engine)
 
     @pytest.fixture
     def db_session(self):
@@ -357,6 +357,7 @@ class TestAuditRefresh:
                 self.mock_get = mock_get
 
                 self.audit = Audit(self.config)
+                Base.metadata.create_all(self.audit.engine)
                 self.audit.setup_database()
 
         session = sessionmaker(self.audit.engine)()

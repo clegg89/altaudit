@@ -2,9 +2,9 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from .base import Base, IdMixin
+from .base import Base
 
-class Region(IdMixin, Base):
+class Region(Base):
     __tablename__ = 'regions'
 
     name = Column(String)
