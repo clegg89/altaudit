@@ -11,7 +11,7 @@ import requests
 from wowapi import WowApi
 
 from .utility import Utility
-from .models import Base, Class, Faction, Race, Region, Realm, Character, Gem
+from .models import Class, Faction, Race, Region, Realm, Character, Gem
 from .constants import BLIZZARD_REGION, BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
 from .gem_enchant import gem_lookup
 from . import sections as Section
