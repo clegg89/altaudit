@@ -12,5 +12,8 @@ characters:
       - character2
       - character3
 
+database:
+  sqlite:///altaudit.db
+
 server:
   localhost:/var/www/html
