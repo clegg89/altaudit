@@ -148,15 +148,14 @@ class Character(Base):
 
         @param force_refresh If True will force the Character to update data
         """
+        # Only update items that need the api if modified or forced
+        deep_fetch = force_refresh or response['lastModified'] != self.lastmodified
+        conditional_api = api if deep_fetch else None
+
         Section.basic(self, response, db_session)
         Section.items(self, response)
-
-        if response['lastModified'] != self.lastmodified or force_refresh:
-            # Only update if things have changed. API calls are expensive
-            Section.azerite(self, response, db_session, api)
-            Section.audit(self, response, db_session, api)
-
-        # Below sections do not make api calls so no harm calling them
+        Section.azerite(self, response, db_session, conditional_api)
+        Section.audit(self, response, db_session, conditional_api)
         Section.professions(self, response)
         Section.reputations(self, response)
         Section.pve(self, response)

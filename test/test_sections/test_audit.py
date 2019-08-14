@@ -193,3 +193,17 @@ def test_audit_no_gems(db_session, mock_api):
 
     assert jack.gems == []
 
+def test_audit_no_api_unknown_gem(db_session):
+    jack = Character('jack')
+    response = { 'items' : {
+        'finger1' : { 'tooltipParams' : { 'gem0' : 12390 }}},
+        'audit' : { 'emptySockets' : 0 }}
+
+    Section.audit(jack, response, db_session, None)
+
+    assert jack.gems[0].gem.id == 12390
+    assert jack.gems[0].gem.quality == 1
+    assert jack.gems[0].gem.name == 'unknown'
+    assert jack.gems[0].gem.icon == None
+    assert jack.gems[0].gem.stat == None
+    assert jack.gems[0].slot == 'finger1'

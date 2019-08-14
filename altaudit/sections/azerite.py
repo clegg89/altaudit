@@ -13,9 +13,10 @@ def azerite(character, response, db_session, api):
         character.azerite_experience = hoa['azeriteExperience']
         character.azerite_experience_remaining = hoa['azeriteExperienceRemaining']
 
-    for slot in AZERITE_ITEM_SLOTS:
-        if slot in items_response:
-            _azerite_item(character, response['items'][slot], db_session, api, slot)
+    if api:
+        for slot in AZERITE_ITEM_SLOTS:
+            if slot in items_response:
+                _azerite_item(character, response['items'][slot], db_session, api, slot)
 
 def _azerite_item(character, item, db_session, api, slot):
     item_traits = item['azeriteEmpoweredItem']['azeritePowers']

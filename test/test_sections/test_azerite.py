@@ -218,3 +218,32 @@ def test_azerite_item_no_traits():
 
     assert jack._head_tier0_selected == None
     assert jack._head_tier0_available == []
+
+def test_azerite_no_api_given_set_hoa():
+    jack = Character('jack')
+    response = { 'items' : {
+        'neck' : hoa_item_info,
+        'head' : fake_azerite_item_traits_not_in_db,
+        }
+    }
+    Section.azerite(jack, response, None, None)
+    assert jack.hoa_level == 47
+    assert jack.azerite_experience == 1062
+    assert jack.azerite_experience_remaining == 22815
+
+def test_azerite_no_api_no_change_traits():
+    jack = Character('jack', class_id=9)
+    jack._head_tier0_selected = AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard')
+    jack._head_tier0_available.append(AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'))
+    response = { 'items' : { 'head' : fake_azerite_item_traits_not_in_db } }
+    Section.azerite(jack, response, None, None)
+
+    assert jack._head_tier0_selected.id == 13
+    assert jack._head_tier0_selected.spell_id == 263978
+    assert jack._head_tier0_selected.name == 'Azerite Empowered'
+    assert jack._head_tier0_selected.icon == 'inv_smallazeriteshard'
+    assert jack._head_tier0_available[0].id == 13
+    assert jack._head_tier0_available[0].spell_id == 263978
+    assert jack._head_tier0_available[0].name == 'Azerite Empowered'
+    assert jack._head_tier0_available[0].icon == 'inv_smallazeriteshard'
+    assert len(jack._head_tier0_available) == 1

@@ -50,7 +50,10 @@ def _gem(item, db_session, api):
     gem_model = db_session.query(Gem).filter_by(id=id).first()
 
     if not gem_model:
-        gem = api.get_item(BLIZZARD_REGION, id, locale=BLIZZARD_LOCALE)
-        gem_model = Gem(id, 1, gem['name'], gem['icon'], gem['gemInfo']['bonus']['name'])
+        if api:
+            gem = api.get_item(BLIZZARD_REGION, id, locale=BLIZZARD_LOCALE)
+            gem_model = Gem(id, 1, gem['name'], gem['icon'], gem['gemInfo']['bonus']['name'])
+        else:
+            gem_model = Gem(id, 1, 'unknown', None, None)
 
     return gem_model
