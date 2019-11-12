@@ -137,20 +137,25 @@ class Audit:
         Utility.set_refresh_timestamp(dt.utcnow())
 
         session = sessionmaker(self.engine)()
-        characters = session.query(Character).all()
 
-        output = [Section.metadata()]
-        for character in characters:
-            blizz_resp = self.blizzard_api.get_character_profile(**_character_as_dict(character),
-                locale=BLIZZARD_LOCALE,
-                fields=','.join(BLIZZARD_CHARACTER_FIELDS))
-            rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
+        try:
+            characters = session.query(Character).all()
 
-            character.process_blizzard(blizz_resp, session, self.blizzard_api, force_refresh)
-            character.process_raiderio(rio_resp)
-            output.append(character.serialize())
+            output = [Section.metadata()]
+            for character in characters:
+                blizz_resp = self.blizzard_api.get_character_profile(**_character_as_dict(character),
+                    locale=BLIZZARD_LOCALE,
+                    fields=','.join(BLIZZARD_CHARACTER_FIELDS))
+                rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
 
-        session.commit()
-        session.close()
+                character.process_blizzard(blizz_resp, session, self.blizzard_api, force_refresh)
+                character.process_raiderio(rio_resp)
+                output.append(character.serialize())
+
+            session.commit()
+        except:
+            session.rollback()
+        finally:
+            session.close()
 
         return output
