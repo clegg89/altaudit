@@ -42,19 +42,24 @@ class Audit:
 
         session = sessionmaker(self.engine)()
 
-        self._create_factions(session)
-        self._create_classes(session)
-        self._create_races(session)
-        self._create_gems(session)
+        try:
+            self._create_factions(session)
+            self._create_classes(session)
+            self._create_races(session)
+            self._create_gems(session)
 
-        self._remove_old_characters(session)
-        self._add_missing_characters(session)
+            self._remove_old_characters(session)
+            self._add_missing_characters(session)
 
-        self._remove_empty_realms(session)
-        self._remove_empty_regions(session)
+            self._remove_empty_realms(session)
+            self._remove_empty_regions(session)
 
-        session.commit()
-        session.close()
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
     def _create_factions(self, session):
         session.query(Faction).delete()
@@ -155,6 +160,7 @@ class Audit:
             session.commit()
         except:
             session.rollback()
+            raise
         finally:
             session.close()
 
