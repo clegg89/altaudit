@@ -1,6 +1,4 @@
 """Top-Level Audit Class"""
-import yaml
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
