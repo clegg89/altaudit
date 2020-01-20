@@ -19,7 +19,6 @@ from altaudit.models import Region, Realm, Character
 ## TODO:
 #
 # Add unit tests
-# Remove empty realms in config
 
 if __name__ == '__main__':
     with open('config.yaml', 'r') as f:
@@ -40,6 +39,10 @@ if __name__ == '__main__':
     else:
         # Different realms, delete old character and add new one
         config['characters'][region][realmIn].remove(characterIn)
+
+        # If old realm is empty, delete it
+        if not config['characters'][region][realmIn]:
+            del config['characters'][region][realmIn]
 
         # Create the realm if it doesn't exist
         if realmOut not in config['characters'][region].keys():
