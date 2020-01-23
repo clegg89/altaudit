@@ -16,10 +16,25 @@ import time
 import os
 import sys
 import traceback
+import logging
 
 from altaudit import Audit
 
 if __name__ == '__main__':
+
+    logger = logging.getLogger('altaudit')
+    logger.setLevel(logging.INFO)
+
+    handler = logging.FileHandler("altaudit.log.txt")
+
+    logFormat = '[%(levelname)s] [%(asctime)s]: %(message)s'
+    dateFormat = '%m-%d-%Y %H:%M:%S'
+    formatter = logging.Formatter(logFormat, dateFormat)
+
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
+
     with open('config.yaml', 'r') as f:
         config = yaml.safe_load(f)
 
@@ -29,16 +44,20 @@ if __name__ == '__main__':
 
     while True:
         try:
+            logger.info("Start Refresh")
             result = audit.refresh(datetime.datetime, force_refresh=force_refresh)
+            logger.info("End Refresh")
             with open('characters.csv', 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerows(result)
 
+            logger.info("Upload...")
             os.system('rsync -razq characters.csv {}'.format(config['server']))
 
+            logger.info("Sleep")
             force_refresh=False
             time.sleep(20)
 
         except Exception:
-            traceback.print_exc(file=sys.stdout)
+            logger.exception(traceback.format_exc())
             continue
