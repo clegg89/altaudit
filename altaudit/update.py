@@ -66,12 +66,12 @@ def update(config, region, charIn, charOut):
         'realm' : Realm the character is going to
         'name' : New name of the character
     """
-    Utility._update_config(config['characters'], region, charIn, charOut)
-    engine = create_engine(database_config)
+    _update_config(config['characters'], region, charIn, charOut)
+    engine = create_engine(config['database'])
     session = sessionmaker(engine)()
 
     try:
-        Utility._update_db(config['database'], region, charIn, charOut)
+        _update_db(session, region, charIn, charOut)
         session.commit()
     except:
         session.rollback()
