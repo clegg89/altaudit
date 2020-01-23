@@ -1,15 +1,6 @@
-#! /usr/bin/env python3
-# -*- coding: utf-8 -*-
-# vim:fenc=utf-8
-#
-# Distributed under terms of the MIT license.
-"""
-Utility functions used throughout altaudit
-"""
+"""Utility functions used throughout altaudit"""
 import datetime
 import time
-import yaml
-import pickle
 
 from .constants import WEEKLY_RESETS
 
