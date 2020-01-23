@@ -1,4 +1,11 @@
-"""Unit Tests for altaudit.utility"""
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+# vim:fenc=utf-8
+#
+# Distributed under terms of the MIT license.
+"""
+Unit Tests for altaudit.utility
+"""
 import pytest
 
 import datetime
