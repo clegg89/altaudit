@@ -24,45 +24,34 @@ def _update_config(character_config, region, charIn, charOut):
         # Append to new list
         character_config[region][charOut['realm']].append(charOut['name'])
 
-def _update_db(database_config, region, charIn, charOut):
-    engine = create_engine(database_config)
-    session = sessionmaker(engine)()
+def _update_db(session, region, charIn, charOut):
+    # Find previous entry in db
+    character_model = session.query(Character).\
+            filter_by(name=charIn['name']).join(Realm).\
+            filter_by(name=charIn['realm']).join(Region).\
+            filter_by(name=region).first()
 
-    try:
-        # Find previous entry in db
-        character_model = session.query(Character).\
-                filter_by(name=charIn['name']).join(Realm).\
-                filter_by(name=charIn['realm']).join(Region).\
-                filter_by(name=region).first()
+    # Find realm we're moving to
+    realm_out_model = session.query(Realm).\
+            filter_by(name=charOut['realm']).join(Region).\
+            filter_by(name=region).first()
 
-        # Find realm we're moving to
-        realm_out_model = session.query(Realm).\
-                filter_by(name=charOut['name']).join(Region).\
-                filter_by(name=region).first()
-
-        # Error, not found
-        if not character_model:
-            print("Character Not Found")
-            raise
-
-        # New realm
-        if not realm_out_model:
-            realm_out_model = Realm(charOut['name'], character_model.realm.region)
-            session.add(realm_out_model)
-
-        # Update
-        character_model.name = charOut['name']
-        character_model.realm = realm_out_model
-
-        # We do not need to delete empty realms as Audit class will take
-        # care of that when it is run.
-
-        session.commit()
-    except:
-        session.rollback()
+    # Error, not found
+    if not character_model:
+        print("Character Not Found")
         raise
-    finally:
-        session.close()
+
+    # New realm
+    if not realm_out_model:
+        realm_out_model = Realm(charOut['realm'], character_model.realm.region)
+        session.add(realm_out_model)
+
+    # Update
+    character_model.name = charOut['name']
+    character_model.realm = realm_out_model
+
+    # We do not need to delete empty realms as Audit class will take
+    # care of that when it is run.
 
 def update(config, region, charIn, charOut):
     """
@@ -78,4 +67,14 @@ def update(config, region, charIn, charOut):
         'name' : New name of the character
     """
     Utility._update_config(config['characters'], region, charIn, charOut)
-    Utility._update_db(config['database'], region, charIn, charOut)
+    engine = create_engine(database_config)
+    session = sessionmaker(engine)()
+
+    try:
+        Utility._update_db(config['database'], region, charIn, charOut)
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()

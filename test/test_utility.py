@@ -2,7 +2,6 @@
 import pytest
 
 import datetime
-import copy
 
 from altaudit.utility import Utility
 
