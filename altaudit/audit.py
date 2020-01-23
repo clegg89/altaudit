@@ -1,4 +1,6 @@
 """Top-Level Audit Class"""
+import yaml
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -118,7 +120,7 @@ class Audit:
                             filter_by(name=region).first()
 
                     if not character_model:
-                        character_model = Character(character, realm=realm_model)
+                        character_model = Character(character, realm=realm_model, region=region_model)
                         session.add(character_model)
 
     def _remove_empty_realms(self, session):
