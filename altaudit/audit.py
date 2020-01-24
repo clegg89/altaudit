@@ -1,4 +1,6 @@
 """Top-Level Audit Class"""
+import logging
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -141,11 +143,14 @@ class Audit:
 
         session = sessionmaker(self.engine)()
 
+        logger = logging.getLogger('altaudit')
+
         try:
             characters = session.query(Character).all()
 
             output = [Section.metadata()]
             for character in characters:
+                logger.info("%s:%s:%s", character.region_name, character.realm_slug, character.name)
                 blizz_resp = self.blizzard_api.get_character_profile(**_character_as_dict(character),
                     locale=BLIZZARD_LOCALE,
                     fields=','.join(BLIZZARD_CHARACTER_FIELDS))

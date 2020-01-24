@@ -13,19 +13,47 @@ import yaml
 import csv
 from datetime import datetime
 import os
+import traceback
+import logging
 
 from altaudit import Audit
 
 if __name__ == '__main__':
+
+    logger = logging.getLogger('altaudit')
+    logger.setLevel(logging.INFO)
+
+    handler = logging.FileHandler("altaudit.log")
+    console = logging.StreamHandler()
+
+    logFormat = '[%(levelname)s] [%(asctime)s]: %(message)s'
+    dateFormat = '%m-%d-%Y %H:%M:%S'
+    formatter = logging.Formatter(logFormat, dateFormat)
+
+    handler.setFormatter(formatter)
+    console.setFormatter(formatter)
+
+    logger.addHandler(handler)
+    logger.addHandler(console)
+
     with open('config.yaml', 'r') as f:
         config = yaml.safe_load(f)
 
     audit = Audit(config)
     audit.setup_database()
 
-    result = audit.refresh(datetime, force_refresh=True)
-    with open('characters.csv', 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(result)
+    try:
+        logger.info("Start Refresh")
+        result = audit.refresh(datetime, force_refresh=True)
+        logger.info("End Refresh")
+        with open('characters.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(result)
 
-    os.system('rsync -razq characters.csv {}'.format(config['server']))
+        logger.info("Upload...")
+        os.system('rsync -razq characters.csv {}'.format(config['server']))
+
+        logger.info("Complete")
+
+    except Exception:
+        logger.exception(traceback.format_exc())
