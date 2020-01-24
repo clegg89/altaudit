@@ -14,7 +14,6 @@ import csv
 import datetime
 import time
 import os
-import sys
 import traceback
 import logging
 
@@ -25,7 +24,7 @@ if __name__ == '__main__':
     logger = logging.getLogger('altaudit')
     logger.setLevel(logging.INFO)
 
-    handler = logging.FileHandler("altaudit.log.txt")
+    handler = logging.FileHandler("altaudit.log")
 
     logFormat = '[%(levelname)s] [%(asctime)s]: %(message)s'
     dateFormat = '%m-%d-%Y %H:%M:%S'
