@@ -34,6 +34,8 @@ if __name__ == '__main__':
     logger.addHandler(handler)
     logger.addHandler(console)
 
+    logger.info("Start Program")
+
     with open('config.yaml', 'r') as f:
         config = yaml.safe_load(f)
 
