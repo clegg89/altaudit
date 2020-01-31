@@ -100,7 +100,7 @@ class TestAuditInit:
         with patch('altaudit.audit.WowApi') as MockApiClass:
             self.mock_wowapi = MockApiClass
             mock_api = MockApiClass.return_value
-            mock_api.get_character_classes.return_value = wow_classes
+            mock_api.get_playable_classes.return_value = wow_classes
             mock_api.get_character_races.return_value = wow_races
 
             self.mock_blizzard_api = mock_api
@@ -349,7 +349,7 @@ class TestAuditRefresh:
             with patch('altaudit.audit.requests.Session') as MockSessionClass:
                 mock_api = MockApiClass.return_value
                 mock_get = MockSessionClass.return_value.get
-                mock_api.get_character_classes.return_value = wow_classes
+                mock_api.get_playable_classes.return_value = wow_classes
                 mock_api.get_character_races.return_value = wow_races
                 mock_api.get_character_profile.return_value = { 'lastModified' : 10 }
 
