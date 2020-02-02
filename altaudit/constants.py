@@ -12,18 +12,6 @@ BLIZZARD_REGION = 'us'
 "Locale to use when fetching"
 BLIZZARD_LOCALE = 'en_US'
 
-"Fields to use in character profile fetch"
-BLIZZARD_CHARACTER_FIELDS = [
-    'talents',
-    'items',
-    'reputation',
-    'audit',
-    'statistics',
-    'achievements',
-    'professions',
-    'quests'
-]
-
 RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm}&name={character_name}&fields=mythic_plus_scores_by_season:current,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
 
 """

@@ -12,7 +12,7 @@ from wowapi import WowApi
 
 from .utility import Utility
 from .models import Class, Faction, Race, Region, Realm, Character, Gem
-from .constants import BLIZZARD_REGION, BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
+from .constants import BLIZZARD_REGION, BLIZZARD_LOCALE, RAIDERIO_URL
 from .gem_enchant import gem_lookup
 from . import sections as Section
 
@@ -155,9 +155,9 @@ class Audit:
             for character in characters:
                 logger.debug("%s:%s:%s", character.region_name, character.realm_slug, character.name)
                 log_character=character.name
-                blizz_resp = self.blizzard_api.get_character_profile(**_character_as_dict(character),
-                    locale=BLIZZARD_LOCALE,
-                    fields=','.join(BLIZZARD_CHARACTER_FIELDS))
+                blizz_resp = self.blizzard_api.get_character_profile_summary(**_character_as_dict(character),
+                    namespace="profile-{}".format(character.region_name),
+                    locale=BLIZZARD_LOCALE)
                 rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
 
                 character.process_blizzard(blizz_resp, session, self.blizzard_api, force_refresh)

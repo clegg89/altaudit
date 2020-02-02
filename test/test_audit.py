@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from altaudit.audit import Audit
 from altaudit.utility import Utility
 from altaudit.models import Base, Faction, Class, Race, Region, Realm, Character, Gem
-from altaudit.constants import BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
+from altaudit.constants import BLIZZARD_LOCALE, RAIDERIO_URL
 from altaudit.gem_enchant import gem_lookup
 import altaudit.sections as Section
 
@@ -404,7 +404,7 @@ class TestAuditRefresh:
                 mock_api.get_playable_race_index.return_value = wow_races
                 mock_api.get_playable_race.side_effect = _get_playable_race
                 mock_api.get_data_resource.side_effect = _get_data_resource
-                mock_api.get_character_profile.return_value = { 'lastModified' : 10 }
+                mock_api.get_character_profile_summary.return_value = { 'last_login_timestamp' : 10 }
 
                 self.mock_blizzard_api = mock_api
                 self.mock_get = mock_get
@@ -437,9 +437,8 @@ class TestAuditRefresh:
 
     def test_blizzard_api_called(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
         self.audit.refresh(datetime.datetime)
-        self.audit.blizzard_api.get_character_profile.assert_called_once_with(region='us', realm='kiljaeden',
-                character_name='clegg', locale=BLIZZARD_LOCALE,
-                fields=','.join(BLIZZARD_CHARACTER_FIELDS))
+        self.audit.blizzard_api.get_character_profile_summary.assert_called_once_with(region='us', realm='kiljaeden', namespace='profile-us',
+                character_name='clegg', locale=BLIZZARD_LOCALE)
 
     def test_raiderio_called(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
 
@@ -449,7 +448,7 @@ class TestAuditRefresh:
             region='us', realm='kiljaeden', character_name='clegg'))
 
     def test_character_process_blizzard(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
-        self.audit.blizzard_api.get_character_profile.return_value = 5
+        self.audit.blizzard_api.get_character_profile_summary.return_value = 5
 
         self.audit.refresh(datetime.datetime)
 
