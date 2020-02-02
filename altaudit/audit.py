@@ -43,7 +43,6 @@ class Audit:
         session = sessionmaker(self.engine)()
 
         try:
-            self._create_factions(session)
             self._create_classes(session)
             self._create_races(session)
             self._create_gems(session)
@@ -61,12 +60,6 @@ class Audit:
         finally:
             session.close()
 
-    def _create_factions(self, session):
-        session.query(Faction).delete()
-        for i,v in enumerate(['Alliance', 'Horde', 'Neutral']):
-            f = Faction(v, id=i+1)
-            session.add(f)
-
     def _create_classes(self, session):
         session.query(Class).delete()
         classes = self.blizzard_api.get_playable_classes(BLIZZARD_REGION,
@@ -75,13 +68,20 @@ class Audit:
 
     def _create_races(self, session):
         session.query(Race).delete()
-        races = self.blizzard_api.get_character_races(BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['races']
+        session.query(Faction).delete()
+        races = self.blizzard_api.get_playable_race_index(BLIZZARD_REGION,
+                'static-' + BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['races']
 
-        fquery = session.query(Faction)
-        session.add_all([
-            Race(r['name'], id=r['id'],
-                faction=fquery.filter_by(name=r['side'].capitalize()).first())
-            for r in races])
+        for r in races:
+            details = self.blizzard_api.get_data_resource("{}&locale={}".format(r['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
+
+            race_faction = session.query(Faction).filter_by(name=details['faction']['name']).first()
+
+            if not race_faction:
+                race_faction = Faction(details['faction']['name'])
+
+            session.add(
+                    Race(details['name'], id=details['id'],faction=race_faction))
 
     def _create_gems(self, session):
         for id, details in gem_lookup.items():

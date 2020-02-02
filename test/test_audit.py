@@ -14,43 +14,72 @@ from altaudit.gem_enchant import gem_lookup
 import altaudit.sections as Section
 
 wow_classes = {'classes': [
-    {'id': 1, 'mask': 1, 'powerType': 'rage', 'name': 'Warrior'},
-    {'id': 2, 'mask': 2, 'powerType': 'mana', 'name': 'Paladin'},
-    {'id': 3, 'mask': 4, 'powerType': 'focus', 'name': 'Hunter'},
-    {'id': 4, 'mask': 8, 'powerType': 'energy', 'name': 'Rogue'},
-    {'id': 5, 'mask': 16, 'powerType': 'mana', 'name': 'Priest'},
-    {'id': 6, 'mask': 32, 'powerType': 'runic-power', 'name': 'Death Knight'},
-    {'id': 7, 'mask': 64, 'powerType': 'mana', 'name': 'Shaman'},
-    {'id': 8, 'mask': 128, 'powerType': 'mana', 'name': 'Mage'},
-    {'id': 9, 'mask': 256, 'powerType': 'mana', 'name': 'Warlock'},
-    {'id': 10, 'mask': 512, 'powerType': 'energy', 'name': 'Monk'},
-    {'id': 11, 'mask': 1024, 'powerType': 'mana', 'name': 'Druid'},
-    {'id': 12, 'mask': 2048, 'powerType': 'fury', 'name': 'Demon Hunter'}]}
+    {'id': 1, 'name': 'Warrior'},
+    {'id': 2, 'name': 'Paladin'},
+    {'id': 3, 'name': 'Hunter'},
+    {'id': 4, 'name': 'Rogue'},
+    {'id': 5, 'name': 'Priest'},
+    {'id': 6, 'name': 'Death Knight'},
+    {'id': 7, 'name': 'Shaman'},
+    {'id': 8, 'name': 'Mage'},
+    {'id': 9, 'name': 'Warlock'},
+    {'id': 10, 'name': 'Monk'},
+    {'id': 11, 'name': 'Druid'},
+    {'id': 12, 'name': 'Demon Hunter'}]}
 
 wow_races = {'races': [
-    {'id': 1, 'mask': 1, 'side': 'alliance', 'name': 'Human'},
-    {'id': 2, 'mask': 2, 'side': 'horde', 'name': 'Orc'},
-    {'id': 3, 'mask': 4, 'side': 'alliance', 'name': 'Dwarf'},
-    {'id': 4, 'mask': 8, 'side': 'alliance', 'name': 'Night Elf'},
-    {'id': 5, 'mask': 16, 'side': 'horde', 'name': 'Undead'},
-    {'id': 6, 'mask': 32, 'side': 'horde', 'name': 'Tauren'},
-    {'id': 7, 'mask': 64, 'side': 'alliance', 'name': 'Gnome'},
-    {'id': 8, 'mask': 128, 'side': 'horde', 'name': 'Troll'},
-    {'id': 9, 'mask': 256, 'side': 'horde', 'name': 'Goblin'},
-    {'id': 10, 'mask': 512, 'side': 'horde', 'name': 'Blood Elf'},
-    {'id': 11, 'mask': 1024, 'side': 'alliance', 'name': 'Draenei'},
-    {'id': 22, 'mask': 2097152, 'side': 'alliance', 'name': 'Worgen'},
-    {'id': 24, 'mask': 8388608, 'side': 'neutral', 'name': 'Pandaren'},
-    {'id': 25, 'mask': 16777216, 'side': 'alliance', 'name': 'Pandaren'},
-    {'id': 26, 'mask': 33554432, 'side': 'horde', 'name': 'Pandaren'},
-    {'id': 27, 'mask': 67108864, 'side': 'horde', 'name': 'Nightborne'},
-    {'id': 28, 'mask': 134217728, 'side': 'horde', 'name': 'Highmountain Tauren'},
-    {'id': 29, 'mask': 268435456, 'side': 'alliance', 'name': 'Void Elf'},
-    {'id': 30, 'mask': 536870912, 'side': 'alliance', 'name': 'Lightforged Draenei'},
-    {'id': 31, 'mask': 1073741824, 'side': 'horde', 'name': 'Zandalari Troll'},
-    {'id': 32, 'mask': -2147483648, 'side': 'alliance', 'name': 'Kul Tiran'},
-    {'id': 34, 'mask': 2, 'side': 'alliance', 'name': 'Dark Iron Dwarf'},
-    {'id': 36, 'mask': 8, 'side': 'horde', 'name': "Mag'har Orc"}]}
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/1?namespace=static-8.3.0_32861-us'}, 'name': 'Human', 'id': 1},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/2?namespace=static-8.3.0_32861-us'}, 'name': 'Orc', 'id': 2},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/3?namespace=static-8.3.0_32861-us'}, 'name': 'Dwarf', 'id': 3},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/4?namespace=static-8.3.0_32861-us'}, 'name': 'Night Elf', 'id': 4},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/5?namespace=static-8.3.0_32861-us'}, 'name': 'Undead', 'id': 5},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/6?namespace=static-8.3.0_32861-us'}, 'name': 'Tauren', 'id': 6},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/7?namespace=static-8.3.0_32861-us'}, 'name': 'Gnome', 'id': 7},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/8?namespace=static-8.3.0_32861-us'}, 'name': 'Troll', 'id': 8},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/9?namespace=static-8.3.0_32861-us'}, 'name': 'Goblin', 'id': 9},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/10?namespace=static-8.3.0_32861-us'}, 'name': 'Blood Elf', 'id': 10},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/11?namespace=static-8.3.0_32861-us'}, 'name': 'Draenei', 'id': 11},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/22?namespace=static-8.3.0_32861-us'}, 'name': 'Worgen', 'id': 22},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/24?namespace=static-8.3.0_32861-us'}, 'name': 'Pandaren', 'id': 24},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/25?namespace=static-8.3.0_32861-us'}, 'name': 'Pandaren', 'id': 25},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/26?namespace=static-8.3.0_32861-us'}, 'name': 'Pandaren', 'id': 26},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/27?namespace=static-8.3.0_32861-us'}, 'name': 'Nightborne', 'id': 27},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/28?namespace=static-8.3.0_32861-us'}, 'name': 'Highmountain Tauren', 'id': 28},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/29?namespace=static-8.3.0_32861-us'}, 'name': 'Void Elf', 'id': 29},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/30?namespace=static-8.3.0_32861-us'}, 'name': 'Lightforged Draenei', 'id': 30},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/31?namespace=static-8.3.0_32861-us'}, 'name': 'Zandalari Troll', 'id': 31},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/32?namespace=static-8.3.0_32861-us'}, 'name': 'Kul Tiran', 'id': 32},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/34?namespace=static-8.3.0_32861-us'}, 'name': 'Dark Iron Dwarf', 'id': 34},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/35?namespace=static-8.3.0_32861-us'}, 'name': 'Vulpera', 'id': 35},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/36?namespace=static-8.3.0_32861-us'}, 'name': "Mag'har Orc", 'id': 36},
+    {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-race/37?namespace=static-8.3.0_32861-us'}, 'name': 'Mechagnome', 'id': 37}]}
+
+wow_race_details = {
+    1 : {'id': 1, 'name': 'Human', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    2 : {'id': 2, 'name': 'Orc', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    3 : {'id': 3, 'name': 'Dwarf', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    4 : {'id': 4, 'name': 'Night Elf', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    5 : {'id': 5, 'name': 'Undead', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    6 : {'id': 6, 'name': 'Tauren', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    7 : {'id': 7, 'name': 'Gnome', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    8 : {'id': 8, 'name': 'Troll', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    9 : {'id': 9, 'name': 'Goblin', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    10 : {'id': 10, 'name': 'Blood Elf', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    11 : {'id': 11, 'name': 'Draenei', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    22 : {'id': 22, 'name': 'Worgen', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    24 : {'id': 24, 'name': 'Pandaren', 'faction': {'type': 'NEUTRAL', 'name': 'Neutral'}, 'is_selectable': True, 'is_allied_race': False},
+    25 : {'id': 25, 'name': 'Pandaren', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': False, 'is_allied_race': False},
+    26 : {'id': 26, 'name': 'Pandaren', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': False, 'is_allied_race': False},
+    27 : {'id': 27, 'name': 'Nightborne', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    28 : {'id': 28, 'name': 'Highmountain Tauren', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    29 : {'id': 29, 'name': 'Void Elf', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True},
+    30 : {'id': 30, 'name': 'Lightforged Draenei', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True},
+    31 : {'id': 31, 'name': 'Zandalari Troll', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    32 : {'id': 32, 'name': 'Kul Tiran', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True},
+    34 : {'id': 34, 'name': 'Dark Iron Dwarf', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True},
+    35 : {'id': 35, 'name': 'Vulpera', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    36 : {'id': 36, 'name': "Mag'har Orc", 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    37 : {'id': 37, 'name': 'Mechagnome', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True}}
 
 @pytest.fixture
 def mock_session_get(mocker):
@@ -93,15 +122,30 @@ class TestAuditInit:
                     'eu' : {
                         'kiljaeden' : [
                             'clegg']}},
-                'database' : 'sqlite://',
-                'server' : 'localhost:/var/www/html'}
+                'database' : 'sqlite://'}
 
     def setup_method(self, method):
         with patch('altaudit.audit.WowApi') as MockApiClass:
+            def _get_data_resource(url, region):
+                assert region == 'us'
+                for r in wow_races['races']:
+                    if url == "{}&{}".format(r['key']['href'], 'locale=en_US'):
+                        return wow_race_details[r['id']]
+
+                assert False, "Race url not found: {}".format(url)
+
+            def _get_playable_race(region, namespace, race_id, locale=None):
+                assert region == 'us'
+                assert namespace == 'static-us'
+                assert locale == 'en_US'
+                return wow_race_details[race_id]
+
             self.mock_wowapi = MockApiClass
             mock_api = MockApiClass.return_value
             mock_api.get_playable_classes.return_value = wow_classes
-            mock_api.get_character_races.return_value = wow_races
+            mock_api.get_playable_race_index.return_value = wow_races
+            mock_api.get_playable_race.side_effect = _get_playable_race
+            mock_api.get_data_resource.side_effect = _get_data_resource
 
             self.mock_blizzard_api = mock_api
 
@@ -121,10 +165,6 @@ class TestAuditInit:
         self.mock_wowapi.assert_called_once_with(client_id='MY_CLIENT_ID',
                 client_secret='MY_CLIENT_SECRET', retry_conn_failures=False)
 
-    @pytest.mark.skip(reason='Unnecessary, should be checked where server is used')
-    def test_server(self):
-        assert self.audit.server == self.config['server']
-
     def test_has_tables(self):
         assert self.audit.engine.has_table('classes')
         assert self.audit.engine.has_table('factions')
@@ -135,28 +175,6 @@ class TestAuditInit:
         assert self.audit.engine.has_table('years')
         assert self.audit.engine.has_table('weeks')
         assert self.audit.engine.has_table('snapshots')
-
-    def test_factions_made(self, db_session):
-        self.audit._create_factions(db_session)
-
-        query = db_session.query(Faction)
-        factions = {f.id : f.name for f in query.all()}
-
-        assert query.count() == 3
-        assert factions[1] == 'Alliance'
-        assert factions[2] == 'Horde'
-        assert factions[3] == 'Neutral'
-
-    def test_factions_remade(self, db_session):
-        self.audit._create_factions(db_session)
-
-        db_session.add(Faction('junk', id=4))
-        db_session.commit()
-
-        self.audit._create_factions(db_session)
-
-        assert db_session.query(Faction).count() == 3
-        assert db_session.query(Faction).filter_by(name='junk').first() == None
 
     def test_classes_retrieved(self, db_session):
         self.audit._create_classes(db_session)
@@ -189,14 +207,35 @@ class TestAuditInit:
         assert db_session.query(Class).count() == 12
         assert db_session.query(Class).filter_by(name='Tinkerer').first() == None
 
+    def test_races_factions_created(self, db_session):
+        self.audit._create_races(db_session)
+
+        query = db_session.query(Faction)
+        factions = {f.id : f.name for f in query.all()}
+
+        assert query.count() == 3
+        assert query.filter_by(name='Alliance').first() != None
+        assert query.filter_by(name='Horde').first() != None
+        assert query.filter_by(name='Neutral').first() != None
+
+    def test_races_factions_recreated(self, db_session):
+        self.audit._create_races(db_session)
+
+        db_session.add(Faction('junk', id=4))
+        db_session.commit()
+
+        self.audit._create_races(db_session)
+
+        assert db_session.query(Faction).count() == 3
+        assert db_session.query(Faction).filter_by(name='junk').first() == None
+
     def test_races_retrieved(self, db_session):
-        self.audit._create_factions(db_session)
         self.audit._create_races(db_session)
 
         query = db_session.query(Race)
         races = {r.id : [r.name, r.faction_name] for r in query.all()}
 
-        assert query.count() == 23
+        assert query.count() == len(wow_races['races'])
         assert races[1] == ['Human', 'Alliance']
         assert races[2] == ['Orc', 'Horde']
         assert races[3] == ['Dwarf', 'Alliance']
@@ -222,7 +261,6 @@ class TestAuditInit:
         assert races[36] == ["Mag'har Orc", 'Horde']
 
     def test_old_races_deleted(self, db_session):
-        self.audit._create_factions(db_session)
         self.audit._create_races(db_session)
 
         db_session.add(Race('Voldunai',
@@ -232,7 +270,7 @@ class TestAuditInit:
 
         self.audit._create_races(db_session)
 
-        assert db_session.query(Race).count() == 23
+        assert db_session.query(Race).count() == len(wow_races['races'])
         assert db_session.query(Race).filter_by(name='Voldunai').first() == None
 
     def test_create_gems(self, db_session):
@@ -339,18 +377,33 @@ class TestAuditRefresh:
                         'client_secret' : 'MY_CLIENT_SECRET' },
                     'wcl' : { 'public_key' : 'MY_WCL_KEY' }},
                 'characters' : { 'us' : { 'kiljaeden' : ['clegg'] }},
-                'database' : 'sqlite://',
-                'server' : 'localhost:/var/www/html'}
+                'database' : 'sqlite://'}
 
     def setup_method(self, method):
         Utility.year = {}
         Utility.week = {}
         with patch('altaudit.audit.WowApi') as MockApiClass:
             with patch('altaudit.audit.requests.Session') as MockSessionClass:
+                def _get_data_resource(url, region):
+                    assert region == 'us'
+                    for r in wow_races['races']:
+                        if url == "{}&{}".format(r['key']['href'], 'locale=en_US'):
+                            return wow_race_details[r['id']]
+
+                    assert False, "Race url not found: {}".format(url)
+
+                def _get_playable_race(region, namespace, race_id, locale=None):
+                    assert region == 'us'
+                    assert namespace == 'static-us'
+                    assert locale == 'en_US'
+                    return wow_race_details[race_id]
+
                 mock_api = MockApiClass.return_value
                 mock_get = MockSessionClass.return_value.get
                 mock_api.get_playable_classes.return_value = wow_classes
-                mock_api.get_character_races.return_value = wow_races
+                mock_api.get_playable_race_index.return_value = wow_races
+                mock_api.get_playable_race.side_effect = _get_playable_race
+                mock_api.get_data_resource.side_effect = _get_data_resource
                 mock_api.get_character_profile.return_value = { 'lastModified' : 10 }
 
                 self.mock_blizzard_api = mock_api
