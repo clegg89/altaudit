@@ -10,36 +10,48 @@ from altaudit.models import Base, Character, Class, Faction, Race
 
 import altaudit.sections as Section
 
-classes = ['Warrior', 'Paladin', 'Hunter',
-    'Rogue', 'Priest', 'Death Knight', 'Shaman',
-    'Mage', 'Warlock', 'Monk', 'Druid', 'Demon Hunter']
+classes = {'classes': [
+    {'id': 1, 'name': 'Warrior'},
+    {'id': 2, 'name': 'Paladin'},
+    {'id': 3, 'name': 'Hunter'},
+    {'id': 4, 'name': 'Rogue'},
+    {'id': 5, 'name': 'Priest'},
+    {'id': 6, 'name': 'Death Knight'},
+    {'id': 7, 'name': 'Shaman'},
+    {'id': 8, 'name': 'Mage'},
+    {'id': 9, 'name': 'Warlock'},
+    {'id': 10, 'name': 'Monk'},
+    {'id': 11, 'name': 'Druid'},
+    {'id': 12, 'name': 'Demon Hunter'}]}
 
 factions = ['Alliance', 'Horde', 'Neutral']
 
-races = {
-    1 : { 'side': 'alliance', 'name': 'Human'},
-    2 : { 'side': 'horde', 'name': 'Orc'},
-    3 : { 'side': 'alliance', 'name': 'Dwarf'},
-    4 : { 'side': 'alliance', 'name': 'Night Elf'},
-    5 : { 'side': 'horde', 'name': 'Undead'},
-    6 : { 'side': 'horde', 'name': 'Tauren'},
-    7 : { 'side': 'alliance', 'name': 'Gnome'},
-    8 : { 'side': 'horde', 'name': 'Troll'},
-    9 : { 'side': 'horde', 'name': 'Goblin'},
-    10 : { 'side': 'horde', 'name': 'Blood Elf'},
-    11 : { 'side': 'alliance', 'name': 'Draenei'},
-    22 : { 'side': 'alliance', 'name': 'Worgen'},
-    24 : { 'side': 'neutral', 'name': 'Pandaren'},
-    25 : { 'side': 'alliance', 'name': 'Pandaren'},
-    26 : { 'side': 'horde', 'name': 'Pandaren'},
-    27 : { 'side': 'horde', 'name': 'Nightborne'},
-    28 : { 'side': 'horde', 'name': 'Highmountain Tauren'},
-    29 : { 'side': 'alliance', 'name': 'Void Elf'},
-    30 : { 'side': 'alliance', 'name': 'Lightforged Draenei'},
-    31 : { 'side': 'horde', 'name': 'Zandalari Troll'},
-    32 : { 'side': 'alliance', 'name': 'Kul Tiran'},
-    34 : { 'side': 'alliance', 'name': 'Dark Iron Dwarf'},
-    36 : { 'side': 'horde', 'name': "Mag'har Orc"}}
+races = [
+    {'id': 1, 'name': 'Human', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 2, 'name': 'Orc', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 3, 'name': 'Dwarf', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 4, 'name': 'Night Elf', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 5, 'name': 'Undead', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 6, 'name': 'Tauren', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 7, 'name': 'Gnome', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 8, 'name': 'Troll', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 9, 'name': 'Goblin', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 10, 'name': 'Blood Elf', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 11, 'name': 'Draenei', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 22, 'name': 'Worgen', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 24, 'name': 'Pandaren', 'faction': {'type': 'NEUTRAL', 'name': 'Neutral'}, 'is_selectable': True, 'is_allied_race': False},
+    {'id': 25, 'name': 'Pandaren', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': False, 'is_allied_race': False},
+    {'id': 26, 'name': 'Pandaren', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': False, 'is_allied_race': False},
+    {'id': 27, 'name': 'Nightborne', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 28, 'name': 'Highmountain Tauren', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 29, 'name': 'Void Elf', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 30, 'name': 'Lightforged Draenei', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 31, 'name': 'Zandalari Troll', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 32, 'name': 'Kul Tiran', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 34, 'name': 'Dark Iron Dwarf', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 35, 'name': 'Vulpera', 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 36, 'name': "Mag'har Orc", 'faction': {'type': 'HORDE', 'name': 'Horde'}, 'is_selectable': True, 'is_allied_race': True},
+    {'id': 37, 'name': 'Mechagnome', 'faction': {'type': 'ALLIANCE', 'name': 'Alliance'}, 'is_selectable': True, 'is_allied_race': True}]
 
 @pytest.fixture(scope='module')
 def db():
@@ -48,11 +60,11 @@ def db():
 
     session = sessionmaker(engine)()
 
-    session.add_all([Faction(f, id=i+1) for i,f in enumerate(factions)])
-    session.add_all([Class(c, id=i+1) for i,c in enumerate(classes)])
-    session.add_all([Race(r['name'], id=i,
-        faction=session.query(Faction).filter_by(name=r['side'].capitalize()).first())
-        for i,r in races.items()])
+    session.add_all([Faction(f) for f in factions])
+    session.add_all([Class(c['name'], id=c['id']) for c in classes])
+    session.add_all([Race(r['name'], id=r['id'],
+        faction=session.query(Faction).filter_by(name=r['faction']['name']).first())
+        for r in races)
 
     session.commit()
     session.close()
@@ -80,13 +92,15 @@ def fake_response_maker():
         faction = 0 if races[race]['side'] == 'alliance' else 1 if races[race]['side'] == 'horde' else 2
 
         return {
-                'lastModified' : timestamp,
                 'name' : name,
+                'gender' : { 'type' : gender.upper(), 'name' : gender }
+                'faction' : { 'type' : faction.upper(), 'name' : faction }
+                'race' : { 'name' : race_name, 'id' : race_id }
+                'character_class' : { 'name' : class_name, 'id' : class_id }
+                'active_spec'
+
+                'lastModified' : timestamp,
                 'realm' : realm,
-                'class' : kls,
-                'race' : race,
-                'faction' : faction,
-                'gender' : gender,
                 'level' : level,
                 'thumbnail' : '{0}/96/{1}-avatar.jpg'.format(realm, media_url),
                 'talents' : [

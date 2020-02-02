@@ -149,7 +149,7 @@ class Character(Base):
         @param force_refresh If True will force the Character to update data
         """
         # Only update items that need the api if modified or forced
-        deep_fetch = force_refresh or response['lastModified'] != self.lastmodified
+        deep_fetch = force_refresh or response['last_login_timestamp'] != self.lastmodified
         conditional_api = api if deep_fetch else None
 
         Section.basic(self, response, db_session)
