@@ -136,11 +136,11 @@ class Character(Base):
             self.dungeons_weekly = 0
             weekly_snapshot.dungeons = self.dungeons_total
 
-    def process_blizzard(self, response, db_session, api, force_refresh):
+    def process_blizzard(self, profile, db_session, api, force_refresh):
         """
         Processes the response from blizzard's API for this character
 
-        @param response The response from blizzard's api
+        @param profile The response from blizzard's api
 
         @param db_session The database session to use for queries
 
@@ -149,16 +149,16 @@ class Character(Base):
         @param force_refresh If True will force the Character to update data
         """
         # Only update items that need the api if modified or forced
-        deep_fetch = force_refresh or response['last_login_timestamp'] != self.lastmodified
+        deep_fetch = force_refresh or profile['last_login_timestamp'] != self.lastmodified
         conditional_api = api if deep_fetch else None
 
-        Section.basic(self, response, db_session)
-        Section.items(self, response)
-        Section.azerite(self, response, db_session, conditional_api)
-        Section.audit(self, response, db_session, conditional_api)
-        Section.professions(self, response)
-        Section.reputations(self, response)
-        Section.pve(self, response)
+        Section.basic(self, profile, db_session, conditional_api)
+        Section.items(self, profile)
+        Section.azerite(self, profile, db_session, conditional_api)
+        Section.audit(self, profile, db_session, conditional_api)
+        Section.professions(self, profile)
+        Section.reputations(self, profile)
+        Section.pve(self, profile)
         self._update_snapshots() # always update snapshots as we may go weeks without playing a character
 
     def process_raiderio(self, response):

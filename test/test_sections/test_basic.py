@@ -61,10 +61,10 @@ def db():
     session = sessionmaker(engine)()
 
     session.add_all([Faction(f) for f in factions])
-    session.add_all([Class(c['name'], id=c['id']) for c in classes])
+    session.add_all([Class(c['name'], id=c['id']) for c in classes['classes']])
     session.add_all([Race(r['name'], id=r['id'],
         faction=session.query(Faction).filter_by(name=r['faction']['name']).first())
-        for r in races)
+        for r in races])
 
     session.commit()
     session.close()
@@ -81,105 +81,113 @@ def db_session(db):
 
 @pytest.fixture
 def fake_response_maker():
-    def _maker(name='toon1', realm='realm1',
+    def _maker(
+            name='toon1',
+            gender='Male',
+            race_name='Undead',
+            class_name='Warlock',
+            mainspec='Destruction',
+            realm='realm1',
+            level=120,
             timestamp=int(datetime.datetime.now().timestamp())*1000,
-            kls=9, race=34, gender=0, level=120, mainspec='Destruction',
-            media_url='184987488'):
-        assert kls < len(classes)
-        assert race in races
-        assert gender in (0,1)
+            media='link_to_media'):
+        class_id = next(c['id'] for c in classes['classes'] if c['name'] == class_name)
+        race = next(r for r in races if r['name'] == race_name)
+        race_id = race['id']
+        faction = race['faction']['name']
+        gender in ('Male','Female')
 
-        faction = 0 if races[race]['side'] == 'alliance' else 1 if races[race]['side'] == 'horde' else 2
-
-        return {
+        return { 'summary' : {
                 'name' : name,
-                'gender' : { 'type' : gender.upper(), 'name' : gender }
-                'faction' : { 'type' : faction.upper(), 'name' : faction }
-                'race' : { 'name' : race_name, 'id' : race_id }
-                'character_class' : { 'name' : class_name, 'id' : class_id }
-                'active_spec'
-
-                'lastModified' : timestamp,
-                'realm' : realm,
+                'gender' : { 'type' : gender.upper(), 'name' : gender },
+                'faction' : { 'type' : faction.upper(), 'name' : faction },
+                'race' : { 'name' : race_name, 'id' : race_id },
+                'character_class' : { 'name' : class_name, 'id' : class_id },
+                'active_spec' : { 'name' : mainspec },
+                'realm' : { 'name' : realm },
                 'level' : level,
-                'thumbnail' : '{0}/96/{1}-avatar.jpg'.format(realm, media_url),
-                'talents' : [
-                    { 'selected' : True, 'spec' : { 'name' : mainspec } },
-                    { 'selected' : False, 'spec' : { 'name' : 'Failed' } },
-                    { 'selected' : False, 'spec' : { 'name' : 'Failed' } }]}
+                'last_login_timestamp' : timestamp,
+                'media' : media }}
 
     return _maker
 
 def test_basic_info_name(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(name='Jack')
-    Section.basic(jack, response, db_session)
+    Section.basic(jack, response, db_session, None)
     assert jack.name_api == 'Jack'
+
+def test_basic_info_gender(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(gender='Female')
+    Section.basic(jack, response, db_session, None)
+    assert jack.gender == 'Female'
+
+def test_basic_info_faction(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker()
+    Section.basic(jack, response, db_session, None)
+    assert type(jack.faction) == Faction
+    assert jack.faction.name == 'Horde'
+
+def test_basic_info_race(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(race_name="Undead")
+    Section.basic(jack, response, db_session, None)
+    assert type(jack.race) == Race
+    assert jack.race.name == "Undead"
+    assert jack.race.id == 5
+
+def test_basic_info_class(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(class_name='Monk')
+    Section.basic(jack, response, db_session, None)
+    assert type(jack.character_class) == Class
+    assert jack.character_class.name == 'Monk'
+    assert jack.character_class.id == 10
+
+def test_basic_info_mainspec(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(mainspec='Shadow')
+    Section.basic(jack, response, db_session, None)
+    assert jack.mainspec == 'Shadow'
 
 def test_basic_info_realm(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(realm="Zin'azshara")
-    Section.basic(jack, response, db_session)
+    Section.basic(jack, response, db_session, None)
     assert jack.realm_name == "Zin'azshara"
+
+def test_basic_info_level(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(level=45)
+    Section.basic(jack, response, db_session, None)
+    assert jack.level == 45
 
 def test_basic_info_timestamp(fake_response_maker, db_session):
     jack = Character('jack')
     now = datetime.datetime.now().timestamp()*1000
     response = fake_response_maker(timestamp=now)
-    Section.basic(jack, response, db_session)
+    Section.basic(jack, response, db_session, None)
     assert jack.lastmodified == now
 
-def test_basic_info_class(fake_response_maker, db_session):
-    jack = Character('jack')
-    kls = 10
-    response = fake_response_maker(kls=kls)
-    Section.basic(jack, response, db_session)
-    assert jack.class_name == 'Monk'
-
-def test_basic_info_level(fake_response_maker, db_session):
-    jack = Character('jack')
-    response = fake_response_maker(level=45)
-    Section.basic(jack, response, db_session)
-    assert jack.level == 45
-
-def test_basic_info_mainspec(fake_response_maker, db_session):
-    jack = Character('jack')
-    response = fake_response_maker(mainspec='Shadow')
-    Section.basic(jack, response, db_session)
-    assert jack.mainspec == 'Shadow'
-
-def test_basic_info_faction(fake_response_maker, db_session):
-    jack = Character('jack')
-    response = fake_response_maker()
-    Section.basic(jack, response, db_session)
-    assert jack.faction_name == 'Alliance'
-
-def test_basic_info_gender(fake_response_maker, db_session):
-    jack = Character('jack')
-    response = fake_response_maker(gender=1)
-    Section.basic(jack, response, db_session)
-    assert jack.gender == 'Female'
-
-def test_basic_info_race(fake_response_maker, db_session):
-    jack = Character('jack')
-    response = fake_response_maker(race=32)
-    Section.basic(jack, response, db_session)
-    assert jack.race_name == "Kul Tiran"
-
+@pytest.mark.skip(reason="Need to setup mock for media")
 def test_basic_info_avatar(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker()
-    Section.basic(jack, response, db_session)
+    Section.basic(jack, response, db_session, None)
     assert jack.avatar == 'realm1/96/184987488-avatar.jpg'
 
+@pytest.mark.skip(reason="Need to setup mock for media")
 def test_basic_info_bust(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker()
-    Section.basic(jack, response, db_session)
+    Section.basic(jack, response, db_session, None)
     assert jack.bust == 'realm1/96/184987488-inset.jpg'
 
+@pytest.mark.skip(reason="Need to setup mock for media")
 def test_basic_info_render(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker()
-    Section.basic(jack, response, db_session)
+    Section.basic(jack, response, db_session, None)
     assert jack.render == 'realm1/96/184987488-main.jpg'

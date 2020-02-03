@@ -155,6 +155,9 @@ class Audit:
             for character in characters:
                 logger.debug("%s:%s:%s", character.region_name, character.realm_slug, character.name)
                 log_character=character.name
+                # profile['summary'] = self.blizzard_api.get_character_profile_summary(**_character_as_dict,
+                #   namespac="profile-{}".format(character.region_name),
+                #   locale=BLIZZARD_LOCALE)
                 blizz_resp = self.blizzard_api.get_character_profile_summary(**_character_as_dict(character),
                     namespace="profile-{}".format(character.region_name),
                     locale=BLIZZARD_LOCALE)
