@@ -172,6 +172,9 @@ class Character(Base):
                         else:
                             sleep(2)
             # call each section, should loop like a pro
+            # sections = [f for _, f in Section.__dict__.items() if callable(f)]
+            # for section in sections:
+            #     section(self, profile, db_session, api)
         deep_fetch = force_refresh or profile['last_login_timestamp'] != self.lastmodified
         conditional_api = api if deep_fetch else None
 
