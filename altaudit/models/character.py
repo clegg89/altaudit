@@ -1,10 +1,15 @@
 """Model representing Characters"""
+import logging
+import traceback
+
 from sqlalchemy import Table, Column, UniqueConstraint, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from ..constants import CHARACTER_HEADER_FIELDS, HEADERS, AZERITE_ITEM_SLOTS, AZERITE_TIERS
+from wowapi import WowApiException
+
+from ..constants import CHARACTER_HEADER_FIELDS, HEADERS, AZERITE_ITEM_SLOTS, AZERITE_TIERS, MAX_API_TRIES
 from ..utility import Utility
 from .. import sections as Section
 
@@ -149,6 +154,24 @@ class Character(Base):
         @param force_refresh If True will force the Character to update data
         """
         # Only update items that need the api if modified or forced
+        if profile['last_login_timestamp'] != self.lastmodified:
+            exceptionCount = 0
+            # Fetch rest of api
+            for section in ['media', 'equipment']:
+                while section not in profile:
+                    try:
+                        profile[section] = api.get_data_resource(
+                                '{}&locale={}'.format(profile['summary'][section], BLIZZARD_LOCALE),
+                                self.region_name)
+                    except WowApiException:
+                        logger = logging.getLogger('altaudit')
+                        logger.exception(traceback.format_exc())
+                        exceptionCount += 1
+                        if exceptionCount >= MAX_API_TRIES:
+                            raise
+                        else:
+                            sleep(2)
+            # call each section, should loop like a pro
         deep_fetch = force_refresh or profile['last_login_timestamp'] != self.lastmodified
         conditional_api = api if deep_fetch else None
 

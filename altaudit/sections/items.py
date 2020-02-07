@@ -4,7 +4,7 @@ from statistics import mean
 
 from ..constants import ITEM_SLOTS, ITEM_FIELDS
 
-def items(character, response):
+def items(character, response, db_session, api):
     items_response = response['items']
     ilevels = {}
 
