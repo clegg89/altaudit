@@ -87,15 +87,15 @@ def mock_session_get(mocker):
 
 @pytest.fixture
 def mock_process_blizzard(mocker):
-    return mocker.patch('altaudit.audit.Character.process_blizzard')
+    return mocker.patch('altaudit.audit.process_blizzard')
 
 @pytest.fixture
 def mock_process_raiderio(mocker):
-    return mocker.patch('altaudit.audit.Character.process_raiderio')
+    return mocker.patch('altaudit.audit.process_raiderio')
 
 @pytest.fixture
 def mock_serialize(mocker):
-    mock = mocker.patch('altaudit.audit.Character.serialize')
+    mock = mocker.patch('altaudit.audit.serialize')
     mock.return_value = [1, 2, 3, 4]
 
     return mock
@@ -426,7 +426,6 @@ class TestAuditRefresh:
     # TODO mock_process_* have to be included below due to no error handling
     # When better error handling is added these can be removed
 
-    @pytest.mark.skip(reason='No longer compatible with profile-api')
     def test_timestamp_set(self, mock_process_blizzard, mock_process_raiderio, mock_serialize, mocker):
         Utility.set_refresh_timestamp(datetime.datetime.utcnow()) # Prevent update_snapshots from failing
         mock_utility = mocker.patch('altaudit.audit.Utility')
@@ -437,13 +436,11 @@ class TestAuditRefresh:
 
         mock_utility.set_refresh_timestamp.assert_called_once_with(datetime.datetime(2019, 8, 5))
 
-    @pytest.mark.skip(reason='No longer compatible with profile-api')
     def test_blizzard_api_called(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
         self.audit.refresh(datetime.datetime)
         self.audit.blizzard_api.get_character_profile_summary.assert_called_once_with(region='us', realm='kiljaeden', namespace='profile-us',
                 character_name='clegg', locale=BLIZZARD_LOCALE)
 
-    @pytest.mark.skip(reason='No longer compatible with profile-api')
     def test_raiderio_called(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
 
         self.audit.refresh(datetime.datetime)
@@ -451,7 +448,6 @@ class TestAuditRefresh:
         self.mock_get.assert_called_once_with(RAIDERIO_URL.format(
             region='us', realm='kiljaeden', character_name='clegg'))
 
-    @pytest.mark.skip(reason='No longer compatible with profile-api')
     def test_character_process_blizzard(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
         self.audit.blizzard_api.get_character_profile_summary.return_value = 5
 
@@ -459,19 +455,16 @@ class TestAuditRefresh:
 
         mock_process_blizzard.assert_called_once()
 
-    @pytest.mark.skip(reason='No longer compatible with profile-api')
     def test_character_process_raiderio(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
         self.audit.refresh(datetime.datetime)
 
         mock_process_raiderio.assert_called_once()
 
-    @pytest.mark.skip(reason='No longer compatible with profile-api')
     def test_refresh_returns_list(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
         result = self.audit.refresh(datetime.datetime)
 
         assert result == [Section.metadata(), mock_serialize.return_value]
 
-    @pytest.mark.skip(reason='No longer compatible with profile-api')
     def tes_refresh_commit_data(self, mock_process_blizzard, mock_process_raiderio, mock_serialize, mocker):
         mock_commit = mocker.patch('altaudit.audit.sqlalchemy.orm.session.Session.commit')
         self.audit.refresh(datetime.datetime)
