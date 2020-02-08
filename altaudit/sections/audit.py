@@ -1,9 +1,12 @@
 """Pull Gear Audit Data from API Response"""
 import copy
 
-from ..constants import BLIZZARD_REGION, BLIZZARD_LOCALE, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELDS, ITEM_SLOTS
-from ..models import GemSlotAssociation, Gem
+from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
+from ..models import GemSlotAssociation, Gem, ITEM_SLOTS, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELD_COLUMNS
 from ..gem_enchant import enchant_lookup
+
+"Item Enchant Fields"
+ENCHANT_ITEM_FIELDS = [field[0] for field in ENCHANT_ITEM_FIELD_COLUMNS]
 
 def audit(character, response, db_session, api):
     for slot in ENCHANTED_ITEM_SLOTS:

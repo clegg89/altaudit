@@ -1,7 +1,4 @@
 """Model representing Characters"""
-import logging
-import traceback
-
 from sqlalchemy import Table, Column, UniqueConstraint, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
@@ -9,15 +6,158 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from wowapi import WowApiException
 
-from ..constants import CHARACTER_HEADER_FIELDS, HEADERS, AZERITE_ITEM_SLOTS, AZERITE_TIERS, MAX_API_TRIES
-from ..utility import Utility
-from .. import sections as Section
-
 from .base import Base
 from .azerite_trait import AzeriteTrait
 from .gem import Gem
 from .gem_slot_association import GemSlotAssociation
 from .snapshot import Year, Snapshot
+
+"Item slots tracked"
+ITEM_SLOTS = [
+    'head', 'neck', 'shoulder', 'back',
+    'chest', 'wrist', 'hands', 'waist',
+    'legs', 'feet', 'finger1', 'finger2',
+    'trinket1', 'trinket2', 'mainHand', 'offHand'
+]
+
+"Item Fields to use in Character Model"
+ITEM_FIELD_COLUMNS = [
+    ('itemLevel','Column(Integer)'),
+    ('id', 'Column(Integer)'),
+    ('name', 'Column(String)'),
+    ('icon', 'Column(String)'),
+    ('quality', 'Column(Integer)')]
+
+"Item Fields"
+ITEM_FIELDS = [field[0] for field in ITEM_FIELD_COLUMNS]
+
+"Azerite piece item slots"
+AZERITE_ITEM_SLOTS = [ 'head', 'shoulder', 'chest' ]
+
+"Number of Azerite Tiers"
+AZERITE_TIERS = 5
+
+"Item slots that can be enchanted (for BfA)"
+ENCHANTED_ITEM_SLOTS = [ 'mainHand', 'offHand', 'finger1', 'finger2', 'hands', 'wrist' ]
+
+"Item Enchant filds for use in Character Model"
+ENCHANT_ITEM_FIELD_COLUMNS = [
+        ('id', 'Column(Integer)'),
+        ('quality', 'Column(Integer)'),
+        ('name', 'Column(String)'),
+        ('description', 'Column(String)')]
+
+"Professions, excluding Archaeology"
+PROFESSIONS = ['primary1', 'primary2', 'cooking', 'fishing']
+
+"List of all expacs and their profession prefix"
+PROFESSION_EXPACS = {
+    '' : 'classic',
+    'Outland' : 'burning_crusade',
+    'Northrend' : 'wrath_of_the_lich_king',
+    'Cataclysm' : 'cataclysm',
+    'Pandaria' : 'mists_of_pandaria',
+    'Draenor' : 'warlords_of_draenor',
+    'Legion' : 'legion',
+    'Kul Tiran' : 'battle_for_azeroth'}
+
+"WoW expansions"
+EXPACS = [v for v in PROFESSION_EXPACS.values()]
+
+"Profession Field Columns excluding Archaeology"
+PROFESSION_FIELD_COLUMNS = [
+    ('name', 'Column(String)'),
+    ('icon', 'Column(String)'),
+    *[('{}_{}'.format(expac, f), 'Column(Integer)')
+        for expac in EXPACS for f in ['level', 'max']]]
+
+"Archaeology Field Columns"
+ARCHAEOLOGY_FIELD_COLUMNS = [
+    ('name', 'Column(String)'),
+    ('icon', 'Column(String)'),
+    ('level', 'Column(Integer)'),
+    ('max', 'Column(Integer)')]
+
+"Raid Difficulties"
+RAID_DIFFICULTIES = [
+    'raid_finder', 'normal', 'heroic', 'mythic'
+]
+
+"Column Headers and their database types"
+CHARACTER_HEADER_FIELDS = {
+    # Basic Info
+    'name_api' : 'Column(String)',
+    'realm_name' : "Column(Integer)",
+    'realm_slug' : "association_proxy('realm', 'name')",
+    'region_name' : "association_proxy('realm', 'region_name')",
+    'lastmodified' : 'Column(Integer)',
+    'class_name' : "association_proxy('character_class', 'name')",
+    'level' : 'Column(Integer)',
+    'mainspec' : 'Column(String)',
+    'faction_name' : "association_proxy('faction', 'name')",
+    'gender' : 'Column(String)',
+    'race_name' : "association_proxy('race', 'name')",
+    'avatar' : 'Column(String)',
+    'bust' : 'Column(String)',
+    'render' : 'Column(String)',
+
+    # Item Info
+    'estimated_ilvl' : 'Column(Float)',
+
+    **{'{}_{}'.format(slot, item[0]) : item[1]
+        for slot in ITEM_SLOTS
+        for item in ITEM_FIELD_COLUMNS},
+
+    # Azerite Info
+    'hoa_level' : 'Column(Integer)',
+    'azerite_experience' : 'Column(Integer)',
+    'azerite_experience_remaining' : 'Column(Integer)',
+
+    **{'{}_tier{}_{}'.format(piece, tier, field) : "''" # Composite from azerite_traits table
+        for piece in AZERITE_ITEM_SLOTS
+        for tier in range(AZERITE_TIERS)
+        for field in ['available', 'selected']},
+
+    # Gear Audit
+    **{'{}_enchant_{}'.format(slot, field[0]) : field[1]
+        for slot in ENCHANTED_ITEM_SLOTS
+        for field in ENCHANT_ITEM_FIELD_COLUMNS},
+
+    'empty_sockets' : 'Column(Integer)',
+
+    **{'gem_{}'.format(field) : "''" # Composite from gems table
+        for field in ['ids', 'qualities', 'names', 'icons', 'stats', 'slots']},
+
+    # Profession Info
+    **{'{}_{}'.format(prof, field[0]) : field[1]
+        for prof in PROFESSIONS
+        for field in PROFESSION_FIELD_COLUMNS},
+
+    **{'archaeology_{}'.format(field[0]) : field[1] for field in
+        ARCHAEOLOGY_FIELD_COLUMNS},
+
+    # Reputations
+    'reputations' : 'Column(String)',
+
+    # PvE and RaiderIO
+    'island_weekly_done' : 'Column(String)',
+    'islands_total' : 'Column(Integer)',
+    'world_quests_total' : 'Column(Integer)',
+    'world_quests_weekly' : "''", # Obtained from snapshots
+    'weekly_event_done' : 'Column(String)',
+    'dungeons_total' : 'Column(Integer)',
+    'dungeons_each_total' : 'Column(String)',
+    'dungeons_weekly' : "''", # Obtained from snapshots
+    'raiderio_score' : 'Column(Float)',
+    'mplus_weekly_highest' : 'Column(Integer)',
+    'mplus_season_highest' : 'Column(Integer)',
+
+    **{'raids_{}{}'.format(difficulty,postfix) : 'Column(String)'
+            for difficulty in RAID_DIFFICULTIES
+            for postfix in ('','_weekly')}
+}
+
+HEADERS = [k for k in CHARACTER_HEADER_FIELDS.keys()]
 
 """
 Each Character has multiple AzeriteTraits available for each AZERITE_TIERS within each AZERITE_ITEM_SLOTS.
@@ -99,109 +239,3 @@ class Character(Base):
             if k in CHARACTER_HEADER_FIELDS or \
             hasattr(self, k):
                 self.__setattr__(k, v)
-
-    def _update_snapshots(self):
-        year = Utility.year[self.region_name]
-        week = Utility.week[self.region_name]
-        if year not in self.snapshots:
-            self.snapshots[year] = {}
-
-        if week not in self.snapshots[year]:
-            self.snapshots[year][week] = Snapshot()
-            self.snapshots[year][week].world_quests = self.world_quests_total
-            self.snapshots[year][week].dungeons = self.dungeons_total
-
-    def _serialize_azerite(self):
-        for slot in AZERITE_ITEM_SLOTS:
-            for tier in range(AZERITE_TIERS):
-                selected = getattr(self, '_{}_tier{}_selected'.format(slot, tier))
-                selected = str(selected) if selected else None
-                setattr(self, '{}_tier{}_selected'.format(slot, tier), selected)
-                available = '|'.join([str(x) for x in getattr(self, '_{}_tier{}_available'.format(slot, tier))])
-                setattr(self, '{}_tier{}_available'.format(slot, tier), available)
-
-    def _serialize_gems(self):
-        self.gem_ids = '|'.join([str(g.gem.id) for g in self.gems])
-        self.gem_qualities = '|'.join([str(g.gem.quality) for g in self.gems])
-        self.gem_names = '|'.join([str(g.gem.name) for g in self.gems])
-        self.gem_icons = '|'.join([str(g.gem.icon) for g in self.gems])
-        self.gem_stats = '|'.join([str(g.gem.stat) for g in self.gems])
-        self.gem_slots = '|'.join([g.slot for g in self.gems])
-
-    def _get_snapshots(self):
-        weekly_snapshot = self.snapshots[Utility.year[self.region_name]][Utility.week[self.region_name]]
-        self.world_quests_weekly = self.world_quests_total - weekly_snapshot.world_quests
-        self.dungeons_weekly = self.dungeons_total - weekly_snapshot.dungeons
-
-        # If something happened where snapshot total > our total, reset snapshot and set to 0
-        if self.world_quests_weekly < 0:
-            self.world_quests_weekly = 0
-            weekly_snapshot.world_quests = self.world_quests_total
-        if self.dungeons_weekly < 0:
-            self.dungeons_weekly = 0
-            weekly_snapshot.dungeons = self.dungeons_total
-
-    def process_blizzard(self, profile, db_session, api, force_refresh):
-        """
-        Processes the response from blizzard's API for this character
-
-        @param profile The response from blizzard's api
-
-        @param db_session The database session to use for queries
-
-        @param api The api object used to make the request
-
-        @param force_refresh If True will force the Character to update data
-        """
-        # Only update items that need the api if modified or forced
-        if profile['last_login_timestamp'] != self.lastmodified:
-            exceptionCount = 0
-            # Fetch rest of api
-            for section in ['media', 'equipment']:
-                while section not in profile:
-                    try:
-                        profile[section] = api.get_data_resource(
-                                '{}&locale={}'.format(profile['summary'][section], BLIZZARD_LOCALE),
-                                self.region_name)
-                    except WowApiException:
-                        logger = logging.getLogger('altaudit')
-                        logger.exception(traceback.format_exc())
-                        exceptionCount += 1
-                        if exceptionCount >= MAX_API_TRIES:
-                            raise
-                        else:
-                            sleep(2)
-            # call each section, should loop like a pro
-            # sections = [f for _, f in Section.__dict__.items() if callable(f)]
-            # for section in sections:
-            #     section(self, profile, db_session, api)
-        deep_fetch = force_refresh or profile['last_login_timestamp'] != self.lastmodified
-        conditional_api = api if deep_fetch else None
-
-        Section.basic(self, profile, db_session, conditional_api)
-        Section.items(self, profile)
-        Section.azerite(self, profile, db_session, conditional_api)
-        Section.audit(self, profile, db_session, conditional_api)
-        Section.professions(self, profile)
-        Section.reputations(self, profile)
-        Section.pve(self, profile)
-        self._update_snapshots() # always update snapshots as we may go weeks without playing a character
-
-    def process_raiderio(self, response):
-        """
-        Processes the response from raider.io API for this character
-
-        @param response The response from raider.io's API
-        """
-        if not response.ok:
-            self.raiderio_score = 0
-            self.mplus_weekly_highest = 0
-            self.mplus_season_highest = 0
-        else:
-            Section.raiderio(self, response.json())
-
-    def serialize(self):
-        self._serialize_azerite()
-        self._serialize_gems()
-        self._get_snapshots()
-        return [getattr(self, field) for field in HEADERS]

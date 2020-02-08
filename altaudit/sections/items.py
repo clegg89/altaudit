@@ -2,9 +2,9 @@
 
 from statistics import mean
 
-from ..constants import ITEM_SLOTS, ITEM_FIELDS
+from ..models import ITEM_SLOTS, ITEM_FIELDS
 
-def items(character, response, db_session, api):
+def items(character, response, db_session=None, api=None):
     items_response = response['items']
     ilevels = {}
 

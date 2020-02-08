@@ -12,9 +12,11 @@ from wowapi import WowApi
 
 from .utility import Utility
 from .models import Class, Faction, Race, Region, Realm, Character, Gem
-from .constants import BLIZZARD_REGION, BLIZZARD_LOCALE, RAIDERIO_URL
+from .blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from .gem_enchant import gem_lookup
 from . import sections as Section
+
+RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm}&name={character_name}&fields=mythic_plus_scores_by_season:current,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
 
 def _character_as_dict(character):
     return {'character_name' : character.name,
@@ -28,10 +30,10 @@ class Audit:
     This class will hold all necessary data across multiple refreshes
     """
 
-    def __init__(self, config, retry_conn_failures=False, sql_echo=False):
+    def __init__(self, config, sql_echo=False):
         self.engine = create_engine(config['database'], echo=sql_echo)
         self.blizzard_api = WowApi(**config['api']['blizzard'],
-                retry_conn_failures=retry_conn_failures)
+                retry_conn_failures=True)
         self.request_session = requests.Session()
         self.config_characters = config['characters']
 

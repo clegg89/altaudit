@@ -1,7 +1,7 @@
 """Pull Azerite Data from API Response"""
 
-from ..constants import AZERITE_ITEM_SLOTS, AZERITE_TIERS, BLIZZARD_REGION, BLIZZARD_LOCALE
-from ..models import AzeriteTrait
+from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
+from ..models import AzeriteTrait, AZERITE_ITEM_SLOTS, AZERITE_TIERS
 
 def azerite(character, response, db_session, api):
     # TODO make a Item->Trait table so we can avoid always querying the API

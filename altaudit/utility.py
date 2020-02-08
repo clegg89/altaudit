@@ -2,7 +2,19 @@
 import datetime
 import time
 
-from .constants import WEEKLY_RESETS
+"""
+Reset days and times.
+
+All values are in UTC time to avoid daylight savings issues
+
+use time.strptime(day, "%A").tm_wday to convert day string to weekday
+"""
+WEEKLY_RESETS = {
+    'us' : { 'hour' : 15, 'day' : 'Tuesday' },
+    'eu' : { 'hour' : 7, 'day' : 'Wednesday' },
+    'kr' : { 'hour' : 7, 'day' : 'Wednesday' },
+    'tw' : { 'hour' : 7, 'day' : 'Wednesday' }
+}
 
 class Utility:
     "Convenience class to hold static variables and functions"

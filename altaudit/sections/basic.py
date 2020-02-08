@@ -1,6 +1,6 @@
 """Pull Basic Character Data from API Response"""
 
-from ..constants import BLIZZARD_LOCALE
+from ..blizzard import BLIZZARD_LOCALE
 from ..models import Class, Faction, Race
 
 def basic(character, profile, db_session, api):

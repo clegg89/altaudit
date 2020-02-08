@@ -1,8 +1,7 @@
 """Unit Tests for items info"""
 import pytest
 
-from altaudit.constants import ITEM_SLOTS
-from altaudit.models import Character
+from altaudit.models import Character, ITEM_SLOTS
 
 import altaudit.sections as Section
 
