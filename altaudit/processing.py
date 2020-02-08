@@ -1,49 +1,49 @@
 """Character Processing"""
 from .utility import Utility
-from .sections import sections
+from .sections import sections, raiderio
 
-def update_snapshots(character):
-    year = Utility.year[self.region_name]
-    week = Utility.week[self.region_name]
-    if year not in self.snapshots:
-        self.snapshots[year] = {}
+def _update_snapshots(character):
+    year = Utility.year[character.region_name]
+    week = Utility.week[character.region_name]
+    if year not in character.snapshots:
+        character.snapshots[year] = {}
 
-    if week not in self.snapshots[year]:
-        self.snapshots[year][week] = Snapshot()
-        self.snapshots[year][week].world_quests = self.world_quests_total
-        self.snapshots[year][week].dungeons = self.dungeons_total
+    if week not in character.snapshots[year]:
+        character.snapshots[year][week] = Snapshot()
+        character.snapshots[year][week].world_quests = character.world_quests_total
+        character.snapshots[year][week].dungeons = character.dungeons_total
 
-def serialize_azerite(self):
+def _serialize_azerite(character):
     for slot in AZERITE_ITEM_SLOTS:
         for tier in range(AZERITE_TIERS):
-            selected = getattr(self, '_{}_tier{}_selected'.format(slot, tier))
+            selected = getattr(character, '_{}_tier{}_selected'.format(slot, tier))
             selected = str(selected) if selected else None
-            setattr(self, '{}_tier{}_selected'.format(slot, tier), selected)
-            available = '|'.join([str(x) for x in getattr(self, '_{}_tier{}_available'.format(slot, tier))])
-            setattr(self, '{}_tier{}_available'.format(slot, tier), available)
+            setattr(character, '{}_tier{}_selected'.format(slot, tier), selected)
+            available = '|'.join([str(x) for x in getattr(character, '_{}_tier{}_available'.format(slot, tier))])
+            setattr(character, '{}_tier{}_available'.format(slot, tier), available)
 
-def serialize_gems(self):
-    self.gem_ids = '|'.join([str(g.gem.id) for g in self.gems])
-    self.gem_qualities = '|'.join([str(g.gem.quality) for g in self.gems])
-    self.gem_names = '|'.join([str(g.gem.name) for g in self.gems])
-    self.gem_icons = '|'.join([str(g.gem.icon) for g in self.gems])
-    self.gem_stats = '|'.join([str(g.gem.stat) for g in self.gems])
-    self.gem_slots = '|'.join([g.slot for g in self.gems])
+def _serialize_gems(character):
+    character.gem_ids = '|'.join([str(g.gem.id) for g in character.gems])
+    character.gem_qualities = '|'.join([str(g.gem.quality) for g in character.gems])
+    character.gem_names = '|'.join([str(g.gem.name) for g in character.gems])
+    character.gem_icons = '|'.join([str(g.gem.icon) for g in character.gems])
+    character.gem_stats = '|'.join([str(g.gem.stat) for g in character.gems])
+    character.gem_slots = '|'.join([g.slot for g in character.gems])
 
-def get_snapshots(self):
-    weekly_snapshot = self.snapshots[Utility.year[self.region_name]][Utility.week[self.region_name]]
-    self.world_quests_weekly = self.world_quests_total - weekly_snapshot.world_quests
-    self.dungeons_weekly = self.dungeons_total - weekly_snapshot.dungeons
+def _get_snapshots(character):
+    weekly_snapshot = character.snapshots[Utility.year[character.region_name]][Utility.week[character.region_name]]
+    character.world_quests_weekly = character.world_quests_total - weekly_snapshot.world_quests
+    character.dungeons_weekly = character.dungeons_total - weekly_snapshot.dungeons
 
     # If something happened where snapshot total > our total, reset snapshot and set to 0
-    if self.world_quests_weekly < 0:
-        self.world_quests_weekly = 0
-        weekly_snapshot.world_quests = self.world_quests_total
-    if self.dungeons_weekly < 0:
-        self.dungeons_weekly = 0
-        weekly_snapshot.dungeons = self.dungeons_total
+    if character.world_quests_weekly < 0:
+        character.world_quests_weekly = 0
+        weekly_snapshot.world_quests = character.world_quests_total
+    if character.dungeons_weekly < 0:
+        character.dungeons_weekly = 0
+        weekly_snapshot.dungeons = character.dungeons_total
 
-def process_blizzard(self, profile, db_session, api, force_refresh):
+def process_blizzard(character, profile, db_session, api, force_refresh):
     """
     Processes the response from blizzard's API for this character
 
@@ -60,46 +60,36 @@ def process_blizzard(self, profile, db_session, api, force_refresh):
     @param force_refresh If True will force the Character to update data
     """
     # Only update items that need the api if modified or forced
-    if force_refresh or profile['last_login_timestamp'] != self.lastmodified:
+    if force_refresh or profile['last_login_timestamp'] != character.lastmodified:
         # Fetch rest of api
         for section in ['media', 'equipment']:
             profile[section] = api.get_data_resource(
                     '{}&locale={}'.format(profile['summary'][section], BLIZZARD_LOCALE),
-                    self.region_name)
+                    character.region_name)
 
         # call each section, should loop like a pro
-        sections = [f for _, f in Section.__dict__.items() if callable(f)]
         for section in sections:
-            section(self, profile, db_session, api)
+            section(character, profile, db_session, api)
 
-    # deep_fetch = force_refresh or profile['last_login_timestamp'] != self.lastmodified
-    # conditional_api = api if deep_fetch else None
 
-    # Section.basic(self, profile, db_session, conditional_api)
-    # Section.items(self, profile)
-    # Section.azerite(self, profile, db_session, conditional_api)
-    # Section.audit(self, profile, db_session, conditional_api)
-    # Section.professions(self, profile)
-    # Section.reputations(self, profile)
-    # Section.pve(self, profile)
+    # always update snapshots as we may go weeks without playing a character
+    _update_snapshots(character)
 
-    self._update_snapshots() # always update snapshots as we may go weeks without playing a character
-
-def process_raiderio(self, response):
+def process_raiderio(character, response):
     """
     Processes the response from raider.io API for this character
 
     @param response The response from raider.io's API
     """
     if not response.ok:
-        self.raiderio_score = 0
-        self.mplus_weekly_highest = 0
-        self.mplus_season_highest = 0
+        character.raiderio_score = 0
+        character.mplus_weekly_highest = 0
+        character.mplus_season_highest = 0
     else:
-        Section.raiderio(self, response.json())
+        raiderio(character, response.json())
 
-def serialize(self):
-    self._serialize_azerite()
-    self._serialize_gems()
-    self._get_snapshots()
-    return [getattr(self, field) for field in HEADERS]
+def serialize(character):
+    _serialize_azerite(character)
+    _serialize_gems(character)
+    _get_snapshots(character)
+    return [getattr(character, field) for field in HEADERS]
