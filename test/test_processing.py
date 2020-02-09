@@ -4,29 +4,30 @@ import pytest
 import datetime
 
 import altaudit
+from altaudit.processing import _update_snapshots, process_blizzard
 from altaudit.models import Region, Realm, Character, Snapshot, AzeriteTrait, Gem, GemSlotAssociation
 from altaudit.utility import Utility
 
 @pytest.fixture
 def mock_section(mocker):
-    return mocker.patch('altaudit.models.character.Section')
+    mock = mocker.MagicMock()
+    mocker.patch.object(altaudit.processing, 'sections', [mock])
+    return mock
 
 @pytest.fixture
 def mock_update_snapshots(mocker):
-    return mocker.patch('altaudit.models.character.Character._update_snapshots')
+    return mocker.patch('altaudit.processing._update_snapshots')
 
-@pytest.mark.skip(reason='No longer compatible with profile-api')
 def test_update_snapshot_add_new_snapshot():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
     Utility.set_refresh_timestamp(now)
 
-    clegg._update_snapshots()
+    _update_snapshots(clegg)
 
     assert 2019 in clegg.snapshots
     assert 31 in clegg.snapshots[2019]
 
-@pytest.mark.skip(reason='No longer compatible with profile-api')
 def test_update_snapshot_no_overwrite_existing():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
@@ -37,12 +38,11 @@ def test_update_snapshot_no_overwrite_existing():
 
     Utility.set_refresh_timestamp(now)
 
-    clegg._update_snapshots()
+    _update_snapshots(clegg)
 
     assert clegg.snapshots[2019][31].world_quests == 5
     assert clegg.snapshots[2019][31].dungeons == 10
 
-@pytest.mark.skip(reason='No longer compatible with profile-api')
 def test_update_snapshot_capture_existing_totals():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
@@ -51,34 +51,30 @@ def test_update_snapshot_capture_existing_totals():
 
     Utility.set_refresh_timestamp(now)
 
-    clegg._update_snapshots()
+    _update_snapshots(clegg)
 
     assert clegg.snapshots[2019][31].world_quests == 300
     assert clegg.snapshots[2019][31].dungeons == 40
 
-@pytest.mark.skip(reason='No longer compatible with profile-api')
 def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapshots, mocker):
     jack = Character('jack', lastmodified=5)
-    fake_response = { 'last_login_timestamp' : 10 }
+    fake_response = { 'summary' : {
+        'last_login_timestamp' : 10,
+        'media' : 'test',
+        'equipment' : 'test' } }
     mock_api = mocker.MagicMock()
 
-    jack.process_blizzard(fake_response, None, mock_api, False)
+    process_blizzard(jack, fake_response, None, mock_api, False)
 
     mock_update_snapshots.assert_called_once()
-    # mock_section.basic.assert_called_once_with(jack, fake_response, 3)
-    # mock_section.items.assert_called_once_with(jack, fake_response)
-    # mock_section.azerite.assert_called_once_with(jack, fake_response, 3, 4)
-    # mock_section.audit.assert_called_once_with(jack, fake_response, 3, 4)
-    # mock_section.professions.assert_called_once_with(jack, fake_response)
-    # mock_section.reputations.assert_called_once_with(jack, fake_response)
-    # mock_section.pve.assert_called_once_with(jack, fake_response)
+    mock_section.assert_called_once_with(jack, fake_response, None, mock_api)
 
 @pytest.mark.skip(reason='No longer compatible with profile-api')
 def test_process_blizzard_last_modified_not_changed(mock_section, mock_update_snapshots):
     jack = Character('jack', lastmodified=10)
     fake_response = { 'lastModified' : 10 }
 
-    jack.process_blizzard(fake_response, 3, 4, False)
+    process_blizzard(jack, fake_response, 3, 4, False)
 
     mock_update_snapshots.assert_called_once()
     mock_section.basic.assert_called_once_with(jack, fake_response, 3)
@@ -94,7 +90,7 @@ def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, 
     jack = Character('jack', lastmodified=10)
     fake_response = { 'lastModified' : 10 }
 
-    jack.process_blizzard(fake_response, 3, 4, True)
+    process_blizzard(jack, fake_response, 3, 4, True)
 
     mock_update_snapshots.assert_called_once()
     mock_section.basic.assert_called_once_with(jack, fake_response, 3)
@@ -113,7 +109,7 @@ def test_process_blizzard_basic_before_azerite(mock_section, mock_update_snapsho
     manager.attach_mock(mock_section.basic, 'basic')
     manager.attach_mock(mock_section.azerite, 'azerite')
 
-    jack.process_blizzard(fake_response, 3, 4, False)
+    process_blizzard(jack, fake_response, 3, 4, False)
 
     mock_update_snapshots.assert_called_once()
     manager.assert_has_calls([
@@ -128,7 +124,7 @@ def test_process_blizzard_basic_before_audit(mock_section, mock_update_snapshots
     manager.attach_mock(mock_section.basic, 'basic')
     manager.attach_mock(mock_section.audit, 'audit')
 
-    jack.process_blizzard(fake_response, 3, 4, False)
+    process_blizzard(jack, fake_response, 3, 4, False)
 
     mock_update_snapshots.assert_called_once()
     manager.assert_has_calls([
@@ -140,7 +136,7 @@ def test_process_raiderio(mock_section, mocker):
     jack = Character('jack')
     mock_response = mocker.MagicMock()
 
-    jack.process_raiderio(mock_response)
+    process_raiderio(jack, mock_response)
 
     mock_section.raiderio.assert_called_once_with(jack, mock_response.json.return_value)
 
@@ -151,7 +147,7 @@ def test_process_raiderio_bad_response(mock_section, mocker):
 
     mock_response.ok = False
 
-    jack.process_raiderio(mock_response)
+    process_raiderio(jack, mock_response)
 
     mock_section.raiderio.assert_not_called()
     assert jack.raiderio_score == 0
@@ -166,7 +162,7 @@ def test_serialize_azerite():
             AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'),
             AzeriteTrait(12, 234444, 'Made Up Trait', 'inv_fakeicon')]
 
-    jack._serialize_azerite()
+    _serialize_azerite(jack)
 
     assert jack.head_tier0_selected == '13+263978+Azerite Empowered+inv_smallazeriteshard'
     assert jack.head_tier0_available == '13+263978+Azerite Empowered+inv_smallazeriteshard|12+234444+Made Up Trait+inv_fakeicon'
@@ -179,7 +175,7 @@ def test_serialize_azerite_no_selected():
             AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'),
             AzeriteTrait(12, 234444, 'Made Up Trait', 'inv_fakeicon')]
 
-    jack._serialize_azerite()
+    _serialize_azerite(jack)
 
     assert jack.head_tier0_selected == None
     assert jack.head_tier0_available == '13+263978+Azerite Empowered+inv_smallazeriteshard|12+234444+Made Up Trait+inv_fakeicon'
@@ -194,7 +190,7 @@ def test_serialize_gems():
             Gem(168645, 5, 'Masterful Name', 'inv_misc_gem_x5_uncommon_perfectcut_purple', '+50 Mastery'))
         ]
 
-    jack._serialize_gems()
+    _serialize_gems(jack)
 
     assert jack.gem_ids == '168641|168645'
     assert jack.gem_qualities == '5|5'
@@ -214,7 +210,7 @@ def test_get_snapshots():
     now = datetime.datetime(2019, 8, 7)
     Utility.set_refresh_timestamp(now)
 
-    jack._get_snapshots()
+    _get_snapshots(jack)
 
     assert jack.world_quests_weekly == 20
     assert jack.dungeons_weekly == 4
@@ -230,7 +226,7 @@ def test_get_snapshots_negative_world_quests():
     now = datetime.datetime(2019, 8, 7)
     Utility.set_refresh_timestamp(now)
 
-    jack._get_snapshots()
+    _get_snapshots(jack)
 
     assert jack.world_quests_weekly == 0
     assert jack.snapshots[2019][32].world_quests == 280
@@ -246,7 +242,7 @@ def test_get_snapshots_negative_dungeons():
     now = datetime.datetime(2019, 8, 7)
     Utility.set_refresh_timestamp(now)
 
-    jack._get_snapshots()
+    _get_snapshots(jack)
 
     assert jack.dungeons_weekly == 0
     assert jack.snapshots[2019][32].dungeons == 18
@@ -260,7 +256,7 @@ def test_serialzie(mocker):
 
     altaudit.models.character.HEADERS = [ 'name', 'region_name', 'realm_slug' ]
 
-    result = jack.serialize()
+    result = serialize(jack)
 
     assert result == ['jack', 'us', 'kiljaeden']
     mock_serialize_azerite.assert_called_once()

@@ -1,6 +1,8 @@
 """Character Processing"""
 from .utility import Utility
 from .sections import sections, raiderio
+from .models import Snapshot
+from .blizzard import BLIZZARD_LOCALE
 
 def _update_snapshots(character):
     year = Utility.year[character.region_name]
@@ -60,7 +62,7 @@ def process_blizzard(character, profile, db_session, api, force_refresh):
     @param force_refresh If True will force the Character to update data
     """
     # Only update items that need the api if modified or forced
-    if force_refresh or profile['last_login_timestamp'] != character.lastmodified:
+    if force_refresh or profile['summary']['last_login_timestamp'] != character.lastmodified:
         # Fetch rest of api
         for section in ['media', 'equipment']:
             profile[section] = api.get_data_resource(
