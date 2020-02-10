@@ -1,7 +1,7 @@
 """Character Processing"""
 from .utility import Utility
 from .sections import sections, raiderio
-from .models import Snapshot
+from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
 from .blizzard import BLIZZARD_LOCALE
 
 def _update_snapshots(character):
