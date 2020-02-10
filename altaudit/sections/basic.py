@@ -13,12 +13,6 @@ def basic(character, profile, db_session, api):
     character.faction = db_session.query(Faction).filter_by(name=profile['summary']['faction']['name']).first()
     character.gender = profile['summary']['gender']['name']
     character.race = db_session.query(Race).filter_by(name=profile['summary']['race']['name']).first()
-
-    if api:
-        profile['media'] = api.get_data_resource(
-                '{}&locale={}'.format(profile['summary']['media'], BLIZZARD_LOCALE),
-                character.region_name)
-
-        character.avatar = profile['media']['avatar_url']
-        character.bust = profile['media']['bust_url']
-        character.render = profile['media']['render_url']
+    character.avatar = profile['media']['avatar_url']
+    character.bust = profile['media']['bust_url']
+    character.render = profile['media']['render_url']

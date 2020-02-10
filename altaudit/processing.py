@@ -4,6 +4,8 @@ from .sections import sections, raiderio
 from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
 from .blizzard import BLIZZARD_LOCALE
 
+PROFILE_API_SECTIONS = ['media', 'equipment']
+
 def _update_snapshots(character):
     year = Utility.year[character.region_name]
     week = Utility.week[character.region_name]
@@ -64,9 +66,9 @@ def process_blizzard(character, profile, db_session, api, force_refresh):
     # Only update items that need the api if modified or forced
     if force_refresh or profile['summary']['last_login_timestamp'] != character.lastmodified:
         # Fetch rest of api
-        for section in ['media', 'equipment']:
-            profile[section] = api.get_data_resource(
-                    '{}&locale={}'.format(profile['summary'][section], BLIZZARD_LOCALE),
+        for api_section in PROFILE_API_SECTIONS:
+            profile[api_section] = api.get_data_resource(
+                    '{}&locale={}'.format(profile['summary'][api_section], BLIZZARD_LOCALE),
                     character.region_name)
 
         # call each section, should loop like a pro

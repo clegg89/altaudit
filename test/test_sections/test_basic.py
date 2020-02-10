@@ -90,7 +90,9 @@ def fake_response_maker():
             realm='realm1',
             level=120,
             timestamp=int(datetime.datetime.now().timestamp())*1000,
-            media='link_to_media'):
+            avatar='avatar_url',
+            bust='bust_url',
+            render='render_url'):
         class_id = next(c['id'] for c in classes['classes'] if c['name'] == class_name)
         race = next(r for r in races if r['name'] == race_name)
         race_id = race['id']
@@ -106,8 +108,11 @@ def fake_response_maker():
                 'active_spec' : { 'name' : mainspec },
                 'realm' : { 'name' : realm },
                 'level' : level,
-                'last_login_timestamp' : timestamp,
-                'media' : media }}
+                'last_login_timestamp' : timestamp },
+            'media' : {
+                'avatar_url' : avatar,
+                'bust_url' : bust,
+                'render_url' : render }}
 
     return _maker
 
@@ -171,23 +176,20 @@ def test_basic_info_timestamp(fake_response_maker, db_session):
     Section.basic(jack, response, db_session, None)
     assert jack.lastmodified == now
 
-@pytest.mark.skip(reason="Need to setup mock for media")
 def test_basic_info_avatar(fake_response_maker, db_session):
     jack = Character('jack')
-    response = fake_response_maker()
+    response = fake_response_maker(avatar='realm1/96/184987488-avatar.jpg')
     Section.basic(jack, response, db_session, None)
     assert jack.avatar == 'realm1/96/184987488-avatar.jpg'
 
-@pytest.mark.skip(reason="Need to setup mock for media")
 def test_basic_info_bust(fake_response_maker, db_session):
     jack = Character('jack')
-    response = fake_response_maker()
+    response = fake_response_maker(bust='realm1/96/184987488-inset.jpg')
     Section.basic(jack, response, db_session, None)
     assert jack.bust == 'realm1/96/184987488-inset.jpg'
 
-@pytest.mark.skip(reason="Need to setup mock for media")
 def test_basic_info_render(fake_response_maker, db_session):
     jack = Character('jack')
-    response = fake_response_maker()
+    response = fake_response_maker(render='realm1/96/184987488-main.jpg')
     Section.basic(jack, response, db_session, None)
     assert jack.render == 'realm1/96/184987488-main.jpg'
