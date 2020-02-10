@@ -72,6 +72,7 @@ def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapsh
 
     mock_update_snapshots.assert_called_once()
     mock_section.assert_called_once_with(jack, fake_response, None, mock_api)
+    mock_api.get_data_resource.assert_called()
 
 def test_process_blizzard_last_modified_not_changed(mock_section, mock_update_snapshots, mocker):
     jack = Character('jack', lastmodified=10)
@@ -84,7 +85,7 @@ def test_process_blizzard_last_modified_not_changed(mock_section, mock_update_sn
     process_blizzard(jack, fake_response, None, mock_api, False)
 
     mock_update_snapshots.assert_called_once()
-    mock_api.get_data_resource.assert_not_called()
+    assert mock_api.method_calls == []
     mock_section.assert_not_called()
 
 def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, mock_update_snapshots, mocker):
@@ -99,6 +100,7 @@ def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, 
 
     mock_update_snapshots.assert_called_once()
     mock_section.assert_called_once_with(jack, fake_response, None, mock_api)
+    mock_api.get_data_resource.assert_called()
 
 @pytest.mark.skip(reason='Move this to sections test')
 def test_process_blizzard_basic_before_azerite(mock_section, mock_update_snapshots, mocker):
