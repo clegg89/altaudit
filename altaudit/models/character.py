@@ -14,10 +14,11 @@ from .snapshot import Year, Snapshot
 
 "Item slots tracked"
 ITEM_SLOTS = [
+    # TODO change in Alembic (fingers, trinkets, main/off hand)
     'head', 'neck', 'shoulder', 'back',
     'chest', 'wrist', 'hands', 'waist',
-    'legs', 'feet', 'finger1', 'finger2',
-    'trinket1', 'trinket2', 'mainHand', 'offHand'
+    'legs', 'feet', 'finger_1', 'finger_2',
+    'trinket_1', 'trinket_2', 'main_hand', 'off_hand'
 ]
 
 "Item Fields to use in Character Model"
@@ -25,8 +26,9 @@ ITEM_FIELD_COLUMNS = [
     ('itemLevel','Column(Integer)'),
     ('id', 'Column(Integer)'),
     ('name', 'Column(String)'),
-    ('icon', 'Column(String)'),
-    ('quality', 'Column(Integer)')]
+    # ('icon', 'Column(String)'), TODO Remove in Alembic
+    # TODO change in Alembic
+    ('quality', 'Column(String)')]
 
 "Item Fields"
 ITEM_FIELDS = [field[0] for field in ITEM_FIELD_COLUMNS]
@@ -38,7 +40,7 @@ AZERITE_ITEM_SLOTS = [ 'head', 'shoulder', 'chest' ]
 AZERITE_TIERS = 5
 
 "Item slots that can be enchanted (for BfA)"
-ENCHANTED_ITEM_SLOTS = [ 'mainHand', 'offHand', 'finger1', 'finger2', 'hands', 'wrist' ]
+ENCHANTED_ITEM_SLOTS = [ 'main_hand', 'off_hand', 'finger_1', 'finger_2', 'hands', 'wrist' ]
 
 "Item Enchant filds for use in Character Model"
 ENCHANT_ITEM_FIELD_COLUMNS = [
