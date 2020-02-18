@@ -112,8 +112,10 @@ CHARACTER_HEADER_FIELDS = {
 
     # Azerite Info
     'hoa_level' : 'Column(Integer)',
-    'azerite_experience' : 'Column(Integer)',
-    'azerite_experience_remaining' : 'Column(Integer)',
+    # TODO Update Alembic. Remove experience/remaining, add percentage
+    'azerite_percentage' : 'Column(Float)',
+    # 'azerite_experience' : 'Column(Integer)',
+    # 'azerite_experience_remaining' : 'Column(Integer)',
 
     **{'{}_tier{}_{}'.format(piece, tier, field) : "''" # Composite from azerite_traits table
         for piece in AZERITE_ITEM_SLOTS
