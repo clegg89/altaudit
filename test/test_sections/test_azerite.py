@@ -174,7 +174,8 @@ def test_hoa_info_non_hoa_neck():
     assert jack.azerite_percentage == None
 
 def test_azerite_item_in_db(db_session, mock_api):
-    jack = Character('jack', class_id=9)
+    warlock = db_session.query(Class).filter_by(name='Warlock').first()
+    jack = Character('jack', character_class=warlock)
     response = { 'equipment' :
             { 'equipped_items' : [{
                 'item' : {'key':{'href' : 'garbage'}},
@@ -185,12 +186,12 @@ def test_azerite_item_in_db(db_session, mock_api):
 
     assert jack._head_tier0_selected.id == 13
     assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Fake Azerite Name'
-    assert jack._head_tier0_selected.icon == 'inv_fake_icon'
+    assert jack._head_tier0_selected.name == 'Azerite Empowered'
+    assert jack._head_tier0_selected.icon == ''
     assert jack._head_tier0_available[0].id == 13
     assert jack._head_tier0_available[0].spell_id == 263978
-    assert jack._head_tier0_available[0].name == 'Fake Azerite Name'
-    assert jack._head_tier0_available[0].icon == 'inv_fake_icon'
+    assert jack._head_tier0_available[0].name == 'Azerite Empowered'
+    assert jack._head_tier0_available[0].icon == ''
     assert len(jack._head_tier0_available) == 1
 
 def test_azerite_item_not_in_db(db_session, mock_api):
