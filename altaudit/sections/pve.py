@@ -35,16 +35,14 @@ MYTHIC_DUNGEONS = {
 }
 
 def pve(character, response, db_session, api):
-    response['completed_quests'] = api.get_data_resource('{}&locale={}'.format(response['quests']['completed'], BLIZZARD_LOCALE), character.region_name)
-
     _island_expeditions(character, response)
-    _world_quests(character, response)
-    _weekly_event(character, response)
-    _dungeons(character, response)
-    _raids(character, response)
+    # _world_quests(character, response)
+    # _weekly_event(character, response)
+    # _dungeons(character, response)
+    # _raids(character, response)
 
 def _island_expeditions(character, response):
-    weekly_islands = next((quest for quest in response['completed_quests']['quests'] if quest['id'] == 53435), None)
+    weekly_islands = next((quest for quest in response['quests_completed']['quests'] if quest['id'] == 53435 or quest['id'] == 53436), None)
     character.island_weekly_done = "TRUE" if weekly_islands else "FALSE"
     # if 53435 in response['quests'] or 53436 in response['quests']:
     #     character.island_weekly_done = 'TRUE'
