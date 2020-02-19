@@ -8,4 +8,11 @@ from .pve import pve
 from .raiderio import raiderio
 from .metadata import metadata
 
-sections = [ basic, items, azerite, audit, professions, reputations, pve ]
+sections = [
+        basic,
+        items,
+        azerite,
+        audit,
+        # professions, Not yet available in Profile API
+        reputations,
+        pve ]

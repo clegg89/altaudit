@@ -5,6 +5,7 @@ from ..models import PROFESSIONS, PROFESSION_EXPACS, PROFESSION_FIELD_COLUMNS
 "Profession Fields"
 PROFESSION_FIELDS = [f[0] for f in PROFESSION_FIELD_COLUMNS]
 
+# TODO Implement professions Profile API when the API is available.
 def professions(character, response):
     profession_response = response['professions']
 
