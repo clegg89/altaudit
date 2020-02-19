@@ -2,6 +2,11 @@
 import datetime
 import time
 
+# TODO Repeated functionality:
+# Calling get_data_resource with locale=en_US appended
+# Missing offhand only if mainhand is two-handed and not a fury warrior
+# Get item by slot
+
 """
 Reset days and times.
 

@@ -47,6 +47,6 @@ def _trait(trait, db_session, api):
         # Spell API not working
         # This is only useful to get the icon
         # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
-        model = AzeriteTrait(trait['id'], trait['spell']['id'], trait['spell']['name'], '')
+        model = AzeriteTrait(trait['id'], trait['spell']['id'], trait['spell']['name'], None)
 
     return model

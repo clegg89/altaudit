@@ -158,7 +158,7 @@ def db():
     session.add(Class('Warlock', id=9))
 
     for trait in fake_azerite_item_class_powers_in_db[2]['powers']:
-        session.add(AzeriteTrait(trait['id'], trait['spell']['id'], trait['spell']['name'], ''))
+        session.add(AzeriteTrait(trait['id'], trait['spell']['id'], trait['spell']['name'], None))
 
     session.commit()
     session.close()
@@ -228,11 +228,11 @@ def test_azerite_item_in_db(db_session, mock_api):
     assert jack._head_tier0_selected.id == 13
     assert jack._head_tier0_selected.spell_id == 263978
     assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == ''
+    assert jack._head_tier0_selected.icon == None
     assert jack._head_tier0_available[0].id == 13
     assert jack._head_tier0_available[0].spell_id == 263978
     assert jack._head_tier0_available[0].name == 'Azerite Empowered'
-    assert jack._head_tier0_available[0].icon == ''
+    assert jack._head_tier0_available[0].icon == None
     assert len(jack._head_tier0_available) == 1
 
 def test_azerite_item_not_in_db(db_session, mock_api):
@@ -261,12 +261,12 @@ def test_azerite_item_not_in_db(db_session, mock_api):
     assert jack._head_tier0_selected.id == 13
     assert jack._head_tier0_selected.spell_id == 263978
     assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == ''
+    assert jack._head_tier0_selected.icon == None
     assert jack._head_tier1_selected.name == 'Longstrider'
     assert jack._head_tier0_available[0].id == 13
     assert jack._head_tier0_available[0].spell_id == 263978
     assert jack._head_tier0_available[0].name == 'Azerite Empowered'
-    assert jack._head_tier0_available[0].icon == ''
+    assert jack._head_tier0_available[0].icon == None
     assert len(jack._head_tier0_available) == 1
 
 def test_azerite_item_no_item():

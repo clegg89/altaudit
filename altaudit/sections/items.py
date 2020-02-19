@@ -15,8 +15,10 @@ def items(character, profile, db_session, api):
 
     if ilevels['off_hand'] == 0:
         # Find mainhand if it exists
-        mainhand = next(iter([item for item in equipped_items if item['slot']['type'] == 'MAIN_HAND']), None)
+        mainhand = next((item for item in equipped_items if item['slot']['type'] == 'MAIN_HAND'), None)
         # If mainhand is a two handed weapon, set offhand ilvl to main ilvl for equipped ilvl calculation
+        # TODO This will not work for fury warriors!
+        # TODO code duplication with audit!
         if mainhand and mainhand['inventory_type']['type'] == 'TWOHWEAPON':
             ilevels['off_hand'] = ilevels['main_hand']
         else:
