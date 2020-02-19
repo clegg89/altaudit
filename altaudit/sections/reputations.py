@@ -24,20 +24,20 @@ REPUTATION_FACTION_ID = {
     ]
 }
 
-def reputations(character, response):
-    reputation_response = response['reputation']
+# TODO Possible to get paragon now if we want
+def reputations(character, response, db_session, api):
+    reputations = response['reputations']['reputations']
     faction = character.faction_name.lower()
 
     result = ''
     for rep in REPUTATION_FACTION_ID[faction]:
-        # Find the reputation dictionary where 'id' is our rep
-        rep_data = next((d for d in reputation_response if d['id'] == rep), None)
+        rep_data = next((d for d in reputations if d['faction']['id'] == rep), None)
         if rep_data:
-            result += '{}+{}+{}+{}+{}|'.format(rep_data['id'],
-                    rep_data['name'],
-                    rep_data['standing'],
-                    rep_data['value'],
-                    rep_data['max'])
+            result += '{}+{}+{}+{}+{}|'.format(rep_data['faction']['id'],
+                    rep_data['faction']['name'],
+                    rep_data['standing']['name'],
+                    rep_data['standing']['value'],
+                    rep_data['standing']['max'])
         else:
             result += '++++|'
 
