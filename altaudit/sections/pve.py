@@ -1,5 +1,6 @@
 """Pull PvE Data from API"""
 
+from ..blizzard import BLIZZARD_LOCALE
 from ..models import RAID_DIFFICULTIES
 from ..utility import Utility
 from .raids import VALID_RAIDS
@@ -33,7 +34,9 @@ MYTHIC_DUNGEONS = {
     'Operation: Mechagon'  : (None, 13620)
 }
 
-def pve(character, response):
+def pve(character, response, db_session, api):
+    response['completed_quests'] = api.get_data_resource('{}&locale={}'.format(response['quests']['completed'], BLIZZARD_LOCALE), character.region_name)
+
     _island_expeditions(character, response)
     _world_quests(character, response)
     _weekly_event(character, response)
@@ -41,17 +44,19 @@ def pve(character, response):
     _raids(character, response)
 
 def _island_expeditions(character, response):
-    if 53435 in response['quests'] or 53436 in response['quests']:
-        character.island_weekly_done = 'TRUE'
-    else:
-        character.island_weekly_done = 'FALSE'
+    weekly_islands = next((quest for quest in response['completed_quests']['quests'] if quest['id'] == 53435), None)
+    character.island_weekly_done = "TRUE" if weekly_islands else "FALSE"
+    # if 53435 in response['quests'] or 53436 in response['quests']:
+    #     character.island_weekly_done = 'TRUE'
+    # else:
+    #     character.island_weekly_done = 'FALSE'
 
     character.islands_total = 0
-    achiev_crit = response['achievements']['criteria']
-    achiev_crit_quantity = response['achievements']['criteriaQuantity']
-    for criteria in (40564, 40565): # PvE, PvP
-        if criteria in achiev_crit:
-            character.islands_total += achiev_crit_quantity[achiev_crit.index(criteria)]
+    achievements = response['achievements']['achievements']
+    for achievment_id in (12596, 12597): # PvE, PvP
+        achievment = next((achiev for achiev in achievements if achiev['id'] == achievment_id), None)
+        if achievment:
+            character.islands_total += achievment['criteria']['child_criteria'][0]['amount']
 
 def _world_quests(character, response):
     try:

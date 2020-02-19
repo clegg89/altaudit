@@ -4,7 +4,7 @@ from .sections import sections, raiderio
 from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
 from .blizzard import BLIZZARD_LOCALE
 
-PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations']
+PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', 'achievements', {'quests' : ['completed']}]
 
 def _update_snapshots(character):
     year = Utility.year[character.region_name]
@@ -46,6 +46,18 @@ def _get_snapshots(character):
     if character.dungeons_weekly < 0:
         character.dungeons_weekly = 0
         weekly_snapshot.dungeons = character.dungeons_total
+
+def _get_subsection(region, profile, api, sub_section, parent='summary', prefix=''):
+    if type(sub_section) is str:
+        profile[prefix + sub_section] = api.get_data_resource(
+                '{}&locale={}'.format(profile[parent][sub_section]['href'], BLIZZARD_LOCALE), region)
+    elif type(sub_section) is list:
+        for section in sub_section:
+            _get_subsection(region, profile, api, section, parent, prefix)
+    elif type(sub_section) is dict:
+        for k,v in sub_section:
+            _get_subsection(region, profile, api, k, parent, prefix)
+            _get_subsection(region, profile, api, v, k, prefix + k + '_')
 
 def process_blizzard(character, profile, db_session, api, force_refresh):
     """

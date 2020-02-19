@@ -4,7 +4,7 @@ import pytest
 import datetime
 
 import altaudit
-from altaudit.processing import _update_snapshots, _serialize_azerite, _serialize_gems, _get_snapshots, process_blizzard, process_raiderio, serialize
+from altaudit.processing import _update_snapshots, _get_subsection, _serialize_azerite, _serialize_gems, _get_snapshots, process_blizzard, process_raiderio, serialize
 from altaudit.models import Region, Realm, Character, Snapshot, AzeriteTrait, Gem, GemSlotAssociation
 from altaudit.utility import Utility
 
@@ -60,6 +60,47 @@ def test_update_snapshot_capture_existing_totals():
     assert clegg.snapshots[2019][31].world_quests == 300
     assert clegg.snapshots[2019][31].dungeons == 40
 
+def test_get_subsection_list_of_strings(mocker):
+    api_sections = ['media', 'equipment', 'reputations']
+    profile = { 'summary' : {
+        **{v : {'href' : v} for v in api_sections} } }
+    mock_api = mocker.MagicMock()
+    # TODO add side effect. See test_audit (also check return values)
+    expected_api_calls = [mocker.call.get_data_resource('{}&locale=en_US'.format(v), 'us')
+            for v in api_sections]
+
+    _get_subsection('us', profile, mock_api, api_sections)
+
+    assert all([expected == actual for expected, actual in zip(expected_api_calls, mock_api.method_calls)]), "Expected {} got {}".format(expected_api_calls, mock_api.method_calls)
+    assert 'media' in profile
+    assert 'equipment' in profile
+    assert 'reputations' in profile
+
+def test_get_subsection_list_of_strings_and_dictionaries(mocker):
+    api_sections = ['media', 'equipment', 'reputations', {'quests' : 'completed'}]
+    profile = { 'summary' : {
+        'media' : {'href' : 'media'},
+        'equipment' : {'href' : 'equipment'},
+        'reputations' : {'href' : 'reputations'},
+        'quests' : {'href' : 'quests'},
+        'quests_completed' : {'href' : 'quests_completed'}}}
+    mock_api = mocker.MagicMock()
+    # TODO add side effect. See test_audit (also check return values)
+    expected_api_calls = [
+            mocker.call.get_data_resource('{}&locale=en_US'.format('media'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('equipment'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('reputations'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('quests'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('quests_completed'), 'us'),
+
+    _get_subsection('us', profile, mock_api, api_sections)
+
+    assert all([expected == actual for expected, actual in zip(expected_api_calls, mock_api.method_calls)]), "Expected {} got {}".format(expected_api_calls, mock_api.method_calls)
+    assert 'media' in profile
+    assert 'equipment' in profile
+    assert 'reputations' in profile
+
+@pytest.mark.skip(reason='Working on different api sections')
 def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapshots, mocker):
     expected_api_sections = ['media', 'equipment', 'reputations']
     jack = Character('jack', lastmodified=5)
@@ -89,6 +130,7 @@ def test_process_blizzard_last_modified_not_changed(mock_section, mock_update_sn
     assert mock_api.method_calls == []
     mock_section.assert_not_called()
 
+@pytest.mark.skip(reason='Working on different api sections')
 def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, mock_update_snapshots, mocker):
     expected_api_sections = ['media', 'equipment', 'reputations']
     jack = Character('jack', lastmodified=10)
