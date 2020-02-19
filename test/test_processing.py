@@ -61,7 +61,7 @@ def test_update_snapshot_capture_existing_totals():
     assert clegg.snapshots[2019][31].dungeons == 40
 
 def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapshots, mocker):
-    expected_api_sections = ['media', 'equipment']
+    expected_api_sections = ['media', 'equipment', 'reputations']
     jack = Character('jack', lastmodified=5)
     fake_response = { 'summary' : {
         'last_login_timestamp' : 10,
@@ -80,9 +80,7 @@ def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapsh
 def test_process_blizzard_last_modified_not_changed(mock_section, mock_update_snapshots, mocker):
     jack = Character('jack', lastmodified=10)
     fake_response = { 'summary' : {
-        'last_login_timestamp' : 10,
-        'media' : 'test',
-        'equipment' : 'test' } }
+        'last_login_timestamp' : 10}}
     mock_api = mocker.MagicMock()
 
     process_blizzard(jack, fake_response, None, mock_api, False)
@@ -92,7 +90,7 @@ def test_process_blizzard_last_modified_not_changed(mock_section, mock_update_sn
     mock_section.assert_not_called()
 
 def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, mock_update_snapshots, mocker):
-    expected_api_sections = ['media', 'equipment']
+    expected_api_sections = ['media', 'equipment', 'reputations']
     jack = Character('jack', lastmodified=10)
     fake_response = { 'summary' : {
         'last_login_timestamp' : 10,
@@ -108,7 +106,7 @@ def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, 
     mock_api.get_data_resource.assert_called()
     assert all([expected == actual for expected, actual in zip(expected_api_calls, mock_api.method_calls)]), "Expected {} got {}".format(expected_api_calls, mock_api.method_calls)
 
-@pytest.mark.skip(reason='Move this to sections test')
+@pytest.mark.skip(reason='Is this still needed? If so, then move this to sections test')
 def test_process_blizzard_basic_before_azerite(mock_section, mock_update_snapshots, mocker):
     jack = Character('jack', lastmodified=5)
     fake_response = { 'lastModified' : 10 }
@@ -123,7 +121,7 @@ def test_process_blizzard_basic_before_azerite(mock_section, mock_update_snapsho
         mocker.call.basic(jack, fake_response, 3),
         mocker.call.azerite(jack, fake_response, 3, 4)])
 
-@pytest.mark.skip(reason='Move this to sections test')
+@pytest.mark.skip(reason='Is this still needed? If so, then move this to sections test')
 def test_process_blizzard_basic_before_audit(mock_section, mock_update_snapshots, mocker):
     jack = Character('jack', lastmodified=5)
     fake_response = { 'lastModified' : 10 }
