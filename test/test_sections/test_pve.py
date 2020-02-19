@@ -86,18 +86,10 @@ def test_weekly_event_done(event_id):
 
     assert jack.weekly_event_done == 'TRUE'
 
-@pytest.mark.skip
 def test_weekly_event_not_done():
     jack = Character('jack')
-    response = {
-            'quests' : [],
-            'achievements' : {
-                'criteria' : [],
-                'criteriaQuantity' : []},
-            'statistics' : {
-                'subCategories' : [
-                    {'name' : 'Dungeons & Raids', 'subCategories' : [
-                        {'name' : 'Battle for Azeroth', 'statistics' : []}]}]}}
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] }}
 
     Section.pve(jack, response, None, None)
 
