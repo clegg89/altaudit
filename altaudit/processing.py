@@ -47,17 +47,17 @@ def _get_snapshots(character):
         character.dungeons_weekly = 0
         weekly_snapshot.dungeons = character.dungeons_total
 
-def _get_subsection(region, profile, api, sub_section, parent='summary', prefix=''):
+def _get_subsections(region, profile, api, sub_section, parent='summary', prefix=''):
     if type(sub_section) is str:
         profile[prefix + sub_section] = api.get_data_resource(
                 '{}&locale={}'.format(profile[parent][sub_section]['href'], BLIZZARD_LOCALE), region)
     elif type(sub_section) is list:
         for section in sub_section:
-            _get_subsection(region, profile, api, section, parent, prefix)
+            _get_subsections(region, profile, api, section, parent, prefix)
     elif type(sub_section) is dict:
-        for k,v in sub_section:
-            _get_subsection(region, profile, api, k, parent, prefix)
-            _get_subsection(region, profile, api, v, k, prefix + k + '_')
+        for k,v in sub_section.items():
+            _get_subsections(region, profile, api, k, parent, prefix)
+            _get_subsections(region, profile, api, v, k, prefix + k + '_')
 
 def process_blizzard(character, profile, db_session, api, force_refresh):
     """
@@ -78,10 +78,7 @@ def process_blizzard(character, profile, db_session, api, force_refresh):
     # Only update items that need the api if modified or forced
     if force_refresh or profile['summary']['last_login_timestamp'] != character.lastmodified:
         # Fetch rest of api
-        for api_section in PROFILE_API_SECTIONS:
-            profile[api_section] = api.get_data_resource(
-                    '{}&locale={}'.format(profile['summary'][api_section], BLIZZARD_LOCALE),
-                    character.region_name)
+        _get_subsections(character.region_name, profile, api, PROFILE_API_SECTIONS)
 
         # call each section, should loop like a pro
         for section in sections:
