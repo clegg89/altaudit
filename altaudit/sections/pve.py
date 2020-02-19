@@ -5,6 +5,9 @@ from ..models import RAID_DIFFICULTIES
 from ..utility import Utility
 from .raids import VALID_RAIDS
 
+"Quest IDs for weekly island quest"
+WEEKLY_ISLAND_QUEST_IDS = (53435, 53436)
+
 "Achievement ID for No Tourist (Normal or higher islands)"
 PVE_ISLAND_ACHIEVEMENT_ID = 12596
 
@@ -46,17 +49,13 @@ MYTHIC_DUNGEONS = {
 def pve(character, response, db_session, api):
     _island_expeditions(character, response)
     _world_quests(character, response)
-    # _weekly_event(character, response)
+    _weekly_event(character, response)
     # _dungeons(character, response)
     # _raids(character, response)
 
 def _island_expeditions(character, response):
-    weekly_islands = next((quest for quest in response['quests_completed']['quests'] if quest['id'] == 53435 or quest['id'] == 53436), None)
+    weekly_islands = next((quest for quest in response['quests_completed']['quests'] if quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
     character.island_weekly_done = "TRUE" if weekly_islands else "FALSE"
-    # if 53435 in response['quests'] or 53436 in response['quests']:
-    #     character.island_weekly_done = 'TRUE'
-    # else:
-    #     character.island_weekly_done = 'FALSE'
 
     character.islands_total = 0
     achievements = response['achievements']['achievements']
@@ -72,8 +71,9 @@ def _world_quests(character, response):
 
 def _weekly_event(character, response):
     character.weekly_event_done = 'FALSE'
-    for event_quest in WEEKLY_EVENT_QUESTS:
-        if event_quest in response['quests']:
+    for event_quest_id in WEEKLY_EVENT_QUESTS:
+        completed_quest = next((quest for quest in response['quests_completed']['quests'] if quest['id'] == event_quest_id), None)
+        if completed_quest:
             character.weekly_event_done = 'TRUE'
             break
 

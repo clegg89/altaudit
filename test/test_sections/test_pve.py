@@ -65,7 +65,6 @@ def test_world_quests_not_present_zero():
 
     assert jack.world_quests_total == 0
 
-@pytest.mark.skip
 @pytest.mark.parametrize('event_id', [
       53032, # Burning Crusade timewalking
       53036, # 4 Battleground matches
@@ -80,15 +79,8 @@ def test_world_quests_not_present_zero():
     ])
 def test_weekly_event_done(event_id):
     jack = Character('jack')
-    response = {
-            'quests' : [event_id],
-            'achievements' : {
-                'criteria' : [],
-                'criteriaQuantity' : []},
-            'statistics' : {
-                'subCategories' : [
-                    {'name' : 'Dungeons & Raids', 'subCategories' : [
-                        {'name' : 'Battle for Azeroth', 'statistics' : []}]}]}}
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [{'id' : event_id}] }}
 
     Section.pve(jack, response, None, None)
 
