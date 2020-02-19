@@ -15,7 +15,7 @@ def azerite(character, response, db_session, api):
 
     for slot in AZERITE_ITEM_SLOTS:
         azerite_item = next((item for item in equipment if item['slot']['type'].lower() == slot), None)
-        if azerite_item:
+        if azerite_item and 'azerite_details' in azerite_item:
             _azerite_item(character, azerite_item, db_session, api)
 
 def _azerite_item(character, item, db_session, api):

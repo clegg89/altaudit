@@ -29,7 +29,7 @@ fake_azerite_item_class_powers_in_db = [
         {'id': 168, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/288755?namespace=static-8.3.0_32861-us'}, 'name': 'Wildfire', 'id': 288755}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/63?namespace=static-8.3.0_32861-us'}, 'name': 'Fire', 'id': 63}]},
         {'id': 225, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/279854?namespace=static-8.3.0_32861-us'}, 'name': 'Glacial Assault', 'id': 279854}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/64?namespace=static-8.3.0_32861-us'}, 'name': 'Frost', 'id': 64}]},
         {'id': 170, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/288164?namespace=static-8.3.0_32861-us'}, 'name': 'Flash Freeze', 'id': 288164}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/64?namespace=static-8.3.0_32861-us'}, 'name': 'Frost', 'id': 64}]}],
-        'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/8?namespace=static-8.3.0_32861-us'}, 'name': 'Mage', 'id': 8}},
+    'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/8?namespace=static-8.3.0_32861-us'}, 'name': 'Mage', 'id': 8}},
     {'powers': [
         {'id': 560, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/288802?namespace=static-8.3.0_32861-us'}, 'name': 'Bonded Souls', 'id': 288802}},
         {'id': 113, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/272775?namespace=static-8.3.0_32861-us'}, 'name': 'Moment of Repose', 'id': 272775}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/256?namespace=static-8.3.0_32861-us'}, 'name': 'Discipline', 'id': 256}]},
@@ -47,7 +47,7 @@ fake_azerite_item_class_powers_in_db = [
         {'id': 165, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273313?namespace=static-8.3.0_32861-us'}, 'name': 'Blessed Sanctuary', 'id': 273313}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/257?namespace=static-8.3.0_32861-us'}, 'name': 'Holy', 'id': 257}]},
         {'id': 236, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/275722?namespace=static-8.3.0_32861-us'}, 'name': 'Whispers of the Damned', 'id': 275722}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/258?namespace=static-8.3.0_32861-us'}, 'name': 'Shadow', 'id': 258}]},
         {'id': 166, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/288340?namespace=static-8.3.0_32861-us'}, 'name': 'Thought Harvester', 'id': 288340}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/258?namespace=static-8.3.0_32861-us'}, 'name': 'Shadow', 'id': 258}]}],
-        'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/5?namespace=static-8.3.0_32861-us'}, 'name': 'Priest', 'id': 5}},
+    'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/5?namespace=static-8.3.0_32861-us'}, 'name': 'Priest', 'id': 5}},
     {'powers': [
         {'id': 560, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/288802?namespace=static-8.3.0_32861-us'}, 'name': 'Bonded Souls', 'id': 288802}},
         {'id': 123, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/272891?namespace=static-8.3.0_32861-us'}, 'name': 'Wracking Brilliance', 'id': 272891}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/265?namespace=static-8.3.0_32861-us'}, 'name': 'Affliction', 'id': 265}]},
@@ -65,26 +65,64 @@ fake_azerite_item_class_powers_in_db = [
         {'id': 190, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273523?namespace=static-8.3.0_32861-us'}, 'name': 'Umbral Blaze', 'id': 273523}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/266?namespace=static-8.3.0_32861-us'}, 'name': 'Demonology', 'id': 266}]},
         {'id': 232, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/275425?namespace=static-8.3.0_32861-us'}, 'name': 'Flashpoint', 'id': 275425}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/267?namespace=static-8.3.0_32861-us'}, 'name': 'Destruction', 'id': 267}]},
         {'id': 460, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/279909?namespace=static-8.3.0_32861-us'}, 'name': 'Bursting Flare', 'id': 279909}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/267?namespace=static-8.3.0_32861-us'}, 'name': 'Destruction', 'id': 267}]}],
-        'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/9?namespace=static-8.3.0_32861-us'}, 'name': 'Warlock', 'id': 9}}]
+    'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/9?namespace=static-8.3.0_32861-us'}, 'name': 'Warlock', 'id': 9}}]
 
-fake_azerite_item_class_powers_not_in_db = {
-    '9': [
-        {'id': 561, 'tier': 3, 'spellId': 288802},
-        {'id': 124, 'tier': 3, 'spellId': 272891},
-        {'id': 132, 'tier': 3, 'spellId': 272944},
-        {'id': 133, 'tier': 3, 'spellId': 287637},
-        {'id': 33, 'tier': 2, 'spellId': 266180},
-        {'id': 465, 'tier': 2, 'spellId': 279926},
-        {'id': 22, 'tier': 2, 'spellId': 263984},
-        {'id': 209, 'tier': 1, 'spellId': 274418},
-        {'id': 16, 'tier': 1, 'spellId': 263962},
-        {'id': 19, 'tier': 0, 'spellId': 263978},
-        {'id': 238, 'tier': 4, 'spellId': 275372},
-        {'id': 185, 'tier': 4, 'spellId': 273521},
-        {'id': 239, 'tier': 4, 'spellId': 275395},
-        {'id': 192, 'tier': 4, 'spellId': 273523},
-        {'id': 234, 'tier': 4, 'spellId': 275425},
-        {'id': 463, 'tier': 4, 'spellId': 279909}]}
+# Direct output from api. Sorry its hard to read, not easy to clean up
+fake_azerite_item_class_powers_not_in_db  = [
+        {'powers': [
+            {'id': 193, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273823?namespace=static-8.3.0_32861-us'}, 'name': 'Blightborne Infusion', 'id': 273823}},
+            {'id': 374, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/278536?namespace=static-8.3.0_32861-us'}, 'name': 'Galvanizing Spark', 'id': 278536}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/62?namespace=static-8.3.0_32861-us'}, 'name': 'Arcane', 'id': 62}]},
+            {'id': 128, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/272932?namespace=static-8.3.0_32861-us'}, 'name': 'Flames of Alacrity', 'id': 272932}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/63?namespace=static-8.3.0_32861-us'}, 'name': 'Fire', 'id': 63}]},
+            {'id': 381, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/278542?namespace=static-8.3.0_32861-us'}, 'name': 'Frigid Grasp', 'id': 278542}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/64?namespace=static-8.3.0_32861-us'}, 'name': 'Frost', 'id': 64}]},
+            {'id': 462, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/266936?namespace=static-8.3.0_32861-us'}, 'name': 'Azerite Globules', 'id': 266936}},
+            {'id': 22, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/263987?namespace=static-8.3.0_32861-us'}, 'name': 'Heed My Call', 'id': 263987}},
+            {'id': 459, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/279899?namespace=static-8.3.0_32861-us'}, 'name': 'Unstable Flames', 'id': 279899}},
+            {'id': 468, 'tier': 1, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/280015?namespace=static-8.3.0_32861-us'}, 'name': 'Cauterizing Blink', 'id': 280015}},
+            {'id': 14, 'tier': 1, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/268594?namespace=static-8.3.0_32861-us'}, 'name': 'Longstrider', 'id': 268594}},
+            {'id': 13, 'tier': 0, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/263978?namespace=static-8.3.0_32861-us'}, 'name': 'Azerite Empowered', 'id': 263978}},
+            {'id': 167, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273326?namespace=static-8.3.0_32861-us'}, 'name': 'Brain Storm', 'id': 273326}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/62?namespace=static-8.3.0_32861-us'}, 'name': 'Arcane', 'id': 62}]},
+            {'id': 214, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/274594?namespace=static-8.3.0_32861-us'}, 'name': 'Arcane Pressure', 'id': 274594}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/62?namespace=static-8.3.0_32861-us'}, 'name': 'Arcane', 'id': 62}]},
+            {'id': 168, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/288755?namespace=static-8.3.0_32861-us'}, 'name': 'Wildfire', 'id': 288755}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/63?namespace=static-8.3.0_32861-us'}, 'name': 'Fire', 'id': 63}]},
+            {'id': 215, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/274596?namespace=static-8.3.0_32861-us'}, 'name': 'Blaster Master', 'id': 274596}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/63?namespace=static-8.3.0_32861-us'}, 'name': 'Fire', 'id': 63}]},
+            {'id': 170, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/288164?namespace=static-8.3.0_32861-us'}, 'name': 'Flash Freeze', 'id': 288164}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/64?namespace=static-8.3.0_32861-us'}, 'name': 'Frost', 'id': 64}]},
+            {'id': 225, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/279854?namespace=static-8.3.0_32861-us'}, 'name': 'Glacial Assault', 'id': 279854}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/64?namespace=static-8.3.0_32861-us'}, 'name': 'Frost', 'id': 64}]}],
+        'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/8?namespace=static-8.3.0_32861-us'}, 'name': 'Mage', 'id': 8}},
+        {'powers': [
+            {'id': 193, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273823?namespace=static-8.3.0_32861-us'}, 'name': 'Blightborne Infusion', 'id': 273823}},
+            {'id': 398, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/278629?namespace=static-8.3.0_32861-us'}, 'name': 'Contemptuous Homily', 'id': 278629}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/256?namespace=static-8.3.0_32861-us'}, 'name': 'Discipline', 'id': 256}]},
+            {'id': 114, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/272780?namespace=static-8.3.0_32861-us'}, 'name': 'Permeating Glow', 'id': 272780}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/257?namespace=static-8.3.0_32861-us'}, 'name': 'Holy', 'id': 257}]},
+            {'id': 405, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/278661?namespace=static-8.3.0_32861-us'}, 'name': 'Chorus of Insanity', 'id': 278661}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/258?namespace=static-8.3.0_32861-us'}, 'name': 'Shadow', 'id': 258}]},
+            {'id': 462, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/266936?namespace=static-8.3.0_32861-us'}, 'name': 'Azerite Globules', 'id': 266936}},
+            {'id': 103, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/267882?namespace=static-8.3.0_32861-us'}, 'name': 'Concentrated Mending', 'id': 267882}},
+            {'id': 105, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/267886?namespace=static-8.3.0_32861-us'}, 'name': 'Ephemeral Recovery', 'id': 267886}},
+            {'id': 472, 'tier': 1, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/280018?namespace=static-8.3.0_32861-us'}, 'name': 'Twist Magic', 'id': 280018}},
+            {'id': 14, 'tier': 1, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/268594?namespace=static-8.3.0_32861-us'}, 'name': 'Longstrider', 'id': 268594}},
+            {'id': 13, 'tier': 0, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/263978?namespace=static-8.3.0_32861-us'}, 'name': 'Azerite Empowered', 'id': 263978}},
+            {'id': 164, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273307?namespace=static-8.3.0_32861-us'}, 'name': 'Weal and Woe', 'id': 273307}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/256?namespace=static-8.3.0_32861-us'}, 'name': 'Discipline', 'id': 256}]},
+            {'id': 227, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/275541?namespace=static-8.3.0_32861-us'}, 'name': 'Depth of the Shadows', 'id': 275541}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/258?namespace=static-8.3.0_32861-us'}, 'name': 'Shadow', 'id': 258}, {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/256?namespace=static-8.3.0_32861-us'}, 'name': 'Discipline', 'id': 256}]},
+            {'id': 165, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273313?namespace=static-8.3.0_32861-us'}, 'name': 'Blessed Sanctuary', 'id': 273313}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/257?namespace=static-8.3.0_32861-us'}, 'name': 'Holy', 'id': 257}]},
+            {'id': 228, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/275602?namespace=static-8.3.0_32861-us'}, 'name': 'Prayerful Litany', 'id': 275602}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/257?namespace=static-8.3.0_32861-us'}, 'name': 'Holy', 'id': 257}]},
+            {'id': 166, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/288340?namespace=static-8.3.0_32861-us'}, 'name': 'Thought Harvester', 'id': 288340}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/258?namespace=static-8.3.0_32861-us'}, 'name': 'Shadow', 'id': 258}]},
+            {'id': 236, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/275722?namespace=static-8.3.0_32861-us'}, 'name': 'Whispers of the Damned', 'id': 275722}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/258?namespace=static-8.3.0_32861-us'}, 'name': 'Shadow', 'id': 258}]}],
+        'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/5?namespace=static-8.3.0_32861-us'}, 'name': 'Priest', 'id': 5}},
+        {'powers': [
+            {'id': 193, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273823?namespace=static-8.3.0_32861-us'}, 'name': 'Blightborne Infusion', 'id': 273823}},
+            {'id': 425, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/278721?namespace=static-8.3.0_32861-us'}, 'name': 'Sudden Onset', 'id': 278721}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/265?namespace=static-8.3.0_32861-us'}, 'name': 'Affliction', 'id': 265}]},
+            {'id': 130, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/272944?namespace=static-8.3.0_32861-us'}, 'name': "Shadow's Bite", 'id': 272944}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/266?namespace=static-8.3.0_32861-us'}, 'name': 'Demonology', 'id': 266}]},
+            {'id': 432, 'tier': 3, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/278748?namespace=static-8.3.0_32861-us'}, 'name': 'Chaotic Inferno', 'id': 278748}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/267?namespace=static-8.3.0_32861-us'}, 'name': 'Destruction', 'id': 267}]},
+            {'id': 462, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/266936?namespace=static-8.3.0_32861-us'}, 'name': 'Azerite Globules', 'id': 266936}},
+            {'id': 22, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/263987?namespace=static-8.3.0_32861-us'}, 'name': 'Heed My Call', 'id': 263987}},
+            {'id': 459, 'tier': 2, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/279899?namespace=static-8.3.0_32861-us'}, 'name': 'Unstable Flames', 'id': 279899}},
+            {'id': 475, 'tier': 1, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/280022?namespace=static-8.3.0_32861-us'}, 'name': 'Desperate Power', 'id': 280022}},
+            {'id': 14, 'tier': 1, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/268594?namespace=static-8.3.0_32861-us'}, 'name': 'Longstrider', 'id': 268594}},
+            {'id': 13, 'tier': 0, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/263978?namespace=static-8.3.0_32861-us'}, 'name': 'Azerite Empowered', 'id': 263978}},
+            {'id': 183, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273521?namespace=static-8.3.0_32861-us'}, 'name': 'Inevitable Demise', 'id': 273521}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/265?namespace=static-8.3.0_32861-us'}, 'name': 'Affliction', 'id': 265}]},
+            {'id': 230, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/275372?namespace=static-8.3.0_32861-us'}, 'name': 'Cascading Calamity', 'id': 275372}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/265?namespace=static-8.3.0_32861-us'}, 'name': 'Affliction', 'id': 265}]},
+            {'id': 190, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/273523?namespace=static-8.3.0_32861-us'}, 'name': 'Umbral Blaze', 'id': 273523}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/266?namespace=static-8.3.0_32861-us'}, 'name': 'Demonology', 'id': 266}]},
+            {'id': 231, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/275395?namespace=static-8.3.0_32861-us'}, 'name': 'Explosive Potential', 'id': 275395}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/266?namespace=static-8.3.0_32861-us'}, 'name': 'Demonology', 'id': 266}]},
+            {'id': 460, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/279909?namespace=static-8.3.0_32861-us'}, 'name': 'Bursting Flare', 'id': 279909}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/267?namespace=static-8.3.0_32861-us'}, 'name': 'Destruction', 'id': 267}]},
+            {'id': 232, 'tier': 4, 'spell': {'key': {'href': 'https://us.api.blizzard.com/data/wow/spell/275425?namespace=static-8.3.0_32861-us'}, 'name': 'Flashpoint', 'id': 275425}, 'allowed_specializations': [{'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-specialization/267?namespace=static-8.3.0_32861-us'}, 'name': 'Destruction', 'id': 267}]}],
+        'playable_class': {'key': {'href': 'https://us.api.blizzard.com/data/wow/playable-class/9?namespace=static-8.3.0_32861-us'}, 'name': 'Warlock', 'id': 9}}]
 
 fake_azerite_item_traits_in_db = [
         { 'id' : 13, 'tier' : 0, 'spell_tooltip' :
@@ -98,14 +136,17 @@ fake_azerite_item_traits_in_db = [
         { 'id' : 183, 'tier' : 4, 'spell_tooltip' :
             { 'spell' : { 'id' : 273521, 'name' : 'Inevitable Demise'}}}]
 
-fake_azerite_item_traits_not_in_db = {
-        'id' : 165822,
-        'azeriteEmpoweredItem' : { 'azeritePowers' : [
-                 {'id': 19, 'tier': 0, 'spellId': 263978},
-                 {'id': 16, 'tier': 1, 'spellId': 263962},
-                 {'id': 33, 'tier': 2, 'spellId': 266180},
-                 {'id': 124, 'tier': 3, 'spellId': 272891},
-                 {'id': 185, 'tier': 4, 'spellId': 273521}]}}
+fake_azerite_item_traits_not_in_db  = [
+        { 'id' : 13, 'tier' : 0, 'spell_tooltip' :
+            { 'spell' : { 'id' : 263978, 'name' : 'Azerite Empowered' }}},
+        { 'id' : 14, 'tier' : 1, 'spell_tooltip' :
+            { 'spell' : { 'id' : 268594, 'name' : 'Longstrider'}}},
+        { 'id' : 22, 'tier' : 2, 'spell_tooltip' :
+            { 'spell' : { 'id' : 263987, 'name' : 'Head My Call'}}},
+        { 'id' : 425, 'tier' : 3, 'spell_tooltip' :
+            { 'spell' : { 'id' : 278721, 'name' : 'Sudden Onset'}}},
+        { 'id' : 183, 'tier' : 4, 'spell_tooltip' :
+            { 'spell' : { 'id' : 273521, 'name' : 'Inevitable Demise'}}}]
 
 @pytest.fixture(scope='module')
 def db():
@@ -195,33 +236,43 @@ def test_azerite_item_in_db(db_session, mock_api):
     assert len(jack._head_tier0_available) == 1
 
 def test_azerite_item_not_in_db(db_session, mock_api):
-    mock_api.get_item.return_value = { 'azeriteClassPowers' :
+    mock_api.get_data_resource.return_value = { 'azerite_class_powers' :
             fake_azerite_item_class_powers_not_in_db }
 
-    def _get_spell(region, spellId, locale=None):
-        assert region == 'us'
-        assert locale == 'en_US'
-        return { 'id' : spellId, 'name' : 'Fake Name', 'icon' : 'inv_fake' }
+    # Preserving for demonstration
+    # def _get_spell(region, spellId, locale=None):
+    #     assert region == 'us'
+    #     assert locale == 'en_US'
+    #     return { 'id' : spellId, 'name' : 'Fake Name', 'icon' : 'inv_fake' }
 
-    mock_api.get_spell.side_effect = _get_spell
+    # mock_api.get_spell.side_effect = _get_spell
 
-    jack = Character('jack', class_id=9)
-    response = { 'items' : { 'head' : fake_azerite_item_traits_not_in_db } }
+    warlock = db_session.query(Class).filter_by(name='Warlock').first()
+    jack = Character('jack', character_class=warlock)
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'item' : {'key':{'href' : 'garbage'}},
+                'slot' : { 'type' : 'HEAD' },
+                'azerite_details' : {
+                    'selected_powers' : fake_azerite_item_traits_not_in_db }}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    assert jack._head_tier0_selected.id == 19
-    assert mock_api.get_spell.call_count == 16
+    # assert mock_api.get_spell.call_count == 16
+    assert jack._head_tier0_selected.id == 13
     assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Fake Name'
-    assert jack._head_tier0_selected.icon == 'inv_fake'
-    assert jack._head_tier0_available[0].id == 19
+    assert jack._head_tier0_selected.name == 'Azerite Empowered'
+    assert jack._head_tier0_selected.icon == ''
+    assert jack._head_tier1_selected.name == 'Longstrider'
+    assert jack._head_tier0_available[0].id == 13
     assert jack._head_tier0_available[0].spell_id == 263978
-    assert jack._head_tier0_available[0].name == 'Fake Name'
-    assert jack._head_tier0_available[0].icon == 'inv_fake'
+    assert jack._head_tier0_available[0].name == 'Azerite Empowered'
+    assert jack._head_tier0_available[0].icon == ''
+    assert len(jack._head_tier0_available) == 1
 
 def test_azerite_item_no_item():
     jack = Character('jack')
-    response = { 'items' : {} }
+    response = { 'equipment' :
+            { 'equipped_items' : []}}
 
     Section.azerite(jack, response, None, None)
 
@@ -230,38 +281,12 @@ def test_azerite_item_no_item():
 
 def test_azerite_item_no_traits():
     jack = Character('jack')
-    response = { 'items' : { 'head' : { 'id' : 165822, 'azeriteEmpoweredItem' : { 'azeritePowers' : [] } } } }
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'item' : {'key':{'href' : 'garbage'}},
+                'slot' : { 'type' : 'HEAD' }}]}}
 
     Section.azerite(jack, response, None, None)
 
     assert jack._head_tier0_selected == None
     assert jack._head_tier0_available == []
-
-def test_azerite_no_api_given_set_hoa():
-    jack = Character('jack')
-    response = { 'items' : {
-        'neck' : hoa_item_info,
-        'head' : fake_azerite_item_traits_not_in_db,
-        }
-    }
-    Section.azerite(jack, response, None, None)
-    assert jack.hoa_level == 47
-    assert jack.azerite_experience == 1062
-    assert jack.azerite_experience_remaining == 22815
-
-def test_azerite_no_api_no_change_traits():
-    jack = Character('jack', class_id=9)
-    jack._head_tier0_selected = AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard')
-    jack._head_tier0_available.append(AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'))
-    response = { 'items' : { 'head' : fake_azerite_item_traits_not_in_db } }
-    Section.azerite(jack, response, None, None)
-
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == 'inv_smallazeriteshard'
-    assert jack._head_tier0_available[0].id == 13
-    assert jack._head_tier0_available[0].spell_id == 263978
-    assert jack._head_tier0_available[0].name == 'Azerite Empowered'
-    assert jack._head_tier0_available[0].icon == 'inv_smallazeriteshard'
-    assert len(jack._head_tier0_available) == 1
