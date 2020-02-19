@@ -46,35 +46,20 @@ def test_islands_total_sum_of_two_criteria():
 
     assert jack.islands_total == 40
 
-@pytest.mark.skip
 def test_world_quests_total():
     jack = Character('jack')
-    response = {
-            'quests' : [],
-            'achievements' : {
-                'criteria' : [33094],
-                'criteriaQuantity' : [20]},
-            'statistics' : {
-                'subCategories' : [
-                    {'name' : 'Dungeons & Raids', 'subCategories' : [
-                        {'name' : 'Battle for Azeroth', 'statistics' : []}]}]}}
+    response = { 'achievements' : { 'achievements' : [
+                {'id' : 11127, 'criteria' : {'child_criteria' : [{'amount' : 20}]}}]},
+            'quests_completed' : { 'quests' : [] }}
 
     Section.pve(jack, response, None, None)
 
     assert jack.world_quests_total == 20
 
-@pytest.mark.skip
 def test_world_quests_not_present_zero():
     jack = Character('jack')
-    response = {
-            'quests' : [],
-            'achievements' : {
-                'criteria' : [],
-                'criteriaQuantity' : []},
-            'statistics' : {
-                'subCategories' : [
-                    {'name' : 'Dungeons & Raids', 'subCategories' : [
-                        {'name' : 'Battle for Azeroth', 'statistics' : []}]}]}}
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] }}
 
     Section.pve(jack, response, None, None)
 

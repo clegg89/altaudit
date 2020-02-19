@@ -5,6 +5,15 @@ from ..models import RAID_DIFFICULTIES
 from ..utility import Utility
 from .raids import VALID_RAIDS
 
+"Achievement ID for No Tourist (Normal or higher islands)"
+PVE_ISLAND_ACHIEVEMENT_ID = 12596
+
+"Achievement ID for Bayside Brawler (PVP islands)"
+PVP_ISLAND_ACHIEVEMENT_ID = 12597
+
+"Achievement ID for 200 World Quests Completed (WQ count)"
+WORLD_QUESTS_COMPLETED_ACHIEVEMENT_ID = 11127
+
 "Weekly Event Quest IDs"
 WEEKLY_EVENT_QUESTS = [
     53032, # Burning Crusade timewalking
@@ -36,7 +45,7 @@ MYTHIC_DUNGEONS = {
 
 def pve(character, response, db_session, api):
     _island_expeditions(character, response)
-    # _world_quests(character, response)
+    _world_quests(character, response)
     # _weekly_event(character, response)
     # _dungeons(character, response)
     # _raids(character, response)
@@ -51,19 +60,15 @@ def _island_expeditions(character, response):
 
     character.islands_total = 0
     achievements = response['achievements']['achievements']
-    for achievment_id in (12596, 12597): # PvE, PvP
+    for achievment_id in (PVE_ISLAND_ACHIEVEMENT_ID, PVP_ISLAND_ACHIEVEMENT_ID):
         achievment = next((achiev for achiev in achievements if achiev['id'] == achievment_id), None)
         if achievment:
             character.islands_total += achievment['criteria']['child_criteria'][0]['amount']
 
 def _world_quests(character, response):
-    try:
-        wq_criteria_index = response['achievements']['criteria'].index(33094)
-        achiev_crit_quantity = response['achievements']['criteriaQuantity']
-        wq_total = achiev_crit_quantity[wq_criteria_index]
-        character.world_quests_total = wq_total
-    except ValueError:
-        character.world_quests_total = 0
+    wq_total = next((achiev for achiev in response['achievements']['achievements']
+        if achiev['id'] == WORLD_QUESTS_COMPLETED_ACHIEVEMENT_ID), None)
+    character.world_quests_total = wq_total['criteria']['child_criteria'][0]['amount'] if wq_total else 0
 
 def _weekly_event(character, response):
     character.weekly_event_done = 'FALSE'
