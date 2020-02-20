@@ -14,7 +14,6 @@ from .snapshot import Year, Snapshot
 
 "Item slots tracked"
 ITEM_SLOTS = [
-    # TODO change in Alembic (fingers, trinkets, main/off hand)
     'head', 'neck', 'shoulder', 'back',
     'chest', 'wrist', 'hands', 'waist',
     'legs', 'feet', 'finger_1', 'finger_2',
@@ -26,8 +25,6 @@ ITEM_FIELD_COLUMNS = [
     ('itemLevel','Column(Integer)'),
     ('id', 'Column(Integer)'),
     ('name', 'Column(String)'),
-    # ('icon', 'Column(String)'), TODO Remove in Alembic
-    # TODO change in Alembic
     ('quality', 'Column(String)')]
 
 "Item Fields"
@@ -112,10 +109,7 @@ CHARACTER_HEADER_FIELDS = {
 
     # Azerite Info
     'hoa_level' : 'Column(Integer)',
-    # TODO Update Alembic. Remove experience/remaining, add percentage
     'azerite_percentage' : 'Column(Float)',
-    # 'azerite_experience' : 'Column(Integer)',
-    # 'azerite_experience_remaining' : 'Column(Integer)',
 
     **{'{}_tier{}_{}'.format(piece, tier, field) : "''" # Composite from azerite_traits table
         for piece in AZERITE_ITEM_SLOTS
