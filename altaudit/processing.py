@@ -4,7 +4,7 @@ from .sections import sections, raiderio
 from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
 from .blizzard import BLIZZARD_LOCALE
 
-PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', 'achievements', {'quests' : ['completed']}]
+PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}]
 
 def _update_snapshots(character):
     year = Utility.year[character.region_name]

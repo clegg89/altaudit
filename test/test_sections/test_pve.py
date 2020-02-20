@@ -11,7 +11,8 @@ import altaudit.sections as Section
 def test_islands_weekly_quest_done():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [{'id' : 53435}] }}
+            'quests_completed' : { 'quests' : [{'id' : 53435}] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -20,7 +21,8 @@ def test_islands_weekly_quest_done():
 def test_islands_weekly_quest_done_other_id():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [{'id' : 53436}] }}
+            'quests_completed' : { 'quests' : [{'id' : 53436}] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -29,7 +31,8 @@ def test_islands_weekly_quest_done_other_id():
 def test_islands_weekly_quest_not_done():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [] }}
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -40,7 +43,8 @@ def test_islands_total_sum_of_two_criteria():
     response = { 'achievements' : { 'achievements' : [
                 {'id' : 12596, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
                 {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}}]},
-            'quests_completed' : { 'quests' : [] }}
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -50,7 +54,8 @@ def test_world_quests_total():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [
                 {'id' : 11127, 'criteria' : {'child_criteria' : [{'amount' : 20}]}}]},
-            'quests_completed' : { 'quests' : [] }}
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -59,7 +64,8 @@ def test_world_quests_total():
 def test_world_quests_not_present_zero():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [] }}
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -80,7 +86,8 @@ def test_world_quests_not_present_zero():
 def test_weekly_event_done(event_id):
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [{'id' : event_id}] }}
+            'quests_completed' : { 'quests' : [{'id' : event_id}] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -89,53 +96,31 @@ def test_weekly_event_done(event_id):
 def test_weekly_event_not_done():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [] }}
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
     assert jack.weekly_event_done == 'FALSE'
 
-@pytest.mark.skip
-def test_dungeons_achievement_only():
-    jack = Character('jack')
-    response = {
-            'quests' : [],
-            'achievements' : {
-                'criteria' : [40808, 40812, 40959, 40955, 40941, 43355, 40191, 40944, 40184, 40144],
-                'criteriaQuantity' : [4, 5, 6, 7, 8, 9, 10, 11, 12, 13]},
-            'statistics' : {
-                'subCategories' : [
-                    {'name' : 'Dungeons & Raids', 'subCategories' : [
-                        {'name' : 'Battle for Azeroth', 'statistics' : []}]}]}}
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.dungeons_total == 85
-    assert jack.dungeons_each_total == "Atal'Dazar+4|Freehold+5|King's Rest+6|The MOTHERLODE!!+7|Shrine of the Storm+8|Siege of Boralus+9|Temple of Sethraliss+10|Tol Dagor+11|Underrot+12|Waycrest Manor+13|Operation: Mechagon+0"
-
-@pytest.mark.skip
 def test_dungeons_statistics_only():
     jack = Character('jack')
-    response = {
-            'quests' : [],
-            'achievements' : {
-                'criteria' : [],
-                'criteriaQuantity' : []},
-            'statistics' : {
-                'subCategories' : [
-                    {'name' : 'Dungeons & Raids', 'subCategories' : [
-                        {'name' : 'Battle for Azeroth', 'statistics' : [
-                            {'id' : 12749, 'quantity' : 4},
-                            {'id' : 12752, 'quantity' : 5},
-                            {'id' : 12763, 'quantity' : 6},
-                            {'id' : 12779, 'quantity' : 7},
-                            {'id' : 12768, 'quantity' : 8},
-                            {'id' : 12773, 'quantity' : 9},
-                            {'id' : 12776, 'quantity' : 10},
-                            {'id' : 12782, 'quantity' : 11},
-                            {'id' : 12745, 'quantity' : 12},
-                            {'id' : 12785, 'quantity' : 13},
-                            {'id' : 13620, 'quantity' : 14}]}]}]}}
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'id' : 14807, 'sub_categories' : [
+                    {'id' : 15409, 'statistics' : [
+                        {'id' : 12749, 'quantity' : 4},
+                        {'id' : 12752, 'quantity' : 5},
+                        {'id' : 12763, 'quantity' : 6},
+                        {'id' : 12779, 'quantity' : 7},
+                        {'id' : 12768, 'quantity' : 8},
+                        {'id' : 12773, 'quantity' : 9},
+                        {'id' : 12776, 'quantity' : 10},
+                        {'id' : 12782, 'quantity' : 11},
+                        {'id' : 12745, 'quantity' : 12},
+                        {'id' : 12785, 'quantity' : 13},
+                        {'id' : 13620, 'quantity' : 14}]}]}]}}
 
     Section.pve(jack, response, None, None)
 

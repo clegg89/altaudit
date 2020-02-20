@@ -31,26 +31,32 @@ WEEKLY_EVENT_QUESTS = [
     54995, # Draenor timewalking
 ]
 
-"Mythic Dungeon Information"
-MYTHIC_DUNGEONS = {
-    "Atal'Dazar"           : (40808, 12749),
-    'Freehold'             : (40812, 12752),
-    "King's Rest"          : (40959, 12763),
-    'The MOTHERLODE!!'     : (40955, 12779),
-    'Shrine of the Storm'  : (40941, 12768),
-    'Siege of Boralus'     : (43355, 12773),
-    'Temple of Sethraliss' : (40191, 12776),
-    'Tol Dagor'            : (40944, 12782),
-    'Underrot'             : (40184, 12745),
-    'Waycrest Manor'       : (40144, 12785),
-    'Operation: Mechagon'  : (None, 13620)
+"Dungeons and Raids statistics category ID"
+DUNGEONS_AND_RAIDS_CATEGORY_ID = 14807
+
+"Battle for Azeroth Sub-Category ID"
+BATTLE_FOR_AZEROTH_SUBCATEGORY_ID = 15409
+
+"Mythic Dungeon Statistic IDs"
+MYTHIC_DUNGEON_STATISTIC_IDS = {
+    "Atal'Dazar"           : 12749,
+    'Freehold'             : 12752,
+    "King's Rest"          : 12763,
+    'The MOTHERLODE!!'     : 12779,
+    'Shrine of the Storm'  : 12768,
+    'Siege of Boralus'     : 12773,
+    'Temple of Sethraliss' : 12776,
+    'Tol Dagor'            : 12782,
+    'Underrot'             : 12745,
+    'Waycrest Manor'       : 12785,
+    'Operation: Mechagon'  : 13620
 }
 
 def pve(character, response, db_session, api):
     _island_expeditions(character, response)
     _world_quests(character, response)
     _weekly_event(character, response)
-    # _dungeons(character, response)
+    _dungeons(character, response)
     # _raids(character, response)
 
 def _island_expeditions(character, response):
@@ -65,9 +71,9 @@ def _island_expeditions(character, response):
             character.islands_total += achievment['criteria']['child_criteria'][0]['amount']
 
 def _world_quests(character, response):
-    wq_total = next((achiev for achiev in response['achievements']['achievements']
-        if achiev['id'] == WORLD_QUESTS_COMPLETED_ACHIEVEMENT_ID), None)
-    character.world_quests_total = wq_total['criteria']['child_criteria'][0]['amount'] if wq_total else 0
+    character.world_quests_total = next((achiev['criteria']['child_criteria'][0]['amount']
+        for achiev in response['achievements']['achievements']
+        if achiev['id'] == WORLD_QUESTS_COMPLETED_ACHIEVEMENT_ID), 0)
 
 def _weekly_event(character, response):
     character.weekly_event_done = 'FALSE'
@@ -78,28 +84,25 @@ def _weekly_event(character, response):
             break
 
 def _dungeons(character, response):
-    achiev_crit = response['achievements']['criteria']
-    achiev_crit_quantity = response['achievements']['criteriaQuantity']
-    instance_stats = next(stat for stat in
-            next(sub for sub in response['statistics']['subCategories']
-                if sub['name'] == "Dungeons & Raids")['subCategories']
-            if stat['name'] == 'Battle for Azeroth')['statistics']
+    """
+    We used to be able to get dungeon clears from achivement criteria, but that
+    doesn't exist in the profile API as it did in the community API. Instead we
+    have to rely on statistics (called achievement statistics in the profile API)
+    to determine boss kills. This value is lower than the achievement value. It is
+    unclear why, but this isn't exactly an important stat post expac release.
+    """
+    statistics = response['achievements_statistics']['statistics']
+    # This will throw an exception if the category/subcategory is not found.
+    # Is that okay? Does it matter? It shouldn't ever happen...
+    # Leave it this way for now. If we start seeing errors here we can change it
+    dungeon_and_raids = next(category for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID)['sub_categories']
+    bfa_instances = next(sub for sub in dungeon_and_raids if sub['id'] == BATTLE_FOR_AZEROTH_SUBCATEGORY_ID)['statistics']
 
-    dungeon_count = 0
-    dungeon_list = {}
-    for name,(criteria,statistic) in MYTHIC_DUNGEONS.items():
-        amount = 0
-        if criteria and criteria in achiev_crit:
-            amount = achiev_crit_quantity[achiev_crit.index(criteria)]
-        if statistic:
-            stat = next((s['quantity'] for s in instance_stats if s['id'] == statistic), 0)
-            amount = max(amount, stat)
+    dungeon_list = {dungeon : next((stat['quantity'] for stat in bfa_instances if stat['id'] == stat_id), 0)
+            for dungeon,stat_id in MYTHIC_DUNGEON_STATISTIC_IDS.items()}
 
-        dungeon_count += amount
-        dungeon_list[name] = amount
-
-    character.dungeons_total = dungeon_count
-    character.dungeons_each_total = '|'.join(('{}+{}'.format(n,a) for n,a in dungeon_list.items()))
+    character.dungeons_total = sum(dungeon_list.values())
+    character.dungeons_each_total = '|'.join(('{}+{}'.format(d,a) for d,a in dungeon_list.items()))
 
 def _raids(character, response):
     raid_list = {}
