@@ -59,6 +59,6 @@ if __name__ == '__main__':
             force_refresh=False
             time.sleep(20)
 
-        except Exception:
+        except:
             logger.exception(traceback.format_exc())
             continue

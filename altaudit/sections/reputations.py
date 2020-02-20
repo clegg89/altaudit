@@ -25,8 +25,8 @@ REPUTATION_FACTION_ID = {
 }
 
 # TODO Possible to get paragon now if we want
-def reputations(character, response, db_session, api):
-    reputations = response['reputations']['reputations']
+def reputations(character, profile, db_session, api):
+    reputations = profile['reputations']['reputations']
     faction = character.faction_name.lower()
 
     result = ''

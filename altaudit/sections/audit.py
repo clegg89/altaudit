@@ -8,8 +8,8 @@ from ..gem_enchant import enchant_lookup
 "Item Enchant Fields"
 ENCHANT_ITEM_FIELDS = [field[0] for field in ENCHANT_ITEM_FIELD_COLUMNS]
 
-def audit(character, response, db_session, api):
-    equipped_items = response['equipment']['equipped_items']
+def audit(character, profile, db_session, api):
+    equipped_items = profile['equipment']['equipped_items']
 
     character.empty_sockets = 0
     character.gems = []

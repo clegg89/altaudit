@@ -1,5 +1,6 @@
 """Top-Level Audit Class"""
 import logging
+import traceback
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -149,30 +150,30 @@ class Audit:
 
         logger = logging.getLogger('altaudit')
 
-        log_character=''
-
         try:
             characters = session.query(Character).all()
 
             output = [Section.metadata()]
             for character in characters:
                 logger.debug("%s:%s:%s", character.region_name, character.realm_slug, character.name)
-                log_character=character.name
-                # profile['summary'] = self.blizzard_api.get_character_profile_summary(**_character_as_dict,
-                #   namespac="profile-{}".format(character.region_name),
-                #   locale=BLIZZARD_LOCALE)
-                blizz_resp = self.blizzard_api.get_character_profile_summary(**_character_as_dict(character),
-                    namespace="profile-{}".format(character.region_name),
-                    locale=BLIZZARD_LOCALE)
-                rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
+                try:
+                    profile = { 'summary' : self.blizzard_api.get_character_profile_summary(**_character_as_dict(character),
+                        namespace="profile-{}".format(character.region_name),
+                        locale=BLIZZARD_LOCALE) }
+                    rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
 
-                process_blizzard(character, blizz_resp, session, self.blizzard_api, force_refresh)
-                process_raiderio(character, rio_resp)
-                output.append(serialize(character))
+                    process_blizzard(character, profile, session, self.blizzard_api, force_refresh)
+                    process_raiderio(character, rio_resp)
+                    session.commit()
+                except:
+                    logger.error("%s Failed", character.name)
+                    logger.exception(traceback.format_exc())
+                    session.rollback()
+                finally:
+                    output.append(serialize(character))
 
-            session.commit()
         except:
-            logger.error('%s Failed', log_character)
+            logger.error('Critical failure in character processing')
             session.rollback()
             raise
         finally:

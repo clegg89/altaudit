@@ -3,9 +3,9 @@
 from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from ..models import AzeriteTrait, AZERITE_ITEM_SLOTS, AZERITE_TIERS
 
-def azerite(character, response, db_session, api):
+def azerite(character, profile, db_session, api):
     # TODO make a Item->Trait table so we can avoid always querying the API
-    equipment = response['equipment']['equipped_items']
+    equipment = profile['equipment']['equipped_items']
 
     neck = next((item for item in equipment if item['slot']['type'] == 'NECK'), None)
 

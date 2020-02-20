@@ -7,7 +7,7 @@
 # Distributed under terms of the MIT license.
 
 """
-Run a single refresh
+Run a single refresh with debug logging. Do not upload to server
 """
 import yaml
 import csv
@@ -21,7 +21,7 @@ from altaudit import Audit
 if __name__ == '__main__':
 
     logger = logging.getLogger('altaudit')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     handler = logging.FileHandler("altaudit.log")
     console = logging.StreamHandler()
@@ -53,7 +53,6 @@ if __name__ == '__main__':
             writer.writerows(result)
 
         logger.info("Upload...")
-        os.system('rsync -razq characters.csv {}'.format(config['server']))
 
         logger.info("Complete")
 
