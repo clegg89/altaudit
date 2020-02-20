@@ -53,11 +53,18 @@ MYTHIC_DUNGEON_STATISTIC_IDS = {
 }
 
 def pve(character, response, db_session, api):
+    # This will throw an exception if the category/subcategory is not found.
+    # Is that okay? Does it matter? It shouldn't ever happen...
+    # Leave it this way for now. If we start seeing errors here we can change it
+    statistics = response['achievements_statistics']['statistics']
+    dungeon_and_raids = next(category for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID)['sub_categories']
+    bfa_instances = next(sub for sub in dungeon_and_raids if sub['id'] == BATTLE_FOR_AZEROTH_SUBCATEGORY_ID)['statistics']
+
     _island_expeditions(character, response)
     _world_quests(character, response)
     _weekly_event(character, response)
-    _dungeons(character, response)
-    # _raids(character, response)
+    _dungeons(character, bfa_instances)
+    _raids(character, bfa_instances)
 
 def _island_expeditions(character, response):
     weekly_islands = next((quest for quest in response['quests_completed']['quests'] if quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
@@ -83,7 +90,7 @@ def _weekly_event(character, response):
             character.weekly_event_done = 'TRUE'
             break
 
-def _dungeons(character, response):
+def _dungeons(character, bfa_instance_stats):
     """
     We used to be able to get dungeon clears from achivement criteria, but that
     doesn't exist in the profile API as it did in the community API. Instead we
@@ -91,38 +98,38 @@ def _dungeons(character, response):
     to determine boss kills. This value is lower than the achievement value. It is
     unclear why, but this isn't exactly an important stat post expac release.
     """
-    statistics = response['achievements_statistics']['statistics']
-    # This will throw an exception if the category/subcategory is not found.
-    # Is that okay? Does it matter? It shouldn't ever happen...
-    # Leave it this way for now. If we start seeing errors here we can change it
-    dungeon_and_raids = next(category for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID)['sub_categories']
-    bfa_instances = next(sub for sub in dungeon_and_raids if sub['id'] == BATTLE_FOR_AZEROTH_SUBCATEGORY_ID)['statistics']
-
-    dungeon_list = {dungeon : next((stat['quantity'] for stat in bfa_instances if stat['id'] == stat_id), 0)
+    dungeon_list = {dungeon : next((stat['quantity'] for stat in bfa_instance_stats if stat['id'] == stat_id), 0)
             for dungeon,stat_id in MYTHIC_DUNGEON_STATISTIC_IDS.items()}
 
     character.dungeons_total = sum(dungeon_list.values())
     character.dungeons_each_total = '|'.join(('{}+{}'.format(d,a) for d,a in dungeon_list.items()))
 
-def _raids(character, response):
+def _raids(character, bfa_instance_stats):
     raid_list = {}
+    # Becomes a dictionary of format raid : [], raid_weekly : []
     raid_output = {'{}{}'.format(difficulty,postfix) : [] for difficulty in RAID_DIFFICULTIES for postfix in ('','_weekly')}
-    instance_stats = next(stat for stat in
-            next(sub for sub in response['statistics']['subCategories']
-                if sub['name'] == "Dungeons & Raids")['subCategories']
-            if stat['name'] == 'Battle for Azeroth')['statistics']
+    # A list of all encounters of the form [{'raid_finder' : [ids], 'normal' : [ids], ...}, ...]
+    # Some bosses (Battle of Dazar'alor) have 2 different IDs. So we get the sum of all IDs
     encounters = [encounter['raid_ids'] for raid in VALID_RAIDS for encounter in raid['encounters']]
-    boss_ids = [i for encounter in encounters for ids in encounter.values() for i in ids]
+    # The stat IDs of every raid boss
+    boss_ids = [ID for encounter in encounters for ids in encounter.values() for ID in ids]
 
-    for instance in instance_stats:
-        if instance['id'] in boss_ids:
-            raid_list[instance['id']] = (instance['quantity'],
-                    1 if (instance['lastUpdated'] / 1000) > Utility.timestamp[character.region_name] else 0)
+    for boss_id in boss_ids:
+        # Tuple of (total, weekly), (0,0) if not found
+        raid_list[boss_id] = next((
+            (stat['quantity'],
+                # Can only kill a boss 1/week, so set if the stat was updated in the last week
+                1 if (stat['last_updated_timestamp']/1000) > Utility.timestamp[character.region_name] else 0)
+            # Loop through all stats in bfa kills, if ID matches, get our tuple. If nothing found (0,0)
+            for stat in bfa_instance_stats if stat['id'] == boss_id), (0,0))
 
     for encounter in encounters:
+        # encounter is of the form {'difficulty' : [ids],...}
         for difficulty,ids in encounter.items():
-            raid_output[difficulty].append(max([raid_list[id][0] for id in ids if id in raid_list] + [0]))
-            raid_output['{}_weekly'.format(difficulty)].append(max([raid_list[id][1] for id in ids if id in raid_list] + [0]))
+            # If a boss has more than 1 ID, take the sum of both. List shouldn't be empty, we put (0,0) in items not found
+            raid_output[difficulty].append(sum([raid_list[ID][0] for ID in ids if ID in raid_list]))
+            raid_output['{}_weekly'.format(difficulty)].append(sum([raid_list[ID][1] for ID in ids if ID in raid_list]))
 
+    # Place into character fields 'raids_{difficult}[_weekly]'
     for metric,data in raid_output.items():
         setattr(character, 'raids_{}'.format(metric), '|'.join(str(d) for d in data))
