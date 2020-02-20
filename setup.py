@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-from altaudit.constants import VERSION
+from altaudit.version import VERSION
 
 setup(
     name='AltAudit',
