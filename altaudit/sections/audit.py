@@ -4,6 +4,7 @@ import re
 from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from ..models import GemSlotAssociation, Gem, ITEM_SLOTS, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELD_COLUMNS
 from ..gem_enchant import enchant_lookup
+from .utility import is_off_hand_weapon
 
 "Item Enchant Fields"
 ENCHANT_ITEM_FIELDS = [field[0] for field in ENCHANT_ITEM_FIELD_COLUMNS]
@@ -34,15 +35,9 @@ def audit(character, profile, db_session, api):
     # Final corner case for off hand. Similiar to item audit, we only
     # ignore missing offhands if the main hand weapon is two handed
     offhand = next((item for item in equipped_items if item['slot']['type'] == 'OFF_HAND'), None)
-    if not offhand:
-        # Find mainhand if it exists
-        mainhand = next((item for item in equipped_items if item['slot']['type'] == 'MAIN_HAND'), None)
-        # If mainhand is a two handed weapon, set offhand ilvl to main ilvl for equipped ilvl calculation
-        # TODO This will not work for fury warriors!
-        # TODO code duplication with items!
-        if mainhand and mainhand['inventory_type']['type'] == 'TWOHWEAPON':
-            for field in ENCHANT_ITEM_FIELDS:
-                setattr(character, 'off_hand_enchant_{}'.format(field), None)
+    if not offhand and not is_off_hand_weapon(profile):
+        for field in ENCHANT_ITEM_FIELDS:
+            setattr(character, 'off_hand_enchant_{}'.format(field), None)
 
 def _enchant(character, item):
     slot = item['slot']['type'].lower()

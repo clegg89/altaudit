@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from altaudit.models import Base, Character, Class, Faction, Race
 
-import altaudit.sections as Section
+import altaudit.sections.basic as Section
 
 classes = {'classes': [
     {'id': 1, 'name': 'Warrior'},

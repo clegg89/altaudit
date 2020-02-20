@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from altaudit.models import Base, Class, Character, AzeriteTrait
 
-import altaudit.sections as Section
+import altaudit.sections.azerite as Section
 
 hoa_item_info = {'id': 158075, 'name': 'Heart of Azeroth', 'icon': 'inv_heartofazeroth', 'quality': 6, 'itemLevel': 427, 'azeriteItem': {'azeriteLevel': 47, 'azeriteExperience': 1062, 'azeriteExperienceRemaining': 22815}}
 

@@ -6,7 +6,7 @@ import datetime
 from altaudit.models import Region, Realm, Character
 from altaudit.utility import Utility
 
-import altaudit.sections as Section
+import altaudit.sections.pve as Section
 
 def test_islands_weekly_quest_done():
     jack = Character('jack')

@@ -1,13 +1,19 @@
 """Unit Test for Audit Info"""
 import pytest
 
+from unittest.mock import patch
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from altaudit.models import Base, Character, Gem
 from altaudit.gem_enchant import gem_lookup
 
-import altaudit.sections as Section
+import altaudit.sections.audit as Section
+
+@pytest.fixture
+def mock_is_off_hand_weapon(mocker):
+    return mocker.patch('altaudit.sections.audit.is_off_hand_weapon')
 
 @pytest.fixture(scope='module')
 def db():
@@ -38,7 +44,7 @@ def db_session(db):
     yield session
     session.close()
 
-def test_audit_regular_item():
+def test_audit_regular_item(mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : [{
@@ -54,7 +60,7 @@ def test_audit_regular_item():
     assert jack.finger_1_enchant_name == 'Accord of Haste'
     assert jack.finger_1_enchant_description == '+60 Haste'
 
-def test_audit_item_missing():
+def test_audit_item_missing(mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : []}}
@@ -66,7 +72,7 @@ def test_audit_item_missing():
     assert jack.finger_1_enchant_name == 'None'
     assert jack.finger_1_enchant_description == None
 
-def test_audit_item_no_enchant():
+def test_audit_item_no_enchant(mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : [{
@@ -79,7 +85,7 @@ def test_audit_item_no_enchant():
     assert jack.finger_1_enchant_name == 'None'
     assert jack.finger_1_enchant_description == None
 
-def test_audit_item_enchant_not_in_lookup():
+def test_audit_item_enchant_not_in_lookup(mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : [{
@@ -95,12 +101,11 @@ def test_audit_item_enchant_not_in_lookup():
     assert jack.finger_1_enchant_name == 'Total Garbage'
     assert jack.finger_1_enchant_description == None
 
-def test_audit_item_enchant_offhand_missing():
+def test_audit_item_enchant_offhand_missing_not_weapon(mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
-        'equipped_items' : [{
-            'slot' : { 'type' : 'MAIN_HAND' },
-            'inventory_type' : { 'type' : 'TWOHWEAPON' }}]}}
+        'equipped_items' : []}}
+    mock_is_off_hand_weapon.return_value = False
 
     Section.audit(jack, response, None, None)
 
@@ -109,12 +114,11 @@ def test_audit_item_enchant_offhand_missing():
     assert jack.off_hand_enchant_name == None
     assert jack.off_hand_enchant_description == None
 
-def test_audit_item_enchant_offhand_not_enchantable():
+def test_audit_item_enchant_offhand_not_enchantable(mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
-        'equipped_items' : [{
-            'slot' : { 'type' : 'OFF_HAND' },
-            'inventory_type' : { 'type' : 'HOLDABLE' }}]}}
+        'equipped_items' : []}}
+    mock_is_off_hand_weapon.return_value = False
 
     Section.audit(jack, response, None, None)
 
@@ -123,7 +127,7 @@ def test_audit_item_enchant_offhand_not_enchantable():
     assert jack.off_hand_enchant_name == None
     assert jack.off_hand_enchant_description == None
 
-def test_audit_empty_sockets():
+def test_audit_empty_sockets(mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : [
@@ -138,7 +142,7 @@ def test_audit_empty_sockets():
 
     assert jack.empty_sockets == 4
 
-def test_audit_gem_in_db(db_session):
+def test_audit_gem_in_db(db_session, mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : [{
@@ -158,7 +162,7 @@ def test_audit_gem_in_db(db_session):
     assert jack.gems[0].gem.stat == '+30 Critical Strike'
     assert jack.gems[0].slot == 'finger_1'
 
-def test_audit_gem_not_in_db(db_session):
+def test_audit_gem_not_in_db(db_session, mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : [{
@@ -178,7 +182,7 @@ def test_audit_gem_not_in_db(db_session):
     assert jack.gems[0].gem.stat == '+20 Bullshit'
     assert jack.gems[0].slot == 'finger_1'
 
-def test_audit_no_gems(db_session, mock_api):
+def test_audit_no_gems(db_session, mock_api, mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : [

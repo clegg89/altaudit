@@ -3,7 +3,7 @@ import pytest
 
 from altaudit.models import Character
 
-import altaudit.sections as Section
+import altaudit.sections.reputations as Section
 
 def test_reputation_proudmoore():
     jack = Character('jack', faction_name='Alliance')
