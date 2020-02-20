@@ -98,7 +98,7 @@ def _dungeons(character, bfa_instance_stats):
     to determine boss kills. This value is lower than the achievement value. It is
     unclear why, but this isn't exactly an important stat post expac release.
     """
-    dungeon_list = {dungeon : next((stat['quantity'] for stat in bfa_instance_stats if stat['id'] == stat_id), 0)
+    dungeon_list = {dungeon : next((int(stat['quantity']) for stat in bfa_instance_stats if stat['id'] == stat_id), 0)
             for dungeon,stat_id in MYTHIC_DUNGEON_STATISTIC_IDS.items()}
 
     character.dungeons_total = sum(dungeon_list.values())
@@ -117,7 +117,7 @@ def _raids(character, bfa_instance_stats):
     for boss_id in boss_ids:
         # Tuple of (total, weekly), (0,0) if not found
         raid_list[boss_id] = next((
-            (stat['quantity'],
+            (int(stat['quantity']),
                 # Can only kill a boss 1/week, so set if the stat was updated in the last week
                 1 if (stat['last_updated_timestamp']/1000) > Utility.timestamp[character.region_name] else 0)
             # Loop through all stats in bfa kills, if ID matches, get our tuple. If nothing found (0,0)

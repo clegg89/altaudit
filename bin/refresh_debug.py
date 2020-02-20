@@ -52,8 +52,6 @@ if __name__ == '__main__':
             writer = csv.writer(f)
             writer.writerows(result)
 
-        logger.info("Upload...")
-
         logger.info("Complete")
 
     except:

@@ -18,11 +18,11 @@ from .gem_enchant import gem_lookup
 from .processing import process_blizzard, process_raiderio, serialize
 from . import sections as Section
 
-RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm}&name={character_name}&fields=mythic_plus_scores_by_season:current,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
+RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm_slug}&name={character_name}&fields=mythic_plus_scores_by_season:current,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
 
 def _character_as_dict(character):
     return {'character_name' : character.name,
-            'realm' : character.realm_slug,
+            'realm_slug' : character.realm_slug,
             'region' : character.region_name}
 
 class Audit:

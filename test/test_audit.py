@@ -438,7 +438,7 @@ class TestAuditRefresh:
 
     def test_blizzard_api_called(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
         self.audit.refresh(datetime.datetime)
-        self.audit.blizzard_api.get_character_profile_summary.assert_called_once_with(region='us', realm='kiljaeden', namespace='profile-us',
+        self.audit.blizzard_api.get_character_profile_summary.assert_called_once_with(region='us', realm_slug='kiljaeden', namespace='profile-us',
                 character_name='clegg', locale=BLIZZARD_LOCALE)
 
     def test_raiderio_called(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
@@ -446,7 +446,7 @@ class TestAuditRefresh:
         self.audit.refresh(datetime.datetime)
 
         self.mock_get.assert_called_once_with(RAIDERIO_URL.format(
-            region='us', realm='kiljaeden', character_name='clegg'))
+            region='us', realm_slug='kiljaeden', character_name='clegg'))
 
     def test_character_process_blizzard(self, mock_process_blizzard, mock_process_raiderio, mock_serialize):
         self.audit.blizzard_api.get_character_profile_summary.return_value = 5
