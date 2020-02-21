@@ -1,6 +1,5 @@
 """Top-Level Audit Class"""
 import logging
-import traceback
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -15,7 +14,7 @@ from .utility import Utility
 from .models import Class, Faction, Race, Region, Realm, Character, Gem
 from .blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from .gem_enchant import gem_lookup
-from .processing import process_blizzard, process_raiderio, serialize
+from .processing import update_snapshots, process_blizzard, process_raiderio, serialize
 from . import sections as Section
 
 RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm_slug}&name={character_name}&fields=mythic_plus_scores_by_season:current,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
@@ -164,6 +163,7 @@ class Audit:
 
                     process_blizzard(character, profile, session, self.blizzard_api, force_refresh)
                     process_raiderio(character, rio_resp)
+                    update_snapshots(character)
                     session.commit()
                 except:
                     logger.exception("%s Failed", character.name)

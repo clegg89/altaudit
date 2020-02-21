@@ -4,7 +4,7 @@ import pytest
 import datetime
 
 import altaudit
-from altaudit.processing import _update_snapshots, _get_subsections, _serialize_azerite, _serialize_gems, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
+from altaudit.processing import update_snapshots, _get_subsections, _serialize_azerite, _serialize_gems, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
 from altaudit.models import Region, Realm, Character, Snapshot, AzeriteTrait, Gem, GemSlotAssociation
 from altaudit.utility import Utility
 
@@ -41,7 +41,7 @@ def test_update_snapshot_add_new_snapshot():
     now = datetime.datetime(2019, 8, 5)
     Utility.set_refresh_timestamp(now)
 
-    _update_snapshots(clegg)
+    update_snapshots(clegg)
 
     assert 2019 in clegg.snapshots
     assert 31 in clegg.snapshots[2019]
@@ -56,7 +56,7 @@ def test_update_snapshot_no_overwrite_existing():
 
     Utility.set_refresh_timestamp(now)
 
-    _update_snapshots(clegg)
+    update_snapshots(clegg)
 
     assert clegg.snapshots[2019][31].world_quests == 5
     assert clegg.snapshots[2019][31].dungeons == 10
@@ -69,7 +69,7 @@ def test_update_snapshot_capture_existing_totals():
 
     Utility.set_refresh_timestamp(now)
 
-    _update_snapshots(clegg)
+    update_snapshots(clegg)
 
     assert clegg.snapshots[2019][31].world_quests == 300
     assert clegg.snapshots[2019][31].dungeons == 40
@@ -261,9 +261,53 @@ def test_get_snapshots_negative_dungeons():
     assert jack.dungeons_weekly == 0
     assert jack.snapshots[2019][32].dungeons == 18
 
+def test_get_snapshots_week_not_present():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots = { 2019 : {} }
+    now = datetime.datetime(2019, 8, 7)
+    Utility.set_refresh_timestamp(now)
+
+    _get_snapshots(jack)
+
+    assert jack.world_quests_weekly == None
+    assert jack.dungeons_weekly == None
+
+def test_get_snapshots_week_not_present():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots = { 2019 : {} }
+    now = datetime.datetime(2019, 8, 7)
+    Utility.set_refresh_timestamp(now)
+
+    _get_snapshots(jack)
+
+    assert jack.world_quests_weekly == None
+    assert jack.dungeons_weekly == None
+
+def test_get_snapshots_year_not_present():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots = {}
+    now = datetime.datetime(2019, 8, 7)
+    Utility.set_refresh_timestamp(now)
+
+    _get_snapshots(jack)
+
+    assert jack.world_quests_weekly == None
+    assert jack.dungeons_weekly == None
+
+def test_get_snapshots_snapshot_invalid_leave_as_none():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots = { 2019 : { 32 : Snapshot() } }
+    # Values that should not be None are None. totals, snapshot values, etc.
+    now = datetime.datetime(2019, 8, 7)
+    Utility.set_refresh_timestamp(now)
+
+    _get_snapshots(jack)
+
+    assert jack.world_quests_weekly == None
+    assert jack.dungeons_weekly == None
+
 def test_serialzie(mocker):
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
-    mock_update_snapshots = mocker.patch('altaudit.processing._update_snapshots')
     mock_serialize_azerite = mocker.patch('altaudit.processing._serialize_azerite')
     mock_serialize_gems = mocker.patch('altaudit.processing._serialize_gems')
     mock_get_snapshots = mocker.patch('altaudit.processing._get_snapshots')
@@ -273,7 +317,6 @@ def test_serialzie(mocker):
     result = serialize(jack)
 
     assert result == ['jack', 'us', 'kiljaeden']
-    mock_update_snapshots.assert_called_once_with(jack)
     mock_serialize_azerite.assert_called_once_with(jack)
     mock_serialize_gems.assert_called_once_with(jack)
     mock_get_snapshots.assert_called_once_with(jack)

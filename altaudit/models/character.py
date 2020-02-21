@@ -141,11 +141,11 @@ CHARACTER_HEADER_FIELDS = {
     'island_weekly_done' : 'Column(String)',
     'islands_total' : 'Column(Integer)',
     'world_quests_total' : 'Column(Integer)',
-    'world_quests_weekly' : "''", # Obtained from snapshots
+    'world_quests_weekly' : "None", # Obtained from snapshots
     'weekly_event_done' : 'Column(String)',
     'dungeons_total' : 'Column(Integer)',
     'dungeons_each_total' : 'Column(String)',
-    'dungeons_weekly' : "''", # Obtained from snapshots
+    'dungeons_weekly' : "None", # Obtained from snapshots
     'raiderio_score' : 'Column(Float)',
     'mplus_weekly_highest' : 'Column(Integer)',
     'mplus_season_highest' : 'Column(Integer)',

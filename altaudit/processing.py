@@ -1,21 +1,12 @@
 """Character Processing"""
+import logging
+
 from .utility import Utility
 from .sections import sections, raiderio
 from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
 from .blizzard import BLIZZARD_LOCALE
 
 PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}]
-
-def _update_snapshots(character):
-    year = Utility.year[character.region_name]
-    week = Utility.week[character.region_name]
-    if year not in character.snapshots:
-        character.snapshots[year] = {}
-
-    if week not in character.snapshots[year]:
-        character.snapshots[year][week] = Snapshot()
-        character.snapshots[year][week].world_quests = character.world_quests_total
-        character.snapshots[year][week].dungeons = character.dungeons_total
 
 def _serialize_azerite(character):
     for slot in AZERITE_ITEM_SLOTS:
@@ -35,17 +26,24 @@ def _serialize_gems(character):
     character.gem_slots = '|'.join([g.slot for g in character.gems])
 
 def _get_snapshots(character):
-    weekly_snapshot = character.snapshots[Utility.year[character.region_name]][Utility.week[character.region_name]]
-    character.world_quests_weekly = character.world_quests_total - weekly_snapshot.world_quests
-    character.dungeons_weekly = character.dungeons_total - weekly_snapshot.dungeons
+    try:
+        weekly_snapshot = character.snapshots[Utility.year[character.region_name]][Utility.week[character.region_name]]
+        character.world_quests_weekly = character.world_quests_total - weekly_snapshot.world_quests
+        character.dungeons_weekly = character.dungeons_total - weekly_snapshot.dungeons
 
-    # If something happened where snapshot total > our total, reset snapshot and set to 0
-    if character.world_quests_weekly < 0:
-        character.world_quests_weekly = 0
-        weekly_snapshot.world_quests = character.world_quests_total
-    if character.dungeons_weekly < 0:
-        character.dungeons_weekly = 0
-        weekly_snapshot.dungeons = character.dungeons_total
+        # If something happened where snapshot total > our total, reset snapshot and set to 0
+        if character.world_quests_weekly < 0:
+            character.world_quests_weekly = 0
+            weekly_snapshot.world_quests = character.world_quests_total
+        if character.dungeons_weekly < 0:
+            character.dungeons_weekly = 0
+            weekly_snapshot.dungeons = character.dungeons_total
+
+    except KeyError:
+        pass
+    except:
+        logger = logging.getLogger('altaudit')
+        logger.exception("Unknown error in snapshot")
 
 def _get_subsections(region, profile, api, sub_section, parent='summary', prefix=''):
     if type(sub_section) is str:
@@ -58,6 +56,17 @@ def _get_subsections(region, profile, api, sub_section, parent='summary', prefix
         for k,v in sub_section.items():
             _get_subsections(region, profile, api, k, parent, prefix)
             _get_subsections(region, profile, api, v, k, prefix + k + '_')
+
+def update_snapshots(character):
+    year = Utility.year[character.region_name]
+    week = Utility.week[character.region_name]
+    if year not in character.snapshots:
+        character.snapshots[year] = {}
+
+    if week not in character.snapshots[year]:
+        character.snapshots[year][week] = Snapshot()
+        character.snapshots[year][week].world_quests = character.world_quests_total
+        character.snapshots[year][week].dungeons = character.dungeons_total
 
 def process_blizzard(character, profile, db_session, api, force_refresh):
     """
@@ -98,7 +107,6 @@ def process_raiderio(character, response):
         raiderio(character, response.json())
 
 def serialize(character):
-    _update_snapshots(character)
     _serialize_azerite(character)
     _serialize_gems(character)
     _get_snapshots(character)
