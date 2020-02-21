@@ -41,3 +41,12 @@ def test_no_weapon_means_off_hand_is_weapon():
             'equipment' : { 'equipped_items' : []}}
 
     assert True == is_off_hand_weapon(profile)
+
+def test_active_spec_is_missing():
+    profile = {
+            'summary' : {
+                'character_class' : { 'name' : 'Warrior' }},
+            'equipment' : { 'equipped_items' : [
+                { 'slot' : { 'type' : 'MAIN_HAND' }, 'inventory_type' : { 'type' : 'TWOHWEAPON' }}]}}
+
+    assert False == is_off_hand_weapon(profile)
