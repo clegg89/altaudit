@@ -1,6 +1,8 @@
 """Character Processing"""
 import logging
 
+from wowapi import WowApiException
+
 from .utility import Utility
 from .sections import sections, raiderio
 from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
@@ -47,8 +49,14 @@ def _get_snapshots(character):
 
 def _get_subsections(region, profile, api, sub_section, parent='summary', prefix=''):
     if type(sub_section) is str:
-        profile[prefix + sub_section] = api.get_data_resource(
-                '{}&locale={}'.format(profile[parent][sub_section]['href'], BLIZZARD_LOCALE), region)
+        if profile[parent] and sub_section in profile[parent]:
+            try:
+                profile[prefix + sub_section] = api.get_data_resource(
+                        '{}&locale={}'.format(profile[parent][sub_section]['href'], BLIZZARD_LOCALE), region)
+            except WowApiException:
+                profile[prefix + sub_section] = None
+        else:
+            profile[prefix + sub_section] = None
     elif type(sub_section) is list:
         for section in sub_section:
             _get_subsections(region, profile, api, section, parent, prefix)

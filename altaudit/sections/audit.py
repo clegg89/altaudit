@@ -59,7 +59,10 @@ def _enchant(character, item):
     # anyway. So just grab the first enchant.
     enchant = item['enchantments'][0]
     enchant_id = enchant['enchantment_id']
-    name = re.sub("Enchant [a-zA-Z]+ - ", "", enchant['source_item']['name'])
+    if 'source_item' in enchant:
+        name = re.sub("Enchant [a-zA-Z]+ - ", "", enchant['source_item']['name'])
+    else:
+        name = re.sub("Enchanted: ", "", enchant['display_string'])
 
     setattr(character, '{}_enchant_id'.format(slot), enchant_id)
     setattr(character, '{}_enchant_name'.format(slot), name)

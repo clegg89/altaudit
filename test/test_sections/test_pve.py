@@ -8,6 +8,17 @@ from altaudit.utility import Utility
 
 import altaudit.sections.pve as Section
 
+def test_pve_quests_missing():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : None,
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.island_weekly_done == 'FALSE'
+    assert jack.weekly_event_done == 'FALSE'
+
 def test_islands_weekly_quest_done():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
@@ -324,6 +335,25 @@ def test_dungeons_and_raids_category_missing():
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'statistics' : []}}
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 0
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_statistics_missing():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : None}
 
     Section.pve(jack, response, None, None)
 

@@ -56,9 +56,12 @@ def pve(character, profile, db_session, api):
     # This will throw an exception if the category/subcategory is not found.
     # Is that okay? Does it matter? It shouldn't ever happen...
     # Leave it this way for now. If we start seeing errors here we can change it
-    statistics = profile['achievements_statistics']['statistics']
-    dungeon_and_raids = next((category['sub_categories'] for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID), [])
-    bfa_instances = next((sub['statistics'] for sub in dungeon_and_raids if sub['id'] == BATTLE_FOR_AZEROTH_SUBCATEGORY_ID), [])
+    if profile['achievements_statistics']:
+        statistics = profile['achievements_statistics']['statistics']
+        dungeon_and_raids = next((category['sub_categories'] for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID), [])
+        bfa_instances = next((sub['statistics'] for sub in dungeon_and_raids if sub['id'] == BATTLE_FOR_AZEROTH_SUBCATEGORY_ID), [])
+    else:
+        bfa_instances = []
 
     _island_expeditions(character, profile)
     _world_quests(character, profile)
@@ -67,8 +70,11 @@ def pve(character, profile, db_session, api):
     _raids(character, bfa_instances)
 
 def _island_expeditions(character, profile):
-    weekly_islands = next((quest for quest in profile['quests_completed']['quests'] if quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
-    character.island_weekly_done = "TRUE" if weekly_islands else "FALSE"
+    if profile['quests_completed']:
+        weekly_islands = next((quest for quest in profile['quests_completed']['quests'] if quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
+        character.island_weekly_done = "TRUE" if weekly_islands else "FALSE"
+    else:
+        character.island_weekly_done = "FALSE"
 
     character.islands_total = 0
     achievements = profile['achievements']['achievements']
@@ -84,11 +90,12 @@ def _world_quests(character, profile):
 
 def _weekly_event(character, profile):
     character.weekly_event_done = 'FALSE'
-    for event_quest_id in WEEKLY_EVENT_QUESTS:
-        completed_quest = next((quest for quest in profile['quests_completed']['quests'] if quest['id'] == event_quest_id), None)
-        if completed_quest:
-            character.weekly_event_done = 'TRUE'
-            break
+    if profile['quests_completed']:
+        for event_quest_id in WEEKLY_EVENT_QUESTS:
+            completed_quest = next((quest for quest in profile['quests_completed']['quests'] if quest['id'] == event_quest_id), None)
+            if completed_quest:
+                character.weekly_event_done = 'TRUE'
+                break
 
 def _dungeons(character, bfa_instance_stats):
     """

@@ -3,6 +3,8 @@ import pytest
 
 import datetime
 
+from wowapi import WowApiException
+
 import altaudit
 from altaudit.processing import update_snapshots, _get_subsections, _serialize_azerite, _serialize_gems, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
 from altaudit.models import Region, Realm, Character, Snapshot, AzeriteTrait, Gem, GemSlotAssociation
@@ -30,6 +32,8 @@ def mock_api(mocker):
         actual_url = url.replace("&locale=en_US","")
         if actual_url == 'quests':
             return {'completed' : {'href' : 'completed'}}
+        elif actual_url == 'fail':
+            raise WowApiException
         return actual_url
 
     mock = mocker.MagicMock()
@@ -95,8 +99,7 @@ def test_get_subsections_list_of_strings_and_dictionaries(mock_api, mocker):
         'media' : {'href' : 'media'},
         'equipment' : {'href' : 'equipment'},
         'reputations' : {'href' : 'reputations'},
-        'quests' : {'href' : 'quests'},
-        'quests_completed' : {'href' : 'quests_completed'}}}
+        'quests' : {'href' : 'quests'}}}
     expected_api_calls = [
             mocker.call.get_data_resource('{}&locale=en_US'.format('media'), 'us'),
             mocker.call.get_data_resource('{}&locale=en_US'.format('equipment'), 'us'),
@@ -114,15 +117,50 @@ def test_get_subsections_list_of_strings_and_dictionaries(mock_api, mocker):
     assert profile['quests'] == {'completed' : {'href' : 'completed'}}
     assert profile['quests_completed'] == 'completed'
 
-def test_process_blizzard_last_modified_changed(mock_section, mock_get_subsections):
-    jack = Character('jack', lastmodified=5)
-    fake_response = { 'summary' : {
-        'last_login_timestamp' : 10}}
+def test_get_subsections_section_missing_from_response(mock_api, mocker):
+    api_sections = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}]
+    profile = { 'summary' : {
+        'media' : {'href' : 'media'},
+        'equipment' : {'href' : 'equipment'},
+        'reputations' : {'href' : 'reputations'},
+        'achievements' : {'href' : 'achievements'},
+        'quests' : {'href' : 'quests'}}}
+    expected_api_calls = [
+            mocker.call.get_data_resource('{}&locale=en_US'.format('media'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('equipment'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('reputations'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('achievements'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('quests'), 'us'),
+            mocker.call.get_data_resource('{}&locale=en_US'.format('completed'), 'us')]
 
-    process_blizzard(jack, fake_response, None, None, False)
+    _get_subsections('us', profile, mock_api, api_sections)
 
-    mock_section.assert_called_once_with(jack, fake_response, None, None)
-    mock_get_subsections.assert_called_once_with(None, fake_response, None, PROFILE_API_SECTIONS)
+    mock_api.get_data_resource.assert_called()
+    assert all([expected == actual for expected, actual in zip(expected_api_calls, mock_api.method_calls)]), "Expected {} got {}".format(expected_api_calls, mock_api.method_calls)
+    assert profile['media'] == 'media'
+    assert profile['equipment'] == 'equipment'
+    assert profile['reputations'] == 'reputations'
+    assert profile['quests'] == {'completed' : {'href' : 'completed'}}
+    assert profile['quests_completed'] == 'completed'
+    assert profile['achievements'] == 'achievements'
+    assert profile['achievements_statistics'] == None
+
+def test_get_subsections_handle_wowapi_error(mock_api, mocker):
+    api_sections = ['media', 'equipment', {'fail' : 'missing'}, 'reputations']
+    profile = { 'summary' : {
+        'media' : {'href' : 'media'},
+        'equipment' : {'href' : 'equipment'},
+        'reputations' : {'href' : 'reputations'},
+        'fail' : {'href' : 'fail'}}}
+
+    _get_subsections('us', profile, mock_api, api_sections)
+
+    mock_api.get_data_resource.assert_called()
+    assert profile['media'] == 'media'
+    assert profile['equipment'] == 'equipment'
+    assert profile['reputations'] == 'reputations'
+    assert profile['fail'] == None
+    assert profile['fail_missing'] == None
 
 def test_process_blizzard_last_modified_not_changed(mock_section, mock_get_subsections):
     jack = Character('jack', lastmodified=10)

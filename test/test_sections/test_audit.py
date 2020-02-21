@@ -142,6 +142,22 @@ def test_audit_empty_sockets(mock_is_off_hand_weapon):
 
     assert jack.empty_sockets == 4
 
+def test_audit_enchant_dk_rune(mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'MAIN_HAND' },
+            'enchantments' : [{
+                'enchantment_id' : 3368,
+                'display_string' : 'Enchanted: Rune of the Fallen Crusader'}]}]}}
+
+    Section.audit(jack, response, None, None)
+
+    assert jack.main_hand_enchant_id == 3368
+    assert jack.main_hand_enchant_quality == 4
+    assert jack.main_hand_enchant_name == 'Rune of the Fallen Crusader'
+    assert jack.main_hand_enchant_description == "Chance to heal for 6% and increases total Strength by 15% for 15 sec."
+
 def test_audit_gem_in_db(db_session, mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
