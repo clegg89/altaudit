@@ -19,10 +19,6 @@ def mock_raiderio(mocker):
     return mocker.patch('altaudit.processing.raiderio')
 
 @pytest.fixture
-def mock_update_snapshots(mocker):
-    return mocker.patch('altaudit.processing._update_snapshots')
-
-@pytest.fixture
 def mock_get_subsections(mocker):
     return mocker.patch('altaudit.processing._get_subsections')
 
@@ -118,68 +114,44 @@ def test_get_subsections_list_of_strings_and_dictionaries(mock_api, mocker):
     assert profile['quests'] == {'completed' : {'href' : 'completed'}}
     assert profile['quests_completed'] == 'completed'
 
-def test_process_blizzard_last_modified_changed(mock_section, mock_update_snapshots, mock_get_subsections):
+def test_process_blizzard_last_modified_changed(mock_section, mock_get_subsections):
     jack = Character('jack', lastmodified=5)
     fake_response = { 'summary' : {
         'last_login_timestamp' : 10}}
 
     process_blizzard(jack, fake_response, None, None, False)
 
-    mock_update_snapshots.assert_called_once()
     mock_section.assert_called_once_with(jack, fake_response, None, None)
     mock_get_subsections.assert_called_once_with(None, fake_response, None, PROFILE_API_SECTIONS)
 
-def test_process_blizzard_last_modified_not_changed(mock_section, mock_update_snapshots, mock_get_subsections):
+def test_process_blizzard_last_modified_not_changed(mock_section, mock_get_subsections):
     jack = Character('jack', lastmodified=10)
     fake_response = { 'summary' : {
         'last_login_timestamp' : 10}}
 
     process_blizzard(jack, fake_response, None, None, False)
 
-    mock_update_snapshots.assert_called_once()
     mock_section.assert_not_called()
     mock_get_subsections.assert_not_called()
 
-def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, mock_update_snapshots, mock_get_subsections):
+def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, mock_get_subsections):
     jack = Character('jack', lastmodified=10)
     fake_response = { 'summary' : {
         'last_login_timestamp' : 10}}
 
     process_blizzard(jack, fake_response, None, None, True)
 
-    mock_update_snapshots.assert_called_once()
     mock_section.assert_called_once_with(jack, fake_response, None, None)
     mock_get_subsections.assert_called_once_with(None, fake_response, None, PROFILE_API_SECTIONS)
 
-@pytest.mark.skip(reason='Is this still needed? If so, then move this to sections test')
-def test_process_blizzard_basic_before_azerite(mock_section, mock_update_snapshots, mocker):
+def test_process_blizzard_always_raise_exception(mock_section, mock_get_subsections):
     jack = Character('jack', lastmodified=5)
-    fake_response = { 'lastModified' : 10 }
-    manager = mocker.Mock()
-    manager.attach_mock(mock_section.basic, 'basic')
-    manager.attach_mock(mock_section.azerite, 'azerite')
+    fake_response = { 'summary' : {
+        'last_login_timestamp' : 10}}
+    mock_get_subsections.side_effect = KeyError()
 
-    process_blizzard(jack, fake_response, 3, 4, False)
-
-    mock_update_snapshots.assert_called_once()
-    manager.assert_has_calls([
-        mocker.call.basic(jack, fake_response, 3),
-        mocker.call.azerite(jack, fake_response, 3, 4)])
-
-@pytest.mark.skip(reason='Is this still needed? If so, then move this to sections test')
-def test_process_blizzard_basic_before_audit(mock_section, mock_update_snapshots, mocker):
-    jack = Character('jack', lastmodified=5)
-    fake_response = { 'lastModified' : 10 }
-    manager = mocker.Mock()
-    manager.attach_mock(mock_section.basic, 'basic')
-    manager.attach_mock(mock_section.audit, 'audit')
-
-    process_blizzard(jack, fake_response, 3, 4, False)
-
-    mock_update_snapshots.assert_called_once()
-    manager.assert_has_calls([
-        mocker.call.basic(jack, fake_response, 3),
-        mocker.call.audit(jack, fake_response, 3, 4)])
+    with pytest.raises(KeyError):
+        process_blizzard(jack, fake_response, None, None, False)
 
 def test_process_raiderio(mock_raiderio, mocker):
     jack = Character('jack')
@@ -291,6 +263,7 @@ def test_get_snapshots_negative_dungeons():
 
 def test_serialzie(mocker):
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    mock_update_snapshots = mocker.patch('altaudit.processing._update_snapshots')
     mock_serialize_azerite = mocker.patch('altaudit.processing._serialize_azerite')
     mock_serialize_gems = mocker.patch('altaudit.processing._serialize_gems')
     mock_get_snapshots = mocker.patch('altaudit.processing._get_snapshots')
@@ -300,6 +273,7 @@ def test_serialzie(mocker):
     result = serialize(jack)
 
     assert result == ['jack', 'us', 'kiljaeden']
-    mock_serialize_azerite.assert_called_once()
-    mock_serialize_gems.assert_called_once()
-    mock_get_snapshots.assert_called_once()
+    mock_update_snapshots.assert_called_once_with(jack)
+    mock_serialize_azerite.assert_called_once_with(jack)
+    mock_serialize_gems.assert_called_once_with(jack)
+    mock_get_snapshots.assert_called_once_with(jack)

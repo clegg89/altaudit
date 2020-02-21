@@ -55,4 +55,4 @@ if __name__ == '__main__':
             yaml.dump(config, f)
 
     except:
-        logger.exception(traceback.format_exc())
+        logger.exception("Error updating character")

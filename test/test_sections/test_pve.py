@@ -103,7 +103,7 @@ def test_weekly_event_not_done():
 
     assert jack.weekly_event_done == 'FALSE'
 
-def test_dungeons_statistics_only():
+def test_dungeons():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
@@ -297,4 +297,43 @@ def test_raids_all_boss_difficulties(bfa_raids):
     assert jack.raids_heroic == '8|7|6|5|4|3|2|1|9|8|7|6|5|4|3|2|1|2|1|8|7|6|5|4|3|2|1'
     assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|1|1|1|1|1|1|1'
     assert jack.raids_mythic == '1|0|0|0|0|0|0|0|9|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_expac_missing():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'id' : 14807, 'sub_categories' : []}]}}
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 0
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_category_missing():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : []}}
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 0
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'

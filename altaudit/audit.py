@@ -166,8 +166,7 @@ class Audit:
                     process_raiderio(character, rio_resp)
                     session.commit()
                 except:
-                    logger.error("%s Failed", character.name)
-                    logger.exception(traceback.format_exc())
+                    logger.exception("%s Failed", character.name)
                     session.rollback()
                 finally:
                     output.append(serialize(character))

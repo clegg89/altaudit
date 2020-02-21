@@ -55,4 +55,4 @@ if __name__ == '__main__':
         logger.info("Complete")
 
     except:
-        logger.exception(traceback.format_exc())
+        logger.exception("Error in refresh")

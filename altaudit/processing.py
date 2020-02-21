@@ -84,10 +84,6 @@ def process_blizzard(character, profile, db_session, api, force_refresh):
         for section in sections:
             section(character, profile, db_session, api)
 
-
-    # always update snapshots as we may go weeks without playing a character
-    _update_snapshots(character)
-
 def process_raiderio(character, response):
     """
     Processes the response from raider.io API for this character
@@ -102,6 +98,7 @@ def process_raiderio(character, response):
         raiderio(character, response.json())
 
 def serialize(character):
+    _update_snapshots(character)
     _serialize_azerite(character)
     _serialize_gems(character)
     _get_snapshots(character)
