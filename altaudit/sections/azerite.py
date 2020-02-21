@@ -4,14 +4,22 @@ from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from ..models import AzeriteTrait, AZERITE_ITEM_SLOTS, AZERITE_TIERS
 
 def azerite(character, profile, db_session, api):
+    """
+    Azerite item information. Default to not failing on
+    anything except equipped_items not being present
+    """
     # TODO make a Item->Trait table so we can avoid always querying the API
     equipment = profile['equipment']['equipped_items']
 
     neck = next((item for item in equipment if item['slot']['type'] == 'NECK'), None)
 
     if neck and neck['name'] == 'Heart of Azeroth':
-        character.hoa_level = neck['azerite_details']['level']['value']
-        character.azerite_percentage = neck['azerite_details']['percentage_to_next_level']
+        try:
+            character.hoa_level = neck['azerite_details']['level']['value']
+            character.azerite_percentage = neck['azerite_details']['percentage_to_next_level']
+        except KeyError:
+            character.hoa_level = None
+            character.azerite_percentage = None
 
     for slot in AZERITE_ITEM_SLOTS:
         azerite_item = next((item for item in equipment if item['slot']['type'].lower() == slot), None)

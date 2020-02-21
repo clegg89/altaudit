@@ -6,6 +6,10 @@ from ..models import ITEM_SLOTS
 from .utility import is_off_hand_weapon
 
 def items(character, profile, db_session, api):
+    """
+    Get basic item info. If equipped_items is missing, just fail.
+    I don't think there would be any reasonable case where that would happen
+    """
     equipped_items = profile['equipment']['equipped_items']
     ilevels = {slot : 0 for slot in ITEM_SLOTS}
 

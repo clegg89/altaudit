@@ -214,6 +214,29 @@ def test_hoa_info_non_hoa_neck():
     assert jack.hoa_level == None
     assert jack.azerite_percentage == None
 
+def test_hoa_info_hoa_no_azerite_details():
+    # Not sure how patch 9.0 will go. Be safe
+    jack = Character('jack')
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'name' : 'Heart of Azeroth',
+                'slot' : { 'type' : 'NECK' }}]}}
+    Section.azerite(jack, response, None, None)
+    assert jack.hoa_level == None
+    assert jack.azerite_percentage == None
+
+def test_hoa_info_hoa_no_level():
+    # Not sure how patch 9.0 will go. Be safe
+    jack = Character('jack')
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'name' : 'Heart of Azeroth',
+                'slot' : { 'type' : 'NECK' },
+                'azerite_details' : {'percentage_to_next_level' : 0.52}}]}}
+    Section.azerite(jack, response, None, None)
+    assert jack.hoa_level == None
+    assert jack.azerite_percentage == None
+
 def test_azerite_item_in_db(db_session, mock_api):
     warlock = db_session.query(Class).filter_by(name='Warlock').first()
     jack = Character('jack', character_class=warlock)
