@@ -157,6 +157,13 @@ def test_basic_info_mainspec(fake_response_maker, db_session):
     Section.basic(jack, response, db_session, None)
     assert jack.mainspec == 'Shadow'
 
+def test_basic_info_mainspec_not_present(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker()
+    del response['summary']['active_spec']
+    Section.basic(jack, response, db_session, None)
+    assert jack.mainspec == None
+
 def test_basic_info_realm(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(realm="Zin'azshara")
