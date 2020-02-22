@@ -15,7 +15,10 @@ def items(character, profile, db_session, api):
 
     for item in equipped_items:
         slot = item['slot']['type'].lower()
-        ilevels[slot] = item['level']['value']
+        try:
+            ilevels[slot] = item['level']['value']
+        except KeyError:
+            ilevels[slot] = 0
         _item(character, slot, item)
 
     if ilevels['off_hand'] == 0 and not is_off_hand_weapon(profile):
@@ -26,7 +29,10 @@ def items(character, profile, db_session, api):
     character.estimated_ilvl = equipped_ilvl
 
 def _item(character, slot, item):
-    setattr(character, '{}_itemLevel'.format(slot), item['level']['value'])
+    try:
+        setattr(character, '{}_itemLevel'.format(slot), item['level']['value'])
+    except KeyError:
+        setattr(character, '{}_itemLevel'.format(slot), 0)
     setattr(character, '{}_id'.format(slot), item['item']['id'])
     setattr(character, '{}_name'.format(slot), item['name'])
     setattr(character, '{}_quality'.format(slot), item['quality']['name'])

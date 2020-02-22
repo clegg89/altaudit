@@ -16,7 +16,8 @@ def _serialize_azerite(character):
             selected = getattr(character, '_{}_tier{}_selected'.format(slot, tier))
             selected = str(selected) if selected else None
             setattr(character, '{}_tier{}_selected'.format(slot, tier), selected)
-            available = '|'.join([str(x) for x in getattr(character, '_{}_tier{}_available'.format(slot, tier))])
+            available = getattr(character, '_{}_tier{}_available'.format(slot, tier))
+            available = '|'.join([str(x) for x in available]) if available else None
             setattr(character, '{}_tier{}_available'.format(slot, tier), available)
 
 def _serialize_gems(character):

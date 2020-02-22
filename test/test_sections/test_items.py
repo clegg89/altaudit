@@ -85,3 +85,23 @@ def test_items_missing_item(default_items_response):
     assert jack.finger_1_id == None
     assert jack.finger_1_name == None
     assert jack.finger_1_quality == None
+
+def test_items_missing_ilevel_is_zero(default_items_response):
+    jack = Character('jack')
+    del default_items_response['equipment']['equipped_items'][0]['level']
+
+    Section.items(jack, default_items_response, None, None)
+    assert jack.head_itemLevel == 0
+    assert jack.head_id == 165822
+    assert jack.head_name == 'Cowl of Tideborne Omens'
+    assert jack.head_quality == 'Epic'
+
+def test_items_missing_ilevel_value_is_zero(default_items_response):
+    jack = Character('jack')
+    del default_items_response['equipment']['equipped_items'][0]['level']['value']
+
+    Section.items(jack, default_items_response, None, None)
+    assert jack.head_itemLevel == 0
+    assert jack.head_id == 165822
+    assert jack.head_name == 'Cowl of Tideborne Omens'
+    assert jack.head_quality == 'Epic'

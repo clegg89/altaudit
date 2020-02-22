@@ -1,5 +1,7 @@
 """Pull Azerite Data from API Response"""
 
+from wowapi import WowApiException
+
 from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from ..models import AzeriteTrait, AZERITE_ITEM_SLOTS, AZERITE_TIERS
 
@@ -28,33 +30,59 @@ def azerite(character, profile, db_session, api):
 
 def _azerite_item(character, item, db_session, api):
     slot = item['slot']['type'].lower()
-    item_traits = item['azerite_details']['selected_powers']
 
     for tier in range(AZERITE_TIERS):
         setattr(character, '_{}_tier{}_selected'.format(slot, tier), None)
         setattr(character, '_{}_tier{}_available'.format(slot, tier), [])
 
+    try:
+        item_traits = item['azerite_details']['selected_powers']
+    except (KeyError, TypeError):
+        item_traits = None
+
+    if item_traits:
+        for trait in item_traits:
+            tier = trait['tier']
+            trait_model = _selected_trait(trait, db_session)
+            setattr(character, '_{}_tier{}_selected'.format(slot, tier), trait_model)
+
     all_traits = _item_traits(item, character, api)
 
     if all_traits:
         for trait in all_traits:
-            tier = trait['tier']
-            trait_model = _trait(trait, db_session, api)
-            getattr(character, '_{}_tier{}_available'.format(slot, tier)).append(trait_model)
-            # This will search 'item_traits' for a trait where its id matches this trait's id
-            if next((t for t in item_traits if t['id'] == trait['id']), None):
-                setattr(character, '_{}_tier{}_selected'.format(slot, tier), trait_model)
+            if trait and 'tier' in trait:
+                tier = trait['tier']
+                trait_model = _trait(trait, db_session)
+                getattr(character, '_{}_tier{}_available'.format(slot, tier)).append(trait_model)
 
 def _item_traits(item, character, api):
-    return next((traits['powers'] for traits in api.get_data_resource('{}&locale={}'.format(item['item']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)['azerite_class_powers'] if traits['playable_class']['name'] == character.class_name), None)
+    try:
+        return next((traits['powers'] for traits in api.get_data_resource('{}&locale={}'.format(item['item']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)['azerite_class_powers'] if traits['playable_class']['name'] == character.class_name), None)
+    except (KeyError, WowApiException):
+        return None
 
-def _trait(trait, db_session, api):
+def _trait(trait, db_session):
+    try:
+        model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
+
+        if not model:
+            # Spell API not working
+            # This is only useful to get the icon
+            # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
+            model = AzeriteTrait(trait['id'], trait['spell']['id'], trait['spell']['name'], None)
+
+        return model
+
+    except KeyError:
+        return None
+
+def _selected_trait(trait, db_session):
     model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
 
     if not model:
         # Spell API not working
         # This is only useful to get the icon
         # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
-        model = AzeriteTrait(trait['id'], trait['spell']['id'], trait['spell']['name'], None)
+        model = AzeriteTrait(trait['id'], trait['spell_tooltip']['spell']['id'], trait['spell_tooltip']['spell']['name'], None)
 
     return model
