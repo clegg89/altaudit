@@ -244,3 +244,11 @@ def test_reputation_rustbolt_resistance_horde():
     Section.reputations(jack, response, None, None)
 
     assert jack.reputations.split('|')[7] == "2391+Rustbolt Resistance+Revered+57+21000"
+
+def test_reputation_no_dictionary():
+    jack = Character('jack', faction_name='Horde')
+    response = { 'reputations' : None }
+
+    Section.reputations(jack, response, None, None)
+
+    assert jack.reputations == None
