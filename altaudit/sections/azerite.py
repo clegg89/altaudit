@@ -40,28 +40,59 @@ def _azerite_item(character, item, db_session, api):
     except (KeyError, TypeError):
         item_traits = None
 
-    if item_traits:
-        for trait in item_traits:
-            tier = trait['tier']
-            trait_model = _selected_trait(trait, db_session)
-            setattr(character, '_{}_tier{}_selected'.format(slot, tier), trait_model)
+    all_traits = _get_all_traits(item, character, api)
 
-    all_traits = _item_traits(item, character, api)
+    # if item_traits:
+    #     for trait in item_traits:
+    #         if trait and 'tier' in trait:
+    #             tier = trait['tier']
+    #             trait_model = _selected_trait(trait, db_session)
+    #             setattr(character, '_{}_tier{}_selected'.format(slot, tier), trait_model)
 
     if all_traits:
         for trait in all_traits:
             if trait and 'tier' in trait:
                 tier = trait['tier']
-                trait_model = _trait(trait, db_session)
+                trait_model = _available_trait(trait, db_session)
                 getattr(character, '_{}_tier{}_available'.format(slot, tier)).append(trait_model)
 
-def _item_traits(item, character, api):
+    _action_per_trait(item_traits, db_session,
+            lambda trait: trait['spell_tooltip']['spell'],
+            lambda tier, model: setattr(character, '_{}_tier{}_selected'.format(slot, tier), model))
+
+def _get_all_traits(item, character, api):
     try:
         return next((traits['powers'] for traits in api.get_data_resource('{}&locale={}'.format(item['item']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)['azerite_class_powers'] if traits['playable_class']['name'] == character.class_name), None)
     except (KeyError, WowApiException):
         return None
 
-def _trait(trait, db_session):
+def _action_per_trait(traits, db_session, spell_lookup, action):
+    if traits:
+        for trait in traits:
+            if trait and 'tier' in trait:
+                tier = trait['tier']
+                try:
+                    trait_model = _trait(trait, db_session, spell_lookup(trait))
+                except KeyError:
+                    trait_model = None
+                action(tier, trait_model)
+
+def _trait(trait, db_session, spell):
+    try:
+        model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
+
+        if not model:
+            # Spell API not working
+            # This is only useful to get the icon
+            # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
+            model = AzeriteTrait(trait['id'], spell['id'], spell['name'], None)
+
+        return model
+
+    except KeyError:
+        return None
+
+def _available_trait(trait, db_session):
     try:
         model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
 
@@ -77,12 +108,16 @@ def _trait(trait, db_session):
         return None
 
 def _selected_trait(trait, db_session):
-    model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
+    try:
+        model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
 
-    if not model:
-        # Spell API not working
-        # This is only useful to get the icon
-        # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
-        model = AzeriteTrait(trait['id'], trait['spell_tooltip']['spell']['id'], trait['spell_tooltip']['spell']['name'], None)
+        if not model:
+            # Spell API not working
+            # This is only useful to get the icon
+            # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
+            model = AzeriteTrait(trait['id'], trait['spell_tooltip']['spell']['id'], trait['spell_tooltip']['spell']['name'], None)
 
-    return model
+        return model
+
+    except KeyError:
+        return None

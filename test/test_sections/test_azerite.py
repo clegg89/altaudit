@@ -353,7 +353,7 @@ def test_azerite_item_wow_api_exception(db_session, mock_api):
     assert jack._head_tier0_selected.icon == None
     assert jack._head_tier0_available == []
 
-def test_azerite_item_item_is_illformed(db_session, mock_api):
+def test_azerite_item_available_item_is_illformed(db_session, mock_api):
     del mock_api.get_data_resource.return_value['azerite_class_powers']
     warlock = db_session.query(Class).filter_by(name='Warlock').first()
     jack = Character('jack', character_class=warlock)
@@ -371,7 +371,7 @@ def test_azerite_item_item_is_illformed(db_session, mock_api):
     assert jack._head_tier0_selected.icon == None
     assert jack._head_tier0_available == []
 
-def test_azerite_item_trait_id_is_missing(db_session, mock_api):
+def test_azerite_item_trait_available_id_is_missing(db_session, mock_api):
     del mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers'][0]['id']
     warlock = db_session.query(Class).filter_by(name='Warlock').first()
     jack = Character('jack', character_class=warlock)
@@ -389,7 +389,27 @@ def test_azerite_item_trait_id_is_missing(db_session, mock_api):
     assert jack._head_tier0_selected.icon == None
     assert jack._head_tier3_available[0] == None
 
-def test_azerite_item_trait_tier_is_missing(db_session, mock_api):
+def test_azerite_item_trait_available_spell_is_missing(db_session, mock_api):
+    mock_api.get_data_resource.return_value = { 'azerite_class_powers' :
+            copy.deepcopy(fake_azerite_item_class_powers_not_in_db) }
+    del mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers'][0]['spell']
+    warlock = db_session.query(Class).filter_by(name='Warlock').first()
+    jack = Character('jack', character_class=warlock)
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'item' : {'key':{'href' : 'garbage'}},
+                'slot' : { 'type' : 'HEAD' },
+                'azerite_details' : {
+                    'selected_powers' : fake_azerite_item_traits_not_in_db }}]}}
+    Section.azerite(jack, response, db_session, mock_api)
+
+    assert jack._head_tier0_selected.id == 13
+    assert jack._head_tier0_selected.spell_id == 263978
+    assert jack._head_tier0_selected.name == 'Azerite Empowered'
+    assert jack._head_tier0_selected.icon == None
+    assert jack._head_tier3_available[0] == None
+
+def test_azerite_item_trait_available_tier_is_missing(db_session, mock_api):
     del mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers'][0]['tier']
     warlock = db_session.query(Class).filter_by(name='Warlock').first()
     jack = Character('jack', character_class=warlock)
@@ -407,7 +427,7 @@ def test_azerite_item_trait_tier_is_missing(db_session, mock_api):
     assert jack._head_tier0_selected.icon == None
     assert len(jack._head_tier3_available) == 3
 
-def test_azerite_item_trait_is_None(db_session, mock_api):
+def test_azerite_item_trait_available_is_None(db_session, mock_api):
     mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers'][0] = None
     warlock = db_session.query(Class).filter_by(name='Warlock').first()
     jack = Character('jack', character_class=warlock)
@@ -424,3 +444,63 @@ def test_azerite_item_trait_is_None(db_session, mock_api):
     assert jack._head_tier0_selected.name == 'Azerite Empowered'
     assert jack._head_tier0_selected.icon == None
     assert len(jack._head_tier3_available) == 3
+
+def test_azerite_item_trait_selected_id_is_missing(db_session, mock_api):
+    warlock = db_session.query(Class).filter_by(name='Warlock').first()
+    bad_selected = copy.deepcopy(fake_azerite_item_traits_in_db)
+    del bad_selected[0]['id']
+    jack = Character('jack', character_class=warlock)
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'item' : {'key':{'href' : 'garbage'}},
+                'slot' : { 'type' : 'HEAD' },
+                'azerite_details' : {
+                    'selected_powers' : bad_selected }}]}}
+    Section.azerite(jack, response, db_session, mock_api)
+
+    assert jack._head_tier0_selected == None
+
+def test_azerite_item_trait_selected_spelltooltip_is_missing(db_session, mock_api):
+    warlock = db_session.query(Class).filter_by(name='Warlock').first()
+    bad_selected = copy.deepcopy(fake_azerite_item_traits_not_in_db)
+    del bad_selected[1]['spell_tooltip']
+    jack = Character('jack', character_class=warlock)
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'item' : {'key':{'href' : 'garbage'}},
+                'slot' : { 'type' : 'HEAD' },
+                'azerite_details' : {
+                    'selected_powers' : bad_selected }}]}}
+    Section.azerite(jack, response, db_session, mock_api)
+
+    assert jack._head_tier1_selected == None
+
+def test_azerite_item_trait_selected_tier_is_missing(db_session, mock_api):
+    warlock = db_session.query(Class).filter_by(name='Warlock').first()
+    bad_selected = copy.deepcopy(fake_azerite_item_traits_not_in_db)
+    del bad_selected[1]['tier']
+    jack = Character('jack', character_class=warlock)
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'item' : {'key':{'href' : 'garbage'}},
+                'slot' : { 'type' : 'HEAD' },
+                'azerite_details' : {
+                    'selected_powers' : bad_selected }}]}}
+    Section.azerite(jack, response, db_session, mock_api)
+
+    assert jack._head_tier1_selected == None
+
+def test_azerite_item_trait_selected_is_None(db_session, mock_api):
+    warlock = db_session.query(Class).filter_by(name='Warlock').first()
+    bad_selected = copy.deepcopy(fake_azerite_item_traits_not_in_db)
+    bad_selected[0] = None
+    jack = Character('jack', character_class=warlock)
+    response = { 'equipment' :
+            { 'equipped_items' : [{
+                'item' : {'key':{'href' : 'garbage'}},
+                'slot' : { 'type' : 'HEAD' },
+                'azerite_details' : {
+                    'selected_powers' : bad_selected }}]}}
+    Section.azerite(jack, response, db_session, mock_api)
+
+    assert jack._head_tier0_selected == None
