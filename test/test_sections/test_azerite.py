@@ -186,6 +186,8 @@ def mock_api(mocker):
 
     return mock
 
+# TODO assert ALL AZERITE TRAITS in appropriate tests
+
 def test_hoa_info():
     jack = Character('jack')
     response = { 'equipment' :

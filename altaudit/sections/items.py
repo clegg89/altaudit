@@ -32,7 +32,16 @@ def _item(character, slot, item):
     try:
         setattr(character, '{}_itemLevel'.format(slot), item['level']['value'])
     except KeyError:
-        setattr(character, '{}_itemLevel'.format(slot), 0)
-    setattr(character, '{}_id'.format(slot), item['item']['id'])
-    setattr(character, '{}_name'.format(slot), item['name'])
-    setattr(character, '{}_quality'.format(slot), item['quality']['name'])
+        setattr(character, '{}_itemLevel'.format(slot), None)
+    try:
+        setattr(character, '{}_id'.format(slot), item['item']['id'])
+    except KeyError:
+        setattr(character, '{}_id'.format(slot), None)
+    try:
+        setattr(character, '{}_name'.format(slot), item['name'])
+    except KeyError:
+        setattr(character, '{}_name'.format(slot), None)
+    try:
+        setattr(character, '{}_quality'.format(slot), item['quality']['name'])
+    except KeyError:
+        setattr(character, '{}_quality'.format(slot), None)
