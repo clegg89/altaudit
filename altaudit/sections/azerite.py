@@ -42,23 +42,13 @@ def _azerite_item(character, item, db_session, api):
 
     all_traits = _get_all_traits(item, character, api)
 
-    # if item_traits:
-    #     for trait in item_traits:
-    #         if trait and 'tier' in trait:
-    #             tier = trait['tier']
-    #             trait_model = _selected_trait(trait, db_session)
-    #             setattr(character, '_{}_tier{}_selected'.format(slot, tier), trait_model)
-
-    if all_traits:
-        for trait in all_traits:
-            if trait and 'tier' in trait:
-                tier = trait['tier']
-                trait_model = _available_trait(trait, db_session)
-                getattr(character, '_{}_tier{}_available'.format(slot, tier)).append(trait_model)
-
     _action_per_trait(item_traits, db_session,
             lambda trait: trait['spell_tooltip']['spell'],
             lambda tier, model: setattr(character, '_{}_tier{}_selected'.format(slot, tier), model))
+
+    _action_per_trait(all_traits, db_session,
+            lambda trait: trait['spell'],
+            lambda tier, model: getattr(character, '_{}_tier{}_available'.format(slot, tier)).append(model))
 
 def _get_all_traits(item, character, api):
     try:
@@ -71,13 +61,10 @@ def _action_per_trait(traits, db_session, spell_lookup, action):
         for trait in traits:
             if trait and 'tier' in trait:
                 tier = trait['tier']
-                try:
-                    trait_model = _trait(trait, db_session, spell_lookup(trait))
-                except KeyError:
-                    trait_model = None
+                trait_model = _trait(trait, db_session, spell_lookup)
                 action(tier, trait_model)
 
-def _trait(trait, db_session, spell):
+def _trait(trait, db_session, spell_lookup):
     try:
         model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
 
@@ -85,37 +72,8 @@ def _trait(trait, db_session, spell):
             # Spell API not working
             # This is only useful to get the icon
             # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
+            spell = spell_lookup(trait)
             model = AzeriteTrait(trait['id'], spell['id'], spell['name'], None)
-
-        return model
-
-    except KeyError:
-        return None
-
-def _available_trait(trait, db_session):
-    try:
-        model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
-
-        if not model:
-            # Spell API not working
-            # This is only useful to get the icon
-            # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
-            model = AzeriteTrait(trait['id'], trait['spell']['id'], trait['spell']['name'], None)
-
-        return model
-
-    except KeyError:
-        return None
-
-def _selected_trait(trait, db_session):
-    try:
-        model = db_session.query(AzeriteTrait).filter_by(id=trait['id']).first()
-
-        if not model:
-            # Spell API not working
-            # This is only useful to get the icon
-            # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
-            model = AzeriteTrait(trait['id'], trait['spell_tooltip']['spell']['id'], trait['spell_tooltip']['spell']['name'], None)
 
         return model
 
