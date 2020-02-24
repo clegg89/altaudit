@@ -70,8 +70,9 @@ def pve(character, profile, db_session, api):
     _raids(character, bfa_instances)
 
 def _island_expeditions(character, profile):
-    if profile['quests_completed']:
-        weekly_islands = next((quest for quest in profile['quests_completed']['quests'] if quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
+    if profile['quests_completed'] and 'quests' in profile['quests_completed']:
+        weekly_islands = next((quest for quest in profile['quests_completed']['quests']
+            if 'id' in quest and quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
         character.island_weekly_done = "TRUE" if weekly_islands else "FALSE"
     else:
         character.island_weekly_done = "FALSE"
@@ -97,9 +98,10 @@ def _world_quests(character, profile):
 
 def _weekly_event(character, profile):
     character.weekly_event_done = 'FALSE'
-    if profile['quests_completed']:
+    if profile['quests_completed'] and 'quests' in profile['quests_completed']:
         for event_quest_id in WEEKLY_EVENT_QUESTS:
-            completed_quest = next((quest for quest in profile['quests_completed']['quests'] if quest['id'] == event_quest_id), None)
+            completed_quest = next((quest for quest in profile['quests_completed']['quests']
+                if 'id' in quest and quest['id'] == event_quest_id), None)
             if completed_quest:
                 character.weekly_event_done = 'TRUE'
                 break
