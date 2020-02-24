@@ -2,6 +2,7 @@
 import pytest
 
 import datetime
+import copy
 
 from altaudit.models import Region, Realm, Character
 from altaudit.utility import Utility
@@ -18,6 +19,182 @@ def test_pve_quests_missing():
 
     assert jack.island_weekly_done == 'FALSE'
     assert jack.weekly_event_done == 'FALSE'
+
+def test_pve_quests_key_missing():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'garbage' : 'More garbage' },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.island_weekly_done == 'FALSE'
+    assert jack.weekly_event_done == 'FALSE'
+
+def test_pve_quests_missing_id():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [{'garbage' : 53436}] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.island_weekly_done == 'FALSE'
+    assert jack.weekly_event_done == 'FALSE'
+
+def test_pve_empty_achievements():
+    jack = Character('jack')
+    response = { 'achievements' : None,
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : None}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 20
+    assert jack.world_quests_total == 30
+
+def test_pve_achievements_key_missing():
+    jack = Character('jack')
+    response = { 'achievements' : {'garbage' : 'some more garbage'},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 20
+    assert jack.world_quests_total == 30
+
+def test_pve_achievements_missing_id():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [
+                {'criteria' : {'child_criteria' : [{'amount' : 10}]}},
+                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
+                {'criteria' : {'child_criteria' : [{'amount' : 40}]}}]},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 30
+    assert jack.world_quests_total == 30
+
+def test_pve_achievements_missing_id_old_value_greater_than_new():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [
+                {'criteria' : {'child_criteria' : [{'amount' : 10}]}},
+                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
+                {'criteria' : {'child_criteria' : [{'amount' : 40}]}}]},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 40
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 40
+    assert jack.world_quests_total == 30
+
+def test_pve_achivements_missing_criteria_islands_value_is_lower():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [
+                {'id' : 12596, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
+                {'id' : 12597},
+                {'id' : 11127}]},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 30
+    assert jack.world_quests_total == 30
+
+def test_pve_achivements_missing_criteria_islands_value_is_greater():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [
+                {'id' : 12596, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
+                {'id' : 12597},
+                {'id' : 11127}]},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 20
+    assert jack.world_quests_total == 30
+
+def test_pve_achievements_criteria_missing_child_criteria_islands_value_is_lesser():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [
+                {'id' : 12596, 'criteria' : None},
+                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
+                {'id' : 11127, 'criteria' : {'garbage' : 123}}]},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 30
+    assert jack.world_quests_total == 30
+
+def test_pve_achievements_criteria_missing_child_criteria_islands_value_is_greater():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [
+                {'id' : 12596, 'criteria' : None},
+                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
+                {'id' : 11127, 'criteria' : {'garbage' : 123}}]},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 20
+    assert jack.world_quests_total == 30
+
+def test_pve_achievements_criteria_missing_amount_islands_value_is_lesser():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [
+                {'id' : 12596, 'criteria' : {'child_criteria' : [{'garbage' : 10}]}},
+                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
+                {'id' : 11127, 'criteria' : {'child_criteria' : [{'garbage' : 20}]}}]},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 30
+    assert jack.world_quests_total == 30
+
+def test_pve_achievements_criteria_missing_amount_islands_value_is_greater():
+    jack = Character('jack')
+    response = { 'achievements' : { 'achievements' : [
+                {'id' : 12596, 'criteria' : {'child_criteria' : [{'garbage' : 10}]}},
+                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
+                {'id' : 11127, 'criteria' : {'child_criteria' : [{'garbage' : 20}]}}]},
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+    jack.islands_total = 20
+    jack.world_quests_total = 30
+
+    Section.pve(jack, response, None, None)
+
+    assert jack.islands_total == 20
+    assert jack.world_quests_total == 30
 
 def test_islands_weekly_quest_done():
     jack = Character('jack')
@@ -73,6 +250,7 @@ def test_world_quests_total():
     assert jack.world_quests_total == 20
 
 def test_world_quests_not_present_zero():
+    # Necessary since world quests are part of snapshots
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
@@ -366,4 +544,217 @@ def test_dungeons_and_raids_statistics_missing():
     assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_missing_sub_category():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 8)
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'id' : 14807}]}}
+
+    Utility.set_refresh_timestamp(now)
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 0
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_missing_category_id(bfa_raids):
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 8)
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'sub_categories' : [
+                    {'id' : 15409, 'statistics' : [
+                        {'id' : 12749, 'quantity' : 4},
+                        {'id' : 12752, 'quantity' : 5},
+                        {'id' : 12763, 'quantity' : 6},
+                        {'id' : 12779, 'quantity' : 7},
+                        {'id' : 12768, 'quantity' : 8},
+                        {'id' : 12773, 'quantity' : 9},
+                        {'id' : 12776, 'quantity' : 10},
+                        {'id' : 12782, 'quantity' : 11},
+                        {'id' : 12745, 'quantity' : 12},
+                        {'id' : 12785, 'quantity' : 13},
+                        {'id' : 13620, 'quantity' : 14},
+                        {'id' : 15409, 'statistics' : bfa_raids}]}]}]}}
+
+    Utility.set_refresh_timestamp(now)
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 0
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_missing_sub_category_id(bfa_raids):
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 8)
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'id' : 14807, 'sub_categories' : [
+                    {'statistics' : [
+                        {'id' : 12749, 'quantity' : 4},
+                        {'id' : 12752, 'quantity' : 5},
+                        {'id' : 12763, 'quantity' : 6},
+                        {'id' : 12779, 'quantity' : 7},
+                        {'id' : 12768, 'quantity' : 8},
+                        {'id' : 12773, 'quantity' : 9},
+                        {'id' : 12776, 'quantity' : 10},
+                        {'id' : 12782, 'quantity' : 11},
+                        {'id' : 12745, 'quantity' : 12},
+                        {'id' : 12785, 'quantity' : 13},
+                        {'id' : 13620, 'quantity' : 14},
+                        {'id' : 15409, 'statistics' : bfa_raids}]}]}]}}
+
+    Utility.set_refresh_timestamp(now)
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 0
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_missing_sub_category_stats():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 8)
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'id' : 14807, 'sub_categories' : [
+                    {'id' : 15409}]}]}}
+
+    Utility.set_refresh_timestamp(now)
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 0
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_missing_stat_id(bfa_raids):
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 8)
+    bad_bfa_raids = copy.deepcopy(bfa_raids)
+    del bad_bfa_raids[1]['id']
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'id' : 14807, 'sub_categories' : [
+                    {'id' : 15409, 'statistics' : [
+                        {'quantity' : 4},
+                        {'id' : 12752, 'quantity' : 5},
+                        {'id' : 12763, 'quantity' : 6},
+                        {'id' : 12779, 'quantity' : 7},
+                        {'id' : 12768, 'quantity' : 8},
+                        {'id' : 12773, 'quantity' : 9},
+                        {'id' : 12776, 'quantity' : 10},
+                        {'id' : 12782, 'quantity' : 11},
+                        {'id' : 12745, 'quantity' : 12},
+                        {'id' : 12785, 'quantity' : 13},
+                        {'id' : 13620, 'quantity' : 14},
+                        {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}]}}
+
+    Utility.set_refresh_timestamp(now)
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 0
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_dungeons_and_raids_missing_stat_quantity(bfa_raids):
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 8)
+    bad_bfa_raids = copy.deepcopy(bfa_raids)
+    del bad_bfa_raids[1]['quantity']
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'id' : 14807, 'sub_categories' : [
+                    {'id' : 15409, 'statistics' : [
+                        {'id' : 12749},
+                        {'id' : 12752, 'quantity' : 5},
+                        {'id' : 12763, 'quantity' : 6},
+                        {'id' : 12779, 'quantity' : 7},
+                        {'id' : 12768, 'quantity' : 8},
+                        {'id' : 12773, 'quantity' : 9},
+                        {'id' : 12776, 'quantity' : 10},
+                        {'id' : 12782, 'quantity' : 11},
+                        {'id' : 12745, 'quantity' : 12},
+                        {'id' : 12785, 'quantity' : 13},
+                        {'id' : 13620, 'quantity' : 14},
+                        {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}]}}
+
+    Utility.set_refresh_timestamp(now)
+    Section.pve(jack, response, None, None)
+
+    assert jack.dungeons_total == 95
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+5|King's Rest+6|The MOTHERLODE!!+7|Shrine of the Storm+8|Siege of Boralus+9|Temple of Sethraliss+10|Tol Dagor+11|Underrot+12|Waycrest Manor+13|Operation: Mechagon+14"
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|1|1|1|1|1|1|1|1|1|2|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '8|7|6|5|4|3|2|1|9|8|7|6|5|4|3|2|1|2|1|8|7|6|5|4|3|2|1'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|1|1|1|1|1|1|1'
+    assert jack.raids_mythic == '1|0|0|0|0|0|0|0|9|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+
+def test_raids_missing_last_updated_timestamp(bfa_raids):
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 8)
+    bad_bfa_raids = copy.deepcopy(bfa_raids)
+    del bad_bfa_raids[86]['last_updated_timestamp']
+    response = { 'achievements' : { 'achievements' : [] },
+            'quests_completed' : { 'quests' : [] },
+            'achievements_statistics' : { 'statistics' : [
+                {'id' : 14807, 'sub_categories' : [
+                    {'id' : 15409, 'statistics' : [
+                        {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}]}}
+
+    Utility.set_refresh_timestamp(now)
+    Section.pve(jack, response, None, None)
+
+    assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|1|1|1|1|1|1|1|1|1|2|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1'
+    assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '8|7|6|5|4|3|2|1|9|8|7|6|5|4|3|2|1|2|1|8|7|6|5|4|3|2|1'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|1|1|1|1|1|1'
+    assert jack.raids_mythic == '1|0|0|0|0|0|0|0|9|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
