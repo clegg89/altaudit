@@ -58,11 +58,15 @@ def _enchant(character, item):
     # I don't know of any case where there's more than 1 enchant, and our database isn't set up for it
     # anyway. So just grab the first enchant.
     enchant = item['enchantments'][0]
-    enchant_id = enchant['enchantment_id']
+    enchant_id = enchant['enchantment_id'] if 'enchantment_id' in enchant else None
     if 'source_item' in enchant:
         name = re.sub("Enchant [a-zA-Z]+ - ", "", enchant['source_item']['name'])
-    else:
+    elif 'display_string' in enchant:
         name = re.sub("Enchanted: ", "", enchant['display_string'])
+    elif enchant_id in enchant_lookup:
+        name = enchant_lookup[enchant_id]['name']
+    else:
+        name = "None"
 
     setattr(character, '{}_enchant_id'.format(slot), enchant_id)
     setattr(character, '{}_enchant_name'.format(slot), name)

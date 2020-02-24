@@ -230,3 +230,48 @@ def test_audit_no_gems(db_session, mock_api, mock_is_off_hand_weapon):
     Section.audit(jack, response, db_session, mock_api)
 
     assert jack.gems == []
+
+def test_audit_missing_enchant_id(mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'FINGER_1' },
+            'enchantments' : [{
+                'source_item' : { 'name' : 'Enchant Ring - Accord of Haste' }}]}]}}
+
+    Section.audit(jack, response, None, None)
+
+    assert jack.finger_1_enchant_id == None
+    assert jack.finger_1_enchant_quality == 0
+    assert jack.finger_1_enchant_name == "Accord of Haste"
+    assert jack.finger_1_enchant_description == None
+
+def test_audit_missing_enchant_source_item_and_display_string_in_lookup(mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'FINGER_1' },
+            'enchantments' : [{
+                'enchantment_id' : 6109}]}]}}
+
+    Section.audit(jack, response, None, None)
+
+    assert jack.finger_1_enchant_id == 6109
+    assert jack.finger_1_enchant_quality == 4
+    assert jack.finger_1_enchant_name == "Accord of Haste"
+    assert jack.finger_1_enchant_description == '+60 Haste'
+
+def test_audit_missing_enchant_source_item_and_display_string_not_in_lookup(mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'FINGER_1' },
+            'enchantments' : [{
+                'enchantment_id' : 3000}]}]}}
+
+    Section.audit(jack, response, None, None)
+
+    assert jack.finger_1_enchant_id == 3000
+    assert jack.finger_1_enchant_quality == 0
+    assert jack.finger_1_enchant_name == "None"
+    assert jack.finger_1_enchant_description == None

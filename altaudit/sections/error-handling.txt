@@ -27,7 +27,4 @@ result in values of None being placed in the respective field.
 
 Audit
 
-Similar to Items, only missing 'equipped_items' or missing slot should trigger an exception.
-Similar to Items, only missing 'equipped_items' should trigger an exception. Missing enchants are already accounted
-for and common. Missing names on enchants should result in string of "Unknown". Missing enchant ID should result in
-ID of None, name of "Unknown", quality of 1 and icon of None.
+Missing items, missing slot, or missing inventory type will trigger error. 
