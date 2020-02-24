@@ -28,7 +28,9 @@ def audit(character, profile, db_session, api):
                     character.empty_sockets += 1
                     # Here is where we would note the slot of the item
                 else:
-                    character.gems.append(GemSlotAssociation(item['slot']['type'].lower(), _gem(socket, db_session)))
+                    gem = _gem(socket, db_session)
+                    if gem:
+                        character.gems.append(GemSlotAssociation(item['slot']['type'].lower(), _gem(socket, db_session)))
         if item['slot']['type'].lower() in ENCHANTED_ITEM_SLOTS:
             _enchant(character, item)
 
@@ -66,7 +68,7 @@ def _enchant(character, item):
     elif enchant_id in enchant_lookup:
         name = enchant_lookup[enchant_id]['name']
     else:
-        name = "None"
+        name = "Unknown"
 
     setattr(character, '{}_enchant_id'.format(slot), enchant_id)
     setattr(character, '{}_enchant_name'.format(slot), name)
@@ -76,13 +78,20 @@ def _enchant(character, item):
     if enchant_id in enchant_lookup:
         setattr(character, '{}_enchant_quality'.format(slot), enchant_lookup[enchant_id]['quality'])
         setattr(character, '{}_enchant_description'.format(slot), enchant_lookup[enchant_id]['description'])
+    else:
+        setattr(character, '{}_enchant_quality'.format(slot), 1)
 
 def _gem(socket, db_session):
+    if 'id' not in socket['item']:
+        return None
+
     id = socket['item']['id']
     gem_model = db_session.query(Gem).filter_by(id=id).first()
 
     if not gem_model:
+        name = socket['item']['name'] if 'name' in socket['item'] else "Unknown"
+        stat = socket['display_string'] if 'display_string' in socket else "Unknown"
         # If it is not in database, the quality is 1. New API makes getting icon a pain, so ignore
-        gem_model = Gem(id, 1, socket['item']['name'], None, socket['display_string'])
+        gem_model = Gem(id, 1, name, None, stat)
 
     return gem_model

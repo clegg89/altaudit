@@ -97,7 +97,7 @@ def test_audit_item_enchant_not_in_lookup(mock_is_off_hand_weapon):
     Section.audit(jack, response, None, None)
 
     assert jack.finger_1_enchant_id == 3000
-    assert jack.finger_1_enchant_quality == 0
+    assert jack.finger_1_enchant_quality == 1
     assert jack.finger_1_enchant_name == 'Total Garbage'
     assert jack.finger_1_enchant_description == None
 
@@ -196,6 +196,58 @@ def test_audit_gem_in_db(db_session, mock_is_off_hand_weapon):
     assert jack.gems[0].gem.stat == '+30 Critical Strike'
     assert jack.gems[0].slot == 'finger_1'
 
+def test_audit_gem_missing_id(db_session, mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'FINGER_1' },
+            'sockets' : [{
+                'item' : {
+                    'name' : 'Deadly Solstone'},
+                'display_string' : '+30 Critical Strike'}]}]}}
+
+    Section.audit(jack, response, db_session, None)
+
+    assert jack.gems == []
+
+def test_audit_gem_missing_name_not_in_db(db_session, mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'FINGER_1' },
+            'sockets' : [{
+                'item' : {
+                    'id' : 12390},
+                'display_string' : '+20 Bullshit'}]}]}}
+
+    Section.audit(jack, response, db_session, None)
+
+    assert jack.gems[0].gem.id == 12390
+    assert jack.gems[0].gem.quality == 1
+    assert jack.gems[0].gem.name == 'Unknown'
+    assert jack.gems[0].gem.icon == None
+    assert jack.gems[0].gem.stat == '+20 Bullshit'
+    assert jack.gems[0].slot == 'finger_1'
+
+def test_audit_gem_missing_display_string_not_in_db(db_session, mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'FINGER_1' },
+            'sockets' : [{
+                'item' : {
+                    'name' : 'Deadly Stone',
+                    'id' : 12390}}]}]}}
+
+    Section.audit(jack, response, db_session, None)
+
+    assert jack.gems[0].gem.id == 12390
+    assert jack.gems[0].gem.quality == 1
+    assert jack.gems[0].gem.name == 'Deadly Stone'
+    assert jack.gems[0].gem.icon == None
+    assert jack.gems[0].gem.stat == "Unknown"
+    assert jack.gems[0].slot == 'finger_1'
+
 def test_audit_gem_not_in_db(db_session, mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
@@ -242,7 +294,7 @@ def test_audit_missing_enchant_id(mock_is_off_hand_weapon):
     Section.audit(jack, response, None, None)
 
     assert jack.finger_1_enchant_id == None
-    assert jack.finger_1_enchant_quality == 0
+    assert jack.finger_1_enchant_quality == 1
     assert jack.finger_1_enchant_name == "Accord of Haste"
     assert jack.finger_1_enchant_description == None
 
@@ -272,6 +324,6 @@ def test_audit_missing_enchant_source_item_and_display_string_not_in_lookup(mock
     Section.audit(jack, response, None, None)
 
     assert jack.finger_1_enchant_id == 3000
-    assert jack.finger_1_enchant_quality == 0
-    assert jack.finger_1_enchant_name == "None"
+    assert jack.finger_1_enchant_quality == 1
+    assert jack.finger_1_enchant_name == "Unknown"
     assert jack.finger_1_enchant_description == None
