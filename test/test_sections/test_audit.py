@@ -117,8 +117,39 @@ def test_audit_item_enchant_offhand_missing_not_weapon(mock_is_off_hand_weapon):
 def test_audit_item_enchant_offhand_not_enchantable(mock_is_off_hand_weapon):
     jack = Character('jack')
     response = { 'equipment' : {
-        'equipped_items' : []}}
-    mock_is_off_hand_weapon.return_value = False
+        'equipped_items' : [{
+            'slot' : { 'type' : 'OFF_HAND' },
+            'inventory_type' : { 'type' : 'HOLDABLE' }}]}}
+
+    Section.audit(jack, response, None, None)
+
+    assert jack.off_hand_enchant_id == None
+    assert jack.off_hand_enchant_quality == None
+    assert jack.off_hand_enchant_name == None
+    assert jack.off_hand_enchant_description == None
+
+def test_audit_item_enchant_weapon_offhand_is_enchanted(mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'OFF_HAND' },
+            'inventory_type' : { 'type' : 'WEAPON' },
+            'enchantments' : [{
+                'enchantment_id' : 5946,
+                'source_item' : { 'name' : 'Enchant Weapon - Coastal Surge' }}]}]}}
+
+    Section.audit(jack, response, None, None)
+
+    assert jack.off_hand_enchant_id == 5946
+    assert jack.off_hand_enchant_quality == 4
+    assert jack.off_hand_enchant_name == 'Coastal Surge'
+    assert jack.off_hand_enchant_description == "Sometimes cause helpful spells to put a short heal over time effect on the target for 10 sec."
+
+def test_audit_item_enchant_offhand_no_inventory_type_not_enchantable(mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'OFF_HAND' }}]}}
 
     Section.audit(jack, response, None, None)
 
