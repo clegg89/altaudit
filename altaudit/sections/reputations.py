@@ -1,4 +1,5 @@
 """Pull Reputation data from API"""
+import logging
 
 "Faction IDs for Reputations"
 REPUTATION_FACTION_ID = {
@@ -30,19 +31,24 @@ def reputations(character, profile, db_session, api):
     Get reputation data relevant to current expac.
     Don't fail in here
     """
-    reputations = profile['reputations']['reputations']
-    faction = character.faction_name.lower()
+    try:
+        reputations = profile['reputations']['reputations']
+        faction = character.faction_name.lower()
 
-    result = ''
-    for rep in REPUTATION_FACTION_ID[faction]:
-        rep_data = next((d for d in reputations if d['faction']['id'] == rep), None)
-        if rep_data:
-            result += '{}+{}+{}+{}+{}|'.format(rep_data['faction']['id'],
-                    rep_data['faction']['name'],
-                    rep_data['standing']['name'],
-                    rep_data['standing']['value'],
-                    rep_data['standing']['max'])
-        else:
-            result += '++++|'
+        result = ''
+        for rep in REPUTATION_FACTION_ID[faction]:
+            rep_data = next((d for d in reputations if d['faction']['id'] == rep), None)
+            if rep_data:
+                result += '{}+{}+{}+{}+{}|'.format(rep_data['faction']['id'],
+                        rep_data['faction']['name'],
+                        rep_data['standing']['name'],
+                        rep_data['standing']['value'],
+                        rep_data['standing']['max'])
+            else:
+                result += '++++|'
 
-    character.reputations = result[:-1]
+        character.reputations = result[:-1]
+
+    except (TypeError, KeyError):
+        logger = logging.getLogger('altaudit')
+        logger.exception("Error in Reputation for {}".format(character.name))

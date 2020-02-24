@@ -27,4 +27,13 @@ result in values of None being placed in the respective field.
 
 Audit
 
-Missing items, missing slot, or missing inventory type will trigger error. 
+Missing items, missing slot, or missing inventory type will trigger error. Other systems try to recover as much as
+possible.
+
+Reputations
+
+Nothing should fail in this section
+
+PvE
+
+Nothing should fail in this section

@@ -252,3 +252,17 @@ def test_reputation_no_dictionary():
     Section.reputations(jack, response, None, None)
 
     assert jack.reputations == None
+
+def test_reputation_missing_key():
+    jack = Character('jack', faction_name='Horde')
+    response = { 'reputations' : { 'reputations' : [
+        { 'faction' : {
+                'id' : 2391 },
+            'standing' : {
+                'value' : 57,
+                'max' : 21000,
+                'name' : 'Revered'}}]}}
+
+    Section.reputations(jack, response, None, None)
+
+    assert jack.reputations == None
