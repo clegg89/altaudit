@@ -186,8 +186,6 @@ def mock_api(mocker):
 
     return mock
 
-# TODO assert ALL AZERITE TRAITS in appropriate tests
-
 def test_hoa_info():
     jack = Character('jack')
     response = { 'equipment' :
@@ -254,15 +252,16 @@ def test_azerite_item_in_db(db_session, mock_api):
                     'selected_powers' : fake_azerite_item_traits_in_db }}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == None
-    assert jack._head_tier0_available[0].id == 13
-    assert jack._head_tier0_available[0].spell_id == 263978
-    assert jack._head_tier0_available[0].name == 'Azerite Empowered'
-    assert jack._head_tier0_available[0].icon == None
-    assert len(jack._head_tier0_available) == 1
+    for trait in fake_azerite_item_traits_in_db:
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
+    for trait in fake_azerite_item_class_powers_in_db[2]['powers']:
+        found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+            if t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+        assert found
 
 def test_azerite_item_not_in_db(db_session, mock_api):
     mock_api.get_data_resource.return_value = { 'azerite_class_powers' :
@@ -286,17 +285,16 @@ def test_azerite_item_not_in_db(db_session, mock_api):
                     'selected_powers' : fake_azerite_item_traits_not_in_db }}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    # assert mock_api.get_spell.call_count == 16
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == None
-    assert jack._head_tier1_selected.name == 'Longstrider'
-    assert jack._head_tier0_available[0].id == 13
-    assert jack._head_tier0_available[0].spell_id == 263978
-    assert jack._head_tier0_available[0].name == 'Azerite Empowered'
-    assert jack._head_tier0_available[0].icon == None
-    assert len(jack._head_tier0_available) == 1
+    for trait in fake_azerite_item_traits_not_in_db:
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
+    for trait in fake_azerite_item_class_powers_not_in_db[2]['powers']:
+        found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+            if t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+        assert found
 
 def test_azerite_item_no_item():
     jack = Character('jack')
@@ -331,11 +329,15 @@ def test_azerite_item_no_selected_traits(db_session, mock_api):
     Section.azerite(jack, response, db_session, mock_api)
 
     assert jack._head_tier0_selected == None
-    assert jack._head_tier0_available[0].id == 13
-    assert jack._head_tier0_available[0].spell_id == 263978
-    assert jack._head_tier0_available[0].name == 'Azerite Empowered'
-    assert jack._head_tier0_available[0].icon == None
-    assert len(jack._head_tier0_available) == 1
+    assert jack._head_tier1_selected == None
+    assert jack._head_tier2_selected == None
+    assert jack._head_tier3_selected == None
+    assert jack._head_tier4_selected == None
+
+    for trait in fake_azerite_item_class_powers_in_db[2]['powers']:
+        found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+            if t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+        assert found
 
 def test_azerite_item_wow_api_exception(db_session, mock_api):
     mock_api.get_data_resource.side_effect = WowApiException()
@@ -349,10 +351,12 @@ def test_azerite_item_wow_api_exception(db_session, mock_api):
                     'selected_powers' : fake_azerite_item_traits_in_db }}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == None
+    for trait in fake_azerite_item_traits_in_db:
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
     assert jack._head_tier0_available == []
 
 def test_azerite_item_available_item_is_illformed(db_session, mock_api):
@@ -367,10 +371,12 @@ def test_azerite_item_available_item_is_illformed(db_session, mock_api):
                     'selected_powers' : fake_azerite_item_traits_in_db }}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == None
+    for trait in fake_azerite_item_traits_in_db:
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
     assert jack._head_tier0_available == []
 
 def test_azerite_item_trait_available_id_is_missing(db_session, mock_api):
@@ -385,11 +391,18 @@ def test_azerite_item_trait_available_id_is_missing(db_session, mock_api):
                     'selected_powers' : fake_azerite_item_traits_in_db}}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == None
+    for trait in fake_azerite_item_traits_in_db:
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
     assert jack._head_tier3_available[0] == None
+    for i,trait in enumerate(mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers']):
+        if i != 0:
+            found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+                if t and t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+            assert found
 
 def test_azerite_item_trait_available_spell_is_missing(db_session, mock_api):
     mock_api.get_data_resource.return_value = { 'azerite_class_powers' :
@@ -405,11 +418,18 @@ def test_azerite_item_trait_available_spell_is_missing(db_session, mock_api):
                     'selected_powers' : fake_azerite_item_traits_not_in_db }}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == None
+    for trait in fake_azerite_item_traits_not_in_db:
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
     assert jack._head_tier3_available[0] == None
+    for i,trait in enumerate(mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers']):
+        if i != 0:
+            found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+                if t and t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+            assert found
 
 def test_azerite_item_trait_available_tier_is_missing(db_session, mock_api):
     del mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers'][0]['tier']
@@ -423,10 +443,18 @@ def test_azerite_item_trait_available_tier_is_missing(db_session, mock_api):
                     'selected_powers' : fake_azerite_item_traits_in_db}}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == None
+    for trait in fake_azerite_item_traits_in_db:
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
+    for i,trait in enumerate(mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers']):
+        if i != 0:
+            found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+                if t and t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+            assert found
+
     assert len(jack._head_tier3_available) == 3
 
 def test_azerite_item_trait_available_is_None(db_session, mock_api):
@@ -441,10 +469,18 @@ def test_azerite_item_trait_available_is_None(db_session, mock_api):
                     'selected_powers' : fake_azerite_item_traits_not_in_db }}]}}
     Section.azerite(jack, response, db_session, mock_api)
 
-    assert jack._head_tier0_selected.id == 13
-    assert jack._head_tier0_selected.spell_id == 263978
-    assert jack._head_tier0_selected.name == 'Azerite Empowered'
-    assert jack._head_tier0_selected.icon == None
+    for trait in fake_azerite_item_traits_not_in_db:
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+        assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
+    for i,trait in enumerate(mock_api.get_data_resource.return_value['azerite_class_powers'][2]['powers']):
+        if i != 0:
+            found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+                if t and t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+            assert found
+
     assert len(jack._head_tier3_available) == 3
 
 def test_azerite_item_trait_selected_id_is_missing(db_session, mock_api):
@@ -461,6 +497,17 @@ def test_azerite_item_trait_selected_id_is_missing(db_session, mock_api):
     Section.azerite(jack, response, db_session, mock_api)
 
     assert jack._head_tier0_selected == None
+    for i,trait in enumerate(bad_selected):
+        if i != 0:
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
+    for trait in fake_azerite_item_class_powers_in_db[2]['powers']:
+        found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+            if t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+        assert found
 
 def test_azerite_item_trait_selected_spelltooltip_is_missing(db_session, mock_api):
     warlock = db_session.query(Class).filter_by(name='Warlock').first()
@@ -476,6 +523,17 @@ def test_azerite_item_trait_selected_spelltooltip_is_missing(db_session, mock_ap
     Section.azerite(jack, response, db_session, mock_api)
 
     assert jack._head_tier1_selected == None
+    for i,trait in enumerate(bad_selected):
+        if i != 1:
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
+    for trait in fake_azerite_item_class_powers_in_db[2]['powers']:
+        found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+            if t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+        assert found
 
 def test_azerite_item_trait_selected_tier_is_missing(db_session, mock_api):
     warlock = db_session.query(Class).filter_by(name='Warlock').first()
@@ -491,6 +549,17 @@ def test_azerite_item_trait_selected_tier_is_missing(db_session, mock_api):
     Section.azerite(jack, response, db_session, mock_api)
 
     assert jack._head_tier1_selected == None
+    for i,trait in enumerate(bad_selected):
+        if i != 1:
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
+    for trait in fake_azerite_item_class_powers_in_db[2]['powers']:
+        found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+            if t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+        assert found
 
 def test_azerite_item_trait_selected_is_None(db_session, mock_api):
     warlock = db_session.query(Class).filter_by(name='Warlock').first()
@@ -506,3 +575,14 @@ def test_azerite_item_trait_selected_is_None(db_session, mock_api):
     Section.azerite(jack, response, db_session, mock_api)
 
     assert jack._head_tier0_selected == None
+    for i,trait in enumerate(bad_selected):
+        if i != 0:
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).id == trait['id']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).spell_id == trait['spell_tooltip']['spell']['id']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).name == trait['spell_tooltip']['spell']['name']
+            assert getattr(jack, '_head_tier{}_selected'.format(trait['tier'])).icon == None
+
+    for trait in fake_azerite_item_class_powers_in_db[2]['powers']:
+        found = next((t for t in getattr(jack, '_head_tier{}_available'.format(trait['tier']))
+            if t.id == trait['id'] and t.spell_id == trait['spell']['id'] and t.name == trait['spell']['name']), None)
+        assert found
