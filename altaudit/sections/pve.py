@@ -56,11 +56,13 @@ def pve(character, profile, db_session, api):
     # This will throw an exception if the category/subcategory is not found.
     # Is that okay? Does it matter? It shouldn't ever happen...
     # Leave it this way for now. If we start seeing errors here we can change it
-    if profile['achievements_statistics']:
+    try:
         statistics = profile['achievements_statistics']['statistics']
-        dungeon_and_raids = next((category['sub_categories'] for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID), [])
-        bfa_instances = next((sub['statistics'] for sub in dungeon_and_raids if sub['id'] == BATTLE_FOR_AZEROTH_SUBCATEGORY_ID), [])
-    else:
+        dungeon_and_raids = next((category['sub_categories']
+            for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID), [])
+        bfa_instances = next((sub['statistics']
+            for sub in dungeon_and_raids if sub['id'] == BATTLE_FOR_AZEROTH_SUBCATEGORY_ID), [])
+    except (TypeError, KeyError):
         bfa_instances = []
 
     _island_expeditions(character, profile)
@@ -70,11 +72,11 @@ def pve(character, profile, db_session, api):
     _raids(character, bfa_instances)
 
 def _island_expeditions(character, profile):
-    if profile['quests_completed'] and 'quests' in profile['quests_completed']:
+    try:
         weekly_islands = next((quest for quest in profile['quests_completed']['quests']
-            if 'id' in quest and quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
+            if quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
         character.island_weekly_done = "TRUE" if weekly_islands else "FALSE"
-    else:
+    except (TypeError, KeyError):
         character.island_weekly_done = "FALSE"
 
     if profile['achievements'] and 'achievements' in profile['achievements']:
@@ -106,13 +108,15 @@ def _world_quests(character, profile):
 
 def _weekly_event(character, profile):
     character.weekly_event_done = 'FALSE'
-    if profile['quests_completed'] and 'quests' in profile['quests_completed']:
+    try:
         for event_quest_id in WEEKLY_EVENT_QUESTS:
             completed_quest = next((quest for quest in profile['quests_completed']['quests']
-                if 'id' in quest and quest['id'] == event_quest_id), None)
+                if quest['id'] == event_quest_id), None)
             if completed_quest:
                 character.weekly_event_done = 'TRUE'
                 break
+    except (TypeError, KeyError):
+        pass
 
 def _dungeons(character, bfa_instance_stats):
     """
@@ -122,7 +126,11 @@ def _dungeons(character, bfa_instance_stats):
     to determine boss kills. This value is lower than the achievement value. It is
     unclear why, but this isn't exactly an important stat post expac release.
     """
-    dungeon_list = {dungeon : next((int(stat['quantity']) for stat in bfa_instance_stats if stat['id'] == stat_id), 0)
+    dungeon_list = {dungeon : next((int(stat['quantity'])
+        for stat in bfa_instance_stats
+        if 'id' in stat and
+        'quantity' in stat and
+        stat['id'] == stat_id), 0)
             for dungeon,stat_id in MYTHIC_DUNGEON_STATISTIC_IDS.items()}
 
     character.dungeons_total = sum(dungeon_list.values())
@@ -145,7 +153,11 @@ def _raids(character, bfa_instance_stats):
                 # Can only kill a boss 1/week, so set if the stat was updated in the last week
                 1 if (stat['last_updated_timestamp']/1000) > Utility.timestamp[character.region_name] else 0)
             # Loop through all stats in bfa kills, if ID matches, get our tuple. If nothing found (0,0)
-            for stat in bfa_instance_stats if stat['id'] == boss_id), (0,0))
+            for stat in bfa_instance_stats
+            if 'id' in stat and
+            'quantity' in stat and
+            'last_updated_timestamp' in stat and
+            stat['id'] == boss_id), (0,0))
 
     for encounter in encounters:
         # encounter is of the form {'difficulty' : [ids],...}

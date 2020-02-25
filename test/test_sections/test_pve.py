@@ -587,7 +587,7 @@ def test_dungeons_and_raids_missing_category_id(bfa_raids):
                         {'id' : 12745, 'quantity' : 12},
                         {'id' : 12785, 'quantity' : 13},
                         {'id' : 13620, 'quantity' : 14},
-                        {'id' : 15409, 'statistics' : bfa_raids}]}]}]}}
+                        *bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
     Section.pve(jack, response, None, None)
@@ -622,7 +622,7 @@ def test_dungeons_and_raids_missing_sub_category_id(bfa_raids):
                         {'id' : 12745, 'quantity' : 12},
                         {'id' : 12785, 'quantity' : 13},
                         {'id' : 13620, 'quantity' : 14},
-                        {'id' : 15409, 'statistics' : bfa_raids}]}]}]}}
+                        *bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
     Section.pve(jack, response, None, None)
@@ -682,20 +682,20 @@ def test_dungeons_and_raids_missing_stat_id(bfa_raids):
                         {'id' : 12745, 'quantity' : 12},
                         {'id' : 12785, 'quantity' : 13},
                         {'id' : 13620, 'quantity' : 14},
-                        {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}]}}
+                        *bad_bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
     Section.pve(jack, response, None, None)
 
-    assert jack.dungeons_total == 0
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.dungeons_total == 95
+    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+5|King's Rest+6|The MOTHERLODE!!+7|Shrine of the Storm+8|Siege of Boralus+9|Temple of Sethraliss+10|Tol Dagor+11|Underrot+12|Waycrest Manor+13|Operation: Mechagon+14"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
-    assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_normal == '0|1|1|1|1|1|1|1|1|1|2|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1'
     assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
-    assert jack.raids_heroic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
-    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
-    assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
+    assert jack.raids_heroic == '8|7|6|5|4|3|2|1|9|8|7|6|5|4|3|2|1|2|1|8|7|6|5|4|3|2|1'
+    assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|1|1|1|1|1|1|1'
+    assert jack.raids_mythic == '1|0|0|0|0|0|0|0|9|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
 
 def test_dungeons_and_raids_missing_stat_quantity(bfa_raids):
@@ -719,7 +719,7 @@ def test_dungeons_and_raids_missing_stat_quantity(bfa_raids):
                         {'id' : 12745, 'quantity' : 12},
                         {'id' : 12785, 'quantity' : 13},
                         {'id' : 13620, 'quantity' : 14},
-                        {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}]}}
+                        *bad_bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
     Section.pve(jack, response, None, None)
@@ -739,22 +739,22 @@ def test_raids_missing_last_updated_timestamp(bfa_raids):
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 8)
     bad_bfa_raids = copy.deepcopy(bfa_raids)
-    del bad_bfa_raids[86]['last_updated_timestamp']
+    entry_to_alter = next(entry for entry in bad_bfa_raids if entry['id'] == 13589)
+    del entry_to_alter['last_updated_timestamp']
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'statistics' : [
                 {'id' : 14807, 'sub_categories' : [
-                    {'id' : 15409, 'statistics' : [
-                        {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}]}}
+                    {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}}
 
     Utility.set_refresh_timestamp(now)
     Section.pve(jack, response, None, None)
 
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
-    assert jack.raids_normal == '0|1|1|1|1|1|1|1|1|1|2|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1'
+    assert jack.raids_normal == '1|1|1|1|1|1|1|1|1|1|2|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1'
     assert jack.raids_normal_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
-    assert jack.raids_heroic == '8|7|6|5|4|3|2|1|9|8|7|6|5|4|3|2|1|2|1|8|7|6|5|4|3|2|1'
+    assert jack.raids_heroic == '8|7|6|5|4|3|2|1|9|8|7|6|5|4|3|2|1|2|1|0|7|6|5|4|3|2|1'
     assert jack.raids_heroic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|1|1|1|1|1|1'
     assert jack.raids_mythic == '1|0|0|0|0|0|0|0|9|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
