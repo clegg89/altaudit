@@ -14,7 +14,6 @@ import csv
 import datetime
 import time
 import os
-import traceback
 import logging
 
 from altaudit import Audit

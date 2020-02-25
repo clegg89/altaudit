@@ -13,7 +13,6 @@ import yaml
 import csv
 from datetime import datetime
 import os
-import traceback
 import logging
 
 from altaudit import Audit

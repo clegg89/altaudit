@@ -11,7 +11,6 @@ Update a character's name and/or realm
 """
 import yaml
 import sys
-import traceback
 import logging
 
 import altaudit.update as updater
