@@ -184,7 +184,7 @@ def test_pve_achievements_criteria_missing_amount_islands_value_is_greater():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [
                 {'id' : 12596, 'criteria' : {'child_criteria' : [{'garbage' : 10}]}},
-                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
+                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
                 {'id' : 11127, 'criteria' : {'child_criteria' : [{'garbage' : 20}]}}]},
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}

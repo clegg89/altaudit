@@ -80,10 +80,13 @@ def _island_expeditions(character, profile):
     if profile['achievements'] and 'achievements' in profile['achievements']:
         new_total = 0
         achievements = profile['achievements']['achievements']
-        for achievment_id in (PVE_ISLAND_ACHIEVEMENT_ID, PVP_ISLAND_ACHIEVEMENT_ID):
-            achievment = next((achiev for achiev in achievements if 'id' in achiev and achiev['id'] == achievment_id), None)
-            if achievment:
-                new_total += achievment['criteria']['child_criteria'][0]['amount']
+        for achievement_id in (PVE_ISLAND_ACHIEVEMENT_ID, PVP_ISLAND_ACHIEVEMENT_ID):
+            achievement = next((achiev for achiev in achievements if 'id' in achiev and achiev['id'] == achievement_id), None)
+            if achievement:
+                try:
+                    new_total += achievement['criteria']['child_criteria'][0]['amount']
+                except (TypeError, KeyError):
+                    pass
 
         character.islands_total = max(new_total, character.islands_total) if character.islands_total else new_total
 
@@ -92,9 +95,14 @@ def _world_quests(character, profile):
         character.world_quests_total = 0
 
     if profile['achievements'] and 'achievements' in profile['achievements']:
-        character.world_quests_total = next((achiev['criteria']['child_criteria'][0]['amount']
-            for achiev in profile['achievements']['achievements']
-            if 'id' in achiev and achiev['id'] == WORLD_QUESTS_COMPLETED_ACHIEVEMENT_ID), character.world_quests_total)
+        achievement = next((achiev for achiev in profile['achievements']['achievements']
+            if 'id' in achiev and achiev['id'] == WORLD_QUESTS_COMPLETED_ACHIEVEMENT_ID), None)
+
+        if achievement:
+            try:
+                character.world_quests_total = achievement['criteria']['child_criteria'][0]['amount']
+            except (TypeError, KeyError):
+                pass
 
 def _weekly_event(character, profile):
     character.weekly_event_done = 'FALSE'
