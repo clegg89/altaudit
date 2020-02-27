@@ -4,7 +4,6 @@ import pytest
 from unittest.mock import patch
 
 import datetime
-from sqlalchemy.orm import sessionmaker
 
 from altaudit.audit import Audit, RAIDERIO_URL
 from altaudit.utility import Utility
@@ -158,7 +157,7 @@ class TestAuditInit:
 
     @pytest.fixture
     def db_session(self):
-        session = sessionmaker(self.audit.engine)()
+        session = self.audit.make_session()
         yield session
         session.close()
 
@@ -418,7 +417,7 @@ class TestAuditRefresh:
                 Base.metadata.create_all(self.audit.engine)
                 self.audit.setup_database()
 
-        session = sessionmaker(self.audit.engine)()
+        session = self.audit.make_session()
         chars = session.query(Character).all()
 
         for c in chars:

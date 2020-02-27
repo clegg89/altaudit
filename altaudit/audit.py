@@ -37,13 +37,14 @@ class Audit:
                 retry_conn_failures=True)
         self.request_session = requests.Session()
         self.config_characters = config['characters']
+        self.make_session = sessionmaker(self.engine)
 
     def setup_database(self):
         # Tables should be created via alembic, not here, as that will prevent
         # database migrations from working
         # Run 'alembic upgrade head' from command-line to create tables
 
-        session = sessionmaker(self.engine)()
+        session = self.make_session()
 
         try:
             self._create_classes(session)
@@ -145,7 +146,7 @@ class Audit:
         """
         Utility.set_refresh_timestamp(dt.utcnow())
 
-        session = sessionmaker(self.engine)()
+        session = self.make_session()
 
         logger = logging.getLogger('altaudit')
 
