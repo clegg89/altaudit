@@ -122,6 +122,7 @@ CHARACTER_HEADER_FIELDS = {
         for field in ENCHANT_ITEM_FIELD_COLUMNS},
 
     'empty_sockets' : 'Column(Integer)',
+    'empty_socket_slots' : 'Column(String)',
 
     **{'gem_{}'.format(field) : "''" # Composite from gems table
         for field in ['ids', 'qualities', 'names', 'icons', 'stats', 'slots']},
