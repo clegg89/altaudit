@@ -60,4 +60,5 @@ if __name__ == '__main__':
 
         except:
             logger.exception("Error in refresh")
+            time.sleep(20)
             continue
