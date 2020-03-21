@@ -13,7 +13,6 @@ import yaml
 import csv
 from datetime import datetime
 import os
-import traceback
 import logging
 
 from altaudit import Audit
@@ -57,5 +56,5 @@ if __name__ == '__main__':
 
         logger.info("Complete")
 
-    except Exception:
-        logger.exception(traceback.format_exc())
+    except:
+        logger.exception("Error in refresh")

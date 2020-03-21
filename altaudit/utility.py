@@ -2,7 +2,24 @@
 import datetime
 import time
 
-from .constants import WEEKLY_RESETS
+# TODO Repeated functionality:
+# Calling get_data_resource with locale=en_US appended
+# Missing offhand only if mainhand is two-handed and not a fury warrior
+# Get item by slot
+
+"""
+Reset days and times.
+
+All values are in UTC time to avoid daylight savings issues
+
+use time.strptime(day, "%A").tm_wday to convert day string to weekday
+"""
+WEEKLY_RESETS = {
+    'us' : { 'hour' : 15, 'day' : 'Tuesday' },
+    'eu' : { 'hour' : 7, 'day' : 'Wednesday' },
+    'kr' : { 'hour' : 7, 'day' : 'Wednesday' },
+    'tw' : { 'hour' : 7, 'day' : 'Wednesday' }
+}
 
 class Utility:
     "Convenience class to hold static variables and functions"

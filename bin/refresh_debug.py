@@ -1,24 +1,26 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2020 clegg <clegg@baratheon>
+# Copyright © 2019 clegg <clegg@baratheon>
 #
 # Distributed under terms of the MIT license.
 
 """
-Update a character's name and/or realm
+Run a single refresh with debug logging. Do not upload to server
 """
 import yaml
-import sys
+import csv
+from datetime import datetime
+import os
 import logging
 
-import altaudit.update as updater
+from altaudit import Audit
 
 if __name__ == '__main__':
 
     logger = logging.getLogger('altaudit')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     handler = logging.FileHandler("altaudit.log")
     console = logging.StreamHandler()
@@ -38,20 +40,18 @@ if __name__ == '__main__':
     with open('config.yaml', 'r') as f:
         config = yaml.safe_load(f)
 
-    if len(sys.argv) < 6:
-        logger.error("Wrong number of arguments")
-        print("usage: {} <region> <realmIn> <nameIn> <realmOut> <nameOut>")
-        sys.exit(1)
-
-    region = sys.argv[1]
-    charIn = {'realm' : sys.argv[2], 'name' : sys.argv[3]}
-    charOut = {'realm' : sys.argv[4], 'name' : sys.argv[5]}
+    audit = Audit(config)
+    audit.setup_database()
 
     try:
-        updater.update(config, region, charIn, charOut)
+        logger.info("Start Refresh")
+        result = audit.refresh(datetime, force_refresh=True)
+        logger.info("End Refresh")
+        with open('characters.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(result)
 
-        with open('config.yaml', 'w') as f:
-            yaml.dump(config, f)
+        logger.info("Complete")
 
     except:
-        logger.exception("Error updating character")
+        logger.exception("Error in refresh")

@@ -1,59 +1,97 @@
 """Pull Gear Audit Data from API Response"""
-import copy
+import re
 
-from ..constants import BLIZZARD_REGION, BLIZZARD_LOCALE, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELDS, ITEM_SLOTS
-from ..models import GemSlotAssociation, Gem
+from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
+from ..models import GemSlotAssociation, Gem, ITEM_SLOTS, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELD_COLUMNS
 from ..gem_enchant import enchant_lookup
+from .utility import is_off_hand_weapon
 
-def audit(character, response, db_session, api):
-    for slot in ENCHANTED_ITEM_SLOTS:
-        _enchant(character, slot, response['items'][slot] if slot in response['items'] else None)
+"Item Enchant Fields"
+ENCHANT_ITEM_FIELDS = [field[0] for field in ENCHANT_ITEM_FIELD_COLUMNS]
 
-    character.empty_sockets = response['audit']['emptySockets']
+def audit(character, profile, db_session, api):
+    equipped_items = profile['equipment']['equipped_items']
+
+    character.empty_sockets = 0
     character.gems = []
 
-    for slot in ITEM_SLOTS:
-        item = response['items'][slot] if slot in response['items'] else None
-        if item and 'gem0' in item['tooltipParams']:
-            character.gems.append(GemSlotAssociation(slot, _gem(item, db_session, api)))
+    for slot in ENCHANTED_ITEM_SLOTS:
+        setattr(character, '{}_enchant_id'.format(slot), None)
+        setattr(character, '{}_enchant_quality'.format(slot), 0)
+        setattr(character, '{}_enchant_name'.format(slot), "None")
+        setattr(character, '{}_enchant_description'.format(slot), None)
 
-def _enchant(character, slot, item):
-    # Handle special case of offHand weapon
-    if slot == 'offHand' and (not item or 'weaponInfo' not in item):
+    for item in equipped_items:
+        if 'sockets' in item:
+            for socket in item['sockets']:
+                if 'item' not in socket:
+                    character.empty_sockets += 1
+                    # Here is where we would note the slot of the item
+                else:
+                    gem = _gem(socket, db_session)
+                    if gem:
+                        character.gems.append(GemSlotAssociation(item['slot']['type'].lower(), _gem(socket, db_session)))
+        if item['slot']['type'].lower() in ENCHANTED_ITEM_SLOTS:
+            _enchant(character, item)
+
+    # Final corner case for off hand. Similiar to item audit, we only
+    # ignore missing offhands if the main hand weapon is two handed
+    offhand = next((item for item in equipped_items if item['slot']['type'] == 'OFF_HAND'), None)
+    if not offhand and not is_off_hand_weapon(profile):
         for field in ENCHANT_ITEM_FIELDS:
-            setattr(character, 'offHand_enchant_{}'.format(field), None)
+            setattr(character, 'off_hand_enchant_{}'.format(field), None)
+
+def _enchant(character, item):
+    slot = item['slot']['type'].lower()
+
+    # Handle special case of offHand weapon (this will trigger if the item is not a weapon)
+    if slot == 'off_hand' and item['inventory_type']['type'] != 'WEAPON':
+        for field in ENCHANT_ITEM_FIELDS:
+            setattr(character, 'off_hand_enchant_{}'.format(field), None)
         return
 
-    if not item or 'enchant' not in item['tooltipParams']:
+    if 'enchantments' not in item:
         setattr(character, '{}_enchant_id'.format(slot), None)
         setattr(character, '{}_enchant_quality'.format(slot), 0)
         setattr(character, '{}_enchant_name'.format(slot), "None")
         setattr(character, '{}_enchant_description'.format(slot), None)
         return
 
-    enchant_id = item['tooltipParams']['enchant']
-    info = copy.copy(enchant_lookup[enchant_id]) if enchant_id in enchant_lookup else {'quality' : 0, 'name' : 'None', 'description' : None}
-
-    # Handle special case of hands
-    if info['description'] and slot == 'hands':
-        f = character.faction_name.lower()
-        prefix = 'Kul Tiran ' if f == 'alliance' else 'Zandalari 'if f == 'horde' else ''
-
-        info['name'] = prefix + info['name']
+    # I don't know of any case where there's more than 1 enchant, and our database isn't set up for it
+    # anyway. So just grab the first enchant.
+    enchant = item['enchantments'][0]
+    enchant_id = enchant['enchantment_id'] if 'enchantment_id' in enchant else None
+    if 'source_item' in enchant:
+        name = re.sub("Enchant [a-zA-Z]+ - ", "", enchant['source_item']['name'])
+    elif 'display_string' in enchant:
+        name = re.sub("Enchanted: ", "", enchant['display_string'])
+    elif enchant_id in enchant_lookup:
+        name = enchant_lookup[enchant_id]['name']
+    else:
+        name = "Unknown"
 
     setattr(character, '{}_enchant_id'.format(slot), enchant_id)
-    for k,v in info.items():
-        setattr(character, '{}_enchant_{}'.format(slot, k), v)
+    setattr(character, '{}_enchant_name'.format(slot), name)
 
-def _gem(item, db_session, api):
-    id = item['tooltipParams']['gem0']
+    # TODO Description is now available on the API (sort of), maybe query for it?
+    # Could treat like gems and create a table for it
+    if enchant_id in enchant_lookup:
+        setattr(character, '{}_enchant_quality'.format(slot), enchant_lookup[enchant_id]['quality'])
+        setattr(character, '{}_enchant_description'.format(slot), enchant_lookup[enchant_id]['description'])
+    else:
+        setattr(character, '{}_enchant_quality'.format(slot), 1)
+
+def _gem(socket, db_session):
+    if 'id' not in socket['item']:
+        return None
+
+    id = socket['item']['id']
     gem_model = db_session.query(Gem).filter_by(id=id).first()
 
     if not gem_model:
-        if api:
-            gem = api.get_item(BLIZZARD_REGION, id, locale=BLIZZARD_LOCALE)
-            gem_model = Gem(id, 1, gem['name'], gem['icon'], gem['gemInfo']['bonus']['name'])
-        else:
-            gem_model = Gem(id, 1, 'unknown', None, None)
+        name = socket['item']['name'] if 'name' in socket['item'] else "Unknown"
+        stat = socket['display_string'] if 'display_string' in socket else "Unknown"
+        # If it is not in database, the quality is 1. New API makes getting icon a pain, so ignore
+        gem_model = Gem(id, 1, name, None, stat)
 
     return gem_model

@@ -45,6 +45,8 @@ gem_lookup = {
 
 """
 There does not seem to be any actual API for looking up enchants by ID. So this is all we have
+
+The name is now provided by the Equipment Profile API, so it is unused. Leaving b/c it helps when reading.
 """
 enchant_lookup = {
     # Ring

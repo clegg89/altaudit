@@ -14,7 +14,6 @@ import csv
 import datetime
 import time
 import os
-import traceback
 import logging
 
 from altaudit import Audit
@@ -59,6 +58,7 @@ if __name__ == '__main__':
             force_refresh=False
             time.sleep(20)
 
-        except Exception:
-            logger.exception(traceback.format_exc())
+        except:
+            logger.exception("Error in refresh")
+            time.sleep(20)
             continue

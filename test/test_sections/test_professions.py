@@ -3,7 +3,7 @@ import pytest
 
 from altaudit.models import Character
 
-import altaudit.sections as Section
+import altaudit.sections.professions as Section
 
 def test_profession_simple_priamries():
     jack = Character('jack')

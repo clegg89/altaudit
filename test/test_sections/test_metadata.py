@@ -4,7 +4,7 @@ import pytest
 import datetime
 
 from altaudit.utility import Utility
-from altaudit.constants import VERSION, WOW_PATCH
+from altaudit.version import VERSION, WOW_PATCH
 
 import altaudit.sections as Section
 

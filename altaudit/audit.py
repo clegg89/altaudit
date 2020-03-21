@@ -12,13 +12,16 @@ from wowapi import WowApi
 
 from .utility import Utility
 from .models import Class, Faction, Race, Region, Realm, Character, Gem
-from .constants import BLIZZARD_REGION, BLIZZARD_LOCALE, BLIZZARD_CHARACTER_FIELDS, RAIDERIO_URL
+from .blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from .gem_enchant import gem_lookup
+from .processing import update_snapshots, process_blizzard, process_raiderio, serialize
 from . import sections as Section
+
+RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm_slug}&name={character_name}&fields=mythic_plus_scores_by_season:current,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
 
 def _character_as_dict(character):
     return {'character_name' : character.name,
-            'realm' : character.realm_slug,
+            'realm_slug' : character.realm_slug,
             'region' : character.region_name}
 
 class Audit:
@@ -28,22 +31,22 @@ class Audit:
     This class will hold all necessary data across multiple refreshes
     """
 
-    def __init__(self, config, retry_conn_failures=False, sql_echo=False):
+    def __init__(self, config, sql_echo=False):
         self.engine = create_engine(config['database'], echo=sql_echo)
         self.blizzard_api = WowApi(**config['api']['blizzard'],
-                retry_conn_failures=retry_conn_failures)
+                retry_conn_failures=True)
         self.request_session = requests.Session()
         self.config_characters = config['characters']
+        self.make_session = sessionmaker(self.engine)
 
     def setup_database(self):
         # Tables should be created via alembic, not here, as that will prevent
         # database migrations from working
         # Run 'alembic upgrade head' from command-line to create tables
 
-        session = sessionmaker(self.engine)()
+        session = self.make_session()
 
         try:
-            self._create_factions(session)
             self._create_classes(session)
             self._create_races(session)
             self._create_gems(session)
@@ -61,26 +64,28 @@ class Audit:
         finally:
             session.close()
 
-    def _create_factions(self, session):
-        session.query(Faction).delete()
-        for i,v in enumerate(['Alliance', 'Horde', 'Neutral']):
-            f = Faction(v, id=i+1)
-            session.add(f)
-
     def _create_classes(self, session):
         session.query(Class).delete()
-        classes = self.blizzard_api.get_character_classes(BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['classes']
+        classes = self.blizzard_api.get_playable_classes(BLIZZARD_REGION,
+                'static-' + BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['classes']
         session.add_all([Class(c['name'], id=c['id']) for c in classes])
 
     def _create_races(self, session):
         session.query(Race).delete()
-        races = self.blizzard_api.get_character_races(BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['races']
+        session.query(Faction).delete()
+        races = self.blizzard_api.get_playable_race_index(BLIZZARD_REGION,
+                'static-' + BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['races']
 
-        fquery = session.query(Faction)
-        session.add_all([
-            Race(r['name'], id=r['id'],
-                faction=fquery.filter_by(name=r['side'].capitalize()).first())
-            for r in races])
+        for r in races:
+            details = self.blizzard_api.get_data_resource("{}&locale={}".format(r['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
+
+            race_faction = session.query(Faction).filter_by(name=details['faction']['name']).first()
+
+            if not race_faction:
+                race_faction = Faction(details['faction']['name'])
+
+            session.add(
+                    Race(details['name'], id=details['id'],faction=race_faction))
 
     def _create_gems(self, session):
         for id, details in gem_lookup.items():
@@ -141,11 +146,9 @@ class Audit:
         """
         Utility.set_refresh_timestamp(dt.utcnow())
 
-        session = sessionmaker(self.engine)()
+        session = self.make_session()
 
         logger = logging.getLogger('altaudit')
-
-        log_character=''
 
         try:
             characters = session.query(Character).all()
@@ -153,19 +156,24 @@ class Audit:
             output = [Section.metadata()]
             for character in characters:
                 logger.debug("%s:%s:%s", character.region_name, character.realm_slug, character.name)
-                log_character=character.name
-                blizz_resp = self.blizzard_api.get_character_profile(**_character_as_dict(character),
-                    locale=BLIZZARD_LOCALE,
-                    fields=','.join(BLIZZARD_CHARACTER_FIELDS))
-                rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
+                try:
+                    profile = { 'summary' : self.blizzard_api.get_character_profile_summary(**_character_as_dict(character),
+                        namespace="profile-{}".format(character.region_name),
+                        locale=BLIZZARD_LOCALE) }
+                    rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
 
-                character.process_blizzard(blizz_resp, session, self.blizzard_api, force_refresh)
-                character.process_raiderio(rio_resp)
-                output.append(character.serialize())
+                    process_blizzard(character, profile, session, self.blizzard_api, force_refresh)
+                    process_raiderio(character, rio_resp)
+                    update_snapshots(character)
+                    session.commit()
+                except:
+                    logger.exception("%s Failed", character.name)
+                    session.rollback()
+                finally:
+                    output.append(serialize(character))
 
-            session.commit()
         except:
-            logger.error('%s Failed', log_character)
+            logger.error('Critical failure in character processing')
             session.rollback()
             raise
         finally:

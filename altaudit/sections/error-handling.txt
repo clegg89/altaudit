@@ -1,0 +1,39 @@
+How Sections Handle Errors
+
+Error handling in each section has to keep the following in mind: Any exception thrown will rollback the character,
+preventing any changes from being made. We only want this to happen in cases where something is so wrong, we wouldn't
+want to update the character. For example, most of the character's "basic" info should be there, otherwise it is
+pointless to try to update other information. Also, errors should only happen from missing items in the api response,
+not from divide-by-zero or other common errors.
+
+
+Basic
+
+Almost any missing keys in this section should throw an exception. The only exception to this rule is mainspec,
+as this is not vital and may not appear on lower level characters (I'm not 100% sure of that, but just in case).
+Missing active spec should be None.
+
+Items
+
+If the top level 'equipped_items' is missing, an exception should be thrown. A slot without a ['slot']['type']
+should also thrown an exception. A missing ['level']['value'] key should result in an ilvl of 0. Otherwise no
+exception should happen. Missing items should count as 0 in estimated ilvl, but should otherwise be None in
+the various item fields.
+
+Azerite
+
+Similar to Items, only missing 'equipped_items' or missing slot should trigger an exception. Any issues should
+result in values of None being placed in the respective field.
+
+Audit
+
+Missing items, missing slot, or missing inventory type will trigger error. Other systems try to recover as much as
+possible.
+
+Reputations
+
+Nothing should fail in this section
+
+PvE
+
+Nothing should fail in this section

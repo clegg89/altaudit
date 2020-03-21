@@ -7,4 +7,4 @@ from .azerite_trait import AzeriteTrait
 from .gem import Gem
 from .gem_slot_association import GemSlotAssociation
 from .snapshot import Snapshot
-from .character import Character
+from .character import ITEM_SLOTS, ITEM_FIELDS, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELD_COLUMNS, AZERITE_ITEM_SLOTS, AZERITE_TIERS, PROFESSIONS, PROFESSION_EXPACS, PROFESSION_FIELD_COLUMNS, RAID_DIFFICULTIES, HEADERS, Character
