@@ -1,6 +1,7 @@
 """Pull Item Data from API Response"""
 
 from statistics import mean
+import re
 
 from ..models import ITEM_SLOTS
 from .utility import is_off_hand_weapon
@@ -27,6 +28,11 @@ def items(character, profile, db_session, api):
     equipped_ilvl = mean(list(ilevels.values()))
 
     character.estimated_ilvl = equipped_ilvl
+
+    # Bolt on cloak data here
+    cloak = next((item for item in equipped_items if item['slot']['type'] == 'BACK'), None)
+    if cloak and cloak['name'] == "Ashjra'kamas, Shroud of Resolve":
+        character.cloak_rank = int(re.match(r'Rank ([0-9]+)', cloak['name_desription']['display_string']).group(1))
 
 def _item(character, slot, item):
     try:

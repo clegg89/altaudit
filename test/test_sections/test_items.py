@@ -137,3 +137,15 @@ def test_items_missing_quality_value_is_None(default_items_response):
     assert jack.head_id == 165822
     assert jack.head_name == 'Cowl of Tideborne Omens'
     assert jack.head_quality == None
+
+def test_cloak_missing_name_desc(default_items_response):
+    pass
+
+def test_cloak_missing_display_string(default_items_response):
+    pass
+
+def test_cloak_not_ashjrakamas(default_items_response):
+    pass
+
+def test_cloak_ashjrakamas(default_items_response):
+    pass
