@@ -14,6 +14,7 @@ def audit(character, profile, db_session, api):
 
     character.empty_sockets = 0
     character.gems = []
+    empty_socket_slots = []
 
     for slot in ENCHANTED_ITEM_SLOTS:
         setattr(character, '{}_enchant_id'.format(slot), None)
@@ -22,17 +23,21 @@ def audit(character, profile, db_session, api):
         setattr(character, '{}_enchant_description'.format(slot), None)
 
     for item in equipped_items:
+        slot = item['slot']['type'].lower()
         if 'sockets' in item:
             for socket in item['sockets']:
                 if 'item' not in socket:
                     character.empty_sockets += 1
-                    # Here is where we would note the slot of the item
+                    if slot not in empty_socket_slots:
+                        empty_socket_slots.append(slot)
                 else:
                     gem = _gem(socket, db_session)
                     if gem:
                         character.gems.append(GemSlotAssociation(item['slot']['type'].lower(), _gem(socket, db_session)))
-        if item['slot']['type'].lower() in ENCHANTED_ITEM_SLOTS:
+        if slot in ENCHANTED_ITEM_SLOTS:
             _enchant(character, item)
+
+    character.empty_socket_slots = '|'.join(str(s) for s in empty_socket_slots)
 
     # Final corner case for off hand. Similiar to item audit, we only
     # ignore missing offhands if the main hand weapon is two handed

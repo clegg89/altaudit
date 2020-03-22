@@ -159,6 +159,7 @@ def test_audit_empty_sockets(mock_is_off_hand_weapon):
     Section.audit(jack, response, None, None)
 
     assert jack.empty_sockets == 4
+    assert jack.empty_socket_slots == 'waist|wrist|finger_1|finger_2'
 
 def test_audit_enchant_dk_rune(mock_is_off_hand_weapon):
     jack = Character('jack')
