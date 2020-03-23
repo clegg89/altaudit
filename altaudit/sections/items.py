@@ -32,7 +32,10 @@ def items(character, profile, db_session, api):
     # Bolt on cloak data here
     cloak = next((item for item in equipped_items if item['slot']['type'] == 'BACK'), None)
     if cloak and cloak['name'] == "Ashjra'kamas, Shroud of Resolve":
-        character.cloak_rank = int(re.match(r'Rank ([0-9]+)', cloak['name_desription']['display_string']).group(1))
+        try:
+            character.cloak_rank = int(re.match(r'Rank ([0-9]+)', cloak['name_description']['display_string']).group(1))
+        except (KeyError,TypeError):
+            pass
 
 def _item(character, slot, item):
     try:
