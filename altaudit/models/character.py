@@ -107,6 +107,9 @@ CHARACTER_HEADER_FIELDS = {
         for slot in ITEM_SLOTS
         for item in ITEM_FIELD_COLUMNS},
 
+    # Cloak Rank
+    'cloak_rank' : 'Column(Integer)',
+
     # Azerite Info
     'hoa_level' : 'Column(Integer)',
     'azerite_percentage' : 'Column(Float)',
