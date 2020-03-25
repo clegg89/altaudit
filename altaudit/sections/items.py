@@ -17,7 +17,8 @@ def items(character, profile, db_session, api):
     for item in equipped_items:
         slot = item['slot']['type'].lower()
         try:
-            ilevels[slot] = item['level']['value']
+            if slot in ITEM_SLOTS:
+                ilevels[slot] = item['level']['value']
         except KeyError:
             ilevels[slot] = 0
         _item(character, slot, item)
