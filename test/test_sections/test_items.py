@@ -170,3 +170,15 @@ def test_cloak_ashjrakamas(default_items_response):
     Section.items(jack, default_items_response, None, None)
     assert jack.cloak_rank == 12
     pass
+
+def test_tabard_ignored(default_items_response):
+    jack = Character('jack')
+    default_items_response['equipment']['equipped_items'].append({
+        'slot' : { 'type' : 'TABARD' },
+        'level' : { 'value' : 1 },
+        'item' : { 'id' : 45585 },
+        'name' : 'Silvermoon City Tabard',
+        'quality' : { 'name' : 'UNCOMMON' } })
+
+    Section.items(jack, default_items_response, None, None)
+    assert jack.estimated_ilvl == 405
