@@ -50,6 +50,12 @@ def _get_snapshots(character):
 
 """
 TODO This should work to fill in missing snapshot weeks
+
+The question is, should we do this EVERY time through the loop?
+Only occasionally? Manually? 99% of the time this will do absolutely
+nothing. But its also hard to tell when snapshots ARE missing from
+looking at the output (can you remember how many dungeons/wqs you ran
+on the 20th week of 2017? what was your highest key that week?)
 def _fill_missing_snapshots(character):
     start_year = min(character.snapshots.keys())
     start_year_week = min(character.snapshots[start_year].keys())
