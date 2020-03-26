@@ -57,6 +57,7 @@ def test_update_snapshot_no_overwrite_existing():
     clegg.snapshots[2019][31] = Snapshot()
     clegg.snapshots[2019][31].world_quests = 5
     clegg.snapshots[2019][31].dungeons = 10
+    clegg.snapshots[2019][31].highest_mplus = 13
 
     Utility.set_refresh_timestamp(now)
 
@@ -64,12 +65,15 @@ def test_update_snapshot_no_overwrite_existing():
 
     assert clegg.snapshots[2019][31].world_quests == 5
     assert clegg.snapshots[2019][31].dungeons == 10
+    assert clegg.snapshots[2019][31].highest_mplus == 13
 
 def test_update_snapshot_capture_existing_totals():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
     clegg.world_quests_total = 300
     clegg.dungeons_total = 40
+    clegg.mplus_weekly_highest = 13
+    clegg.snapshots[2019] = { 30 : Snapshot() }
 
     Utility.set_refresh_timestamp(now)
 
@@ -77,6 +81,8 @@ def test_update_snapshot_capture_existing_totals():
 
     assert clegg.snapshots[2019][31].world_quests == 300
     assert clegg.snapshots[2019][31].dungeons == 40
+    assert clegg.snapshots[2019][31].highest_mplus == None
+    assert clegg.snapshots[2019][30].highest_mplus == 13
 
 def test_get_subsections_list_of_strings(mock_api, mocker):
     api_sections = ['media', 'equipment', 'reputations']

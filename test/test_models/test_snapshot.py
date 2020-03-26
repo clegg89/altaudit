@@ -71,5 +71,4 @@ def test_snapshot_default_values(db_session):
 
     assert snapshot.world_quests == 0
     assert snapshot.dungeons == 0
-    assert snapshot.highest_mplus == 0
-
+    assert snapshot.highest_mplus == None

@@ -69,6 +69,8 @@ def _get_subsections(region, profile, api, sub_section, parent='summary', prefix
 def update_snapshots(character):
     year = Utility.year[character.region_name]
     week = Utility.week[character.region_name]
+    prev_week_year = Utility.prev_week_year[character.region_name]
+    prev_week_week = Utility.prev_week_week[character.region_name]
     if year not in character.snapshots:
         character.snapshots[year] = {}
 
@@ -76,6 +78,10 @@ def update_snapshots(character):
         character.snapshots[year][week] = Snapshot()
         character.snapshots[year][week].world_quests = character.world_quests_total
         character.snapshots[year][week].dungeons = character.dungeons_total
+        try:
+            character.snapshots[prev_week_year][prev_week_week].highest_mplus = character.mplus_weekly_highest
+        except KeyError:
+            pass
 
 def process_blizzard(character, profile, db_session, api, force_refresh):
     """
