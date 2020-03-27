@@ -48,42 +48,45 @@ def _get_snapshots(character):
         logger = logging.getLogger('altaudit')
         logger.exception("Unknown error in snapshot")
 
-"""
-TODO This should work to fill in missing snapshot weeks
-
-The question is, should we do this EVERY time through the loop?
-Only occasionally? Manually? 99% of the time this will do absolutely
-nothing. But its also hard to tell when snapshots ARE missing from
-looking at the output (can you remember how many dungeons/wqs you ran
-on the 20th week of 2017? what was your highest key that week?)
 def _fill_missing_snapshots(character):
-    start_year = min(character.snapshots.keys())
-    start_year_week = min(character.snapshots[start_year].keys())
-    stop_year = max(character.snapshots.keys())
-    stop_year_week = max(character.snapshots.keys())
-    start_date = datetime.datetime.combine(datetime.date(start_year, start_year_week, WEEKLY_RESETS[character.region_name]['day']), datetime.time(WEEKLY_RESETS[character.region_name]['hour']))
-    stop_date = datetime.datetime.combine(datetime.date(stop_year, stop_year_week, WEEKLY_RESETS[character.region_name]['day']), datetime.time(WEEKLY_RESETS[character.region_name]['hour']))
+    """
+    TODO This should work to fill in missing snapshot weeks
 
-    world_quests = character.snapshots[start_year][start_year_week].world_quests
-    dungeons = character.snapshots[start_year][start_year_week].dungeons
+    The question is, should we do this EVERY time through the loop?
+    Only occasionally? Manually? 99% of the time this will do absolutely
+    nothing. But its also hard to tell when snapshots ARE missing from
+    looking at the output (can you remember how many dungeons/wqs you ran
+    on the 20th week of 2017? what was your highest key that week?)
 
-    test_date = start_date
-    while test_date < stop_date:
-        year = test_date.isocalendar()[0]
-        week = test_date.isocalendar()[1]
-        if year not in character.snapshots:
-            character.snapshots[year] = {}
+    Good compromise: Run whenever a new snapshot is created (1/week)
+    """
+    pass
+    # start_year = min(character.snapshots.keys())
+    # start_year_week = min(character.snapshots[start_year].keys())
+    # stop_year = max(character.snapshots.keys())
+    # stop_year_week = max(character.snapshots.keys())
+    # start_date = datetime.datetime.combine(datetime.date(start_year, start_year_week, WEEKLY_RESETS[character.region_name]['day']), datetime.time(WEEKLY_RESETS[character.region_name]['hour']))
+    # stop_date = datetime.datetime.combine(datetime.date(stop_year, stop_year_week, WEEKLY_RESETS[character.region_name]['day']), datetime.time(WEEKLY_RESETS[character.region_name]['hour']))
 
-        if week not in character.snapshots[year]:
-            character.snapshots[year][week] = Snapshot()
-            character.snapshots[year][week].world_quests = world_quests
-            character.snapshots[year][week].dungeons = dungeons
+    # world_quests = character.snapshots[start_year][start_year_week].world_quests
+    # dungeons = character.snapshots[start_year][start_year_week].dungeons
 
-        world_quests = character.snapshots[year][week].world_quests
-        dungeons = character.snapshots[year][week].dungeons
+    # test_date = start_date
+    # while test_date < stop_date:
+    #     year = test_date.isocalendar()[0]
+    #     week = test_date.isocalendar()[1]
+    #     if year not in character.snapshots:
+    #         character.snapshots[year] = {}
 
-        test_date += datetime.timedelta(7)
-"""
+    #     if week not in character.snapshots[year]:
+    #         character.snapshots[year][week] = Snapshot()
+    #         character.snapshots[year][week].world_quests = world_quests
+    #         character.snapshots[year][week].dungeons = dungeons
+
+    #     world_quests = character.snapshots[year][week].world_quests
+    #     dungeons = character.snapshots[year][week].dungeons
+
+    #     test_date += datetime.timedelta(7)
 
 def _get_historical_data(character):
     world_quests = []
@@ -96,13 +99,11 @@ def _get_historical_data(character):
     for index,snapshot in enumerate(all_snapshots[1:]):
         world_quests.insert(0, snapshot.world_quests - all_snapshots[index].world_quests)
         dungeons.insert(0, snapshot.dungeons - all_snapshots[index].dungeons)
-        mplus.insert(0, snapshot.highest_mplus)
-
-    mplus.pop(0)
+        mplus.insert(0, all_snapshots[index].highest_mplus) # will skip the last one
 
     character.historic_world_quests_done = '|'.join([str(wq) for  wq in world_quests])
     character.historic_dungeons_done = '|'.join([str(d) for d in dungeons])
-    character.historic_mplus_done = '|'.join([str(mp) for mp in mplus
+    character.historic_mplus_done = '|'.join([str(mp) if mp else '' for mp in mplus])
 
 def _get_subsections(region, profile, api, sub_section, parent='summary', prefix=''):
     if type(sub_section) is str:

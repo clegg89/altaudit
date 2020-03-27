@@ -6,7 +6,7 @@ import datetime
 from wowapi import WowApiException
 
 import altaudit
-from altaudit.processing import update_snapshots, _get_subsections, _serialize_azerite, _serialize_gems, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
+from altaudit.processing import update_snapshots, _get_subsections, _serialize_azerite, _serialize_gems, _get_historical_data, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
 from altaudit.models import Region, Realm, Character, Snapshot, AzeriteTrait, Gem, GemSlotAssociation
 from altaudit.utility import Utility
 
@@ -374,3 +374,42 @@ def test_serialzie(mocker):
     mock_serialize_azerite.assert_called_once_with(jack)
     mock_serialize_gems.assert_called_once_with(jack)
     mock_get_snapshots.assert_called_once_with(jack)
+
+def test_get_historical_data():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots[2019] = {}
+    jack.snapshots[2019][52] = Snapshot()
+    jack.snapshots[2019][50] = Snapshot()
+    jack.snapshots[2019][51] = Snapshot()
+    jack.snapshots[2018] = {}
+    jack.snapshots[2018][52] = Snapshot()
+    jack.snapshots[2020] = {}
+    jack.snapshots[2020][2] = Snapshot()
+    jack.snapshots[2020][1] = Snapshot()
+
+    jack.snapshots[2018][52].world_quests = 20
+    jack.snapshots[2019][50].world_quests = 25
+    jack.snapshots[2019][51].world_quests = 40
+    jack.snapshots[2019][52].world_quests = 50
+    jack.snapshots[2020][1].world_quests = 75
+    jack.snapshots[2020][2].world_quests = 100
+
+    jack.snapshots[2018][52].dungeons = 100
+    jack.snapshots[2019][50].dungeons = 110
+    jack.snapshots[2019][51].dungeons = 120
+    jack.snapshots[2019][52].dungeons = 130
+    jack.snapshots[2020][1].dungeons = 140
+    jack.snapshots[2020][2].dungeons = 170
+
+    jack.snapshots[2018][52].highest_mplus = 8
+    jack.snapshots[2019][50].highest_mplus = 12
+    jack.snapshots[2019][51].highest_mplus = 3
+    # jack.snapshots[2019][52].highest_mplus = None
+    jack.snapshots[2020][1].highest_mplus = 13
+    # jack.snapshots[2020][2].highest_mplus = None
+
+    _get_historical_data(jack)
+
+    assert jack.historic_world_quests_done == "25|25|10|15|5"
+    assert jack.historic_dungeons_done == "30|10|10|10|10"
+    assert jack.historic_mplus_done == "13||3|12|8"
