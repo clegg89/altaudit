@@ -1,9 +1,10 @@
 """Character Processing"""
 import logging
+import datetime
 
 from wowapi import WowApiException
 
-from .utility import Utility
+from .utility import Utility, WEEKLY_RESETS
 from .sections import sections, raiderio
 from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
 from .blizzard import BLIZZARD_LOCALE
@@ -48,6 +49,64 @@ def _get_snapshots(character):
         logger = logging.getLogger('altaudit')
         logger.exception("Unknown error in snapshot")
 
+def _fill_missing_snapshots(character):
+    """
+    The question is, should we do this EVERY time through the loop?
+    Only occasionally? Manually? 99% of the time this will do absolutely
+    nothing. But its also hard to tell when snapshots ARE missing from
+    looking at the output (can you remember how many dungeons/wqs you ran
+    on the 20th week of 2017? what was your highest key that week?)
+
+    Good compromise: Run whenever a new snapshot is created (1/week)
+    """
+    reset_day = WEEKLY_RESETS[character.region_name]['day']
+    reset_hour = WEEKLY_RESETS[character.region_name]['hour']
+    start_year = min(character.snapshots.keys())
+    start_year_week = min(character.snapshots[start_year].keys())
+    stop_year = max(character.snapshots.keys())
+    stop_year_week = max(character.snapshots[stop_year].keys())
+    start_date = datetime.datetime.combine(datetime.date.fromisocalendar(start_year, start_year_week, reset_day),
+            datetime.time(reset_hour))
+    stop_date = datetime.datetime.combine(datetime.date.fromisocalendar(stop_year, stop_year_week, reset_day),
+            datetime.time(reset_hour))
+
+    world_quests = character.snapshots[start_year][start_year_week].world_quests
+    dungeons = character.snapshots[start_year][start_year_week].dungeons
+
+    test_date = start_date
+    while test_date < stop_date:
+        year = test_date.isocalendar()[0]
+        week = test_date.isocalendar()[1]
+        if year not in character.snapshots:
+            character.snapshots[year] = {}
+
+        if week not in character.snapshots[year]:
+            character.snapshots[year][week] = Snapshot()
+            character.snapshots[year][week].world_quests = world_quests
+            character.snapshots[year][week].dungeons = dungeons
+
+        world_quests = character.snapshots[year][week].world_quests
+        dungeons = character.snapshots[year][week].dungeons
+
+        test_date += datetime.timedelta(7)
+
+def _get_historical_data(character):
+    world_quests = []
+    dungeons = []
+    mplus = []
+    all_snapshots = [character.snapshots[year][week]
+            for year in sorted(character.snapshots.keys())
+            for week in sorted(character.snapshots[year].keys())]
+
+    for index,snapshot in enumerate(all_snapshots[1:]):
+        world_quests.insert(0, snapshot.world_quests - all_snapshots[index].world_quests)
+        dungeons.insert(0, snapshot.dungeons - all_snapshots[index].dungeons)
+        mplus.insert(0, all_snapshots[index].highest_mplus) # will skip the last one
+
+    character.historic_world_quests_done = '|'.join([str(wq) for  wq in world_quests])
+    character.historic_dungeons_done = '|'.join([str(d) for d in dungeons])
+    character.historic_mplus_done = '|'.join([str(mp) if mp else '' for mp in mplus])
+
 def _get_subsections(region, profile, api, sub_section, parent='summary', prefix=''):
     if type(sub_section) is str:
         if profile[parent] and sub_section in profile[parent]:
@@ -69,6 +128,8 @@ def _get_subsections(region, profile, api, sub_section, parent='summary', prefix
 def update_snapshots(character):
     year = Utility.year[character.region_name]
     week = Utility.week[character.region_name]
+    prev_week_year = Utility.prev_week_year[character.region_name]
+    prev_week_week = Utility.prev_week_week[character.region_name]
     if year not in character.snapshots:
         character.snapshots[year] = {}
 
@@ -76,6 +137,12 @@ def update_snapshots(character):
         character.snapshots[year][week] = Snapshot()
         character.snapshots[year][week].world_quests = character.world_quests_total
         character.snapshots[year][week].dungeons = character.dungeons_total
+        try:
+            character.snapshots[prev_week_year][prev_week_week].highest_mplus = character.mplus_weekly_highest
+        except KeyError:
+            pass
+
+        _fill_missing_snapshots(character)
 
 def process_blizzard(character, profile, db_session, api, force_refresh):
     """
@@ -119,4 +186,5 @@ def serialize(character):
     _serialize_azerite(character)
     _serialize_gems(character)
     _get_snapshots(character)
+    _get_historical_data(character)
     return [getattr(character, field) for field in HEADERS]

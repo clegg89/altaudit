@@ -6,7 +6,7 @@ import datetime
 from wowapi import WowApiException
 
 import altaudit
-from altaudit.processing import update_snapshots, _get_subsections, _serialize_azerite, _serialize_gems, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
+from altaudit.processing import update_snapshots, _get_subsections, _serialize_azerite, _serialize_gems, _fill_missing_snapshots,  _get_historical_data, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
 from altaudit.models import Region, Realm, Character, Snapshot, AzeriteTrait, Gem, GemSlotAssociation
 from altaudit.utility import Utility
 
@@ -57,6 +57,7 @@ def test_update_snapshot_no_overwrite_existing():
     clegg.snapshots[2019][31] = Snapshot()
     clegg.snapshots[2019][31].world_quests = 5
     clegg.snapshots[2019][31].dungeons = 10
+    clegg.snapshots[2019][31].highest_mplus = 13
 
     Utility.set_refresh_timestamp(now)
 
@@ -64,12 +65,15 @@ def test_update_snapshot_no_overwrite_existing():
 
     assert clegg.snapshots[2019][31].world_quests == 5
     assert clegg.snapshots[2019][31].dungeons == 10
+    assert clegg.snapshots[2019][31].highest_mplus == 13
 
 def test_update_snapshot_capture_existing_totals():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
     clegg.world_quests_total = 300
     clegg.dungeons_total = 40
+    clegg.mplus_weekly_highest = 13
+    clegg.snapshots[2019] = { 30 : Snapshot() }
 
     Utility.set_refresh_timestamp(now)
 
@@ -77,6 +81,32 @@ def test_update_snapshot_capture_existing_totals():
 
     assert clegg.snapshots[2019][31].world_quests == 300
     assert clegg.snapshots[2019][31].dungeons == 40
+    assert clegg.snapshots[2019][31].highest_mplus == None
+    assert clegg.snapshots[2019][30].highest_mplus == 13
+
+def test_update_snapshot_fill_missing_on_new_week(mocker):
+    mock_fill_missing_snapshots = mocker.patch('altaudit.processing._fill_missing_snapshots')
+    clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 5)
+    clegg.snapshots[2019] = { 30 : Snapshot() }
+
+    Utility.set_refresh_timestamp(now)
+
+    update_snapshots(clegg)
+
+    mock_fill_missing_snapshots.assert_called_once_with(clegg)
+
+def test_update_snapshot_fill_missing_not_on_existing_week(mocker):
+    mock_fill_missing_snapshots = mocker.patch('altaudit.processing._fill_missing_snapshots')
+    clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 5)
+    clegg.snapshots[2019] = { 31 : Snapshot() }
+
+    Utility.set_refresh_timestamp(now)
+
+    update_snapshots(clegg)
+
+    mock_fill_missing_snapshots.assert_not_called()
 
 def test_get_subsections_list_of_strings(mock_api, mocker):
     api_sections = ['media', 'equipment', 'reputations']
@@ -354,11 +384,85 @@ def test_get_snapshots_snapshot_invalid_leave_as_none():
     assert jack.world_quests_weekly == None
     assert jack.dungeons_weekly == None
 
+def test_get_historical_data():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots[2019] = {}
+    jack.snapshots[2019][52] = Snapshot()
+    jack.snapshots[2019][50] = Snapshot()
+    jack.snapshots[2019][51] = Snapshot()
+    jack.snapshots[2018] = {}
+    jack.snapshots[2018][52] = Snapshot()
+    jack.snapshots[2020] = {}
+    jack.snapshots[2020][2] = Snapshot()
+    jack.snapshots[2020][1] = Snapshot()
+
+    jack.snapshots[2018][52].world_quests = 20
+    jack.snapshots[2019][50].world_quests = 25
+    jack.snapshots[2019][51].world_quests = 40
+    jack.snapshots[2019][52].world_quests = 50
+    jack.snapshots[2020][1].world_quests = 75
+    jack.snapshots[2020][2].world_quests = 100
+
+    jack.snapshots[2018][52].dungeons = 100
+    jack.snapshots[2019][50].dungeons = 110
+    jack.snapshots[2019][51].dungeons = 120
+    jack.snapshots[2019][52].dungeons = 130
+    jack.snapshots[2020][1].dungeons = 140
+    jack.snapshots[2020][2].dungeons = 170
+
+    jack.snapshots[2018][52].highest_mplus = 8
+    jack.snapshots[2019][50].highest_mplus = 12
+    jack.snapshots[2019][51].highest_mplus = 3
+    # jack.snapshots[2019][52].highest_mplus = None
+    jack.snapshots[2020][1].highest_mplus = 13
+    # jack.snapshots[2020][2].highest_mplus = None
+
+    _get_historical_data(jack)
+
+    assert jack.historic_world_quests_done == "25|25|10|15|5"
+    assert jack.historic_dungeons_done == "30|10|10|10|10"
+    assert jack.historic_mplus_done == "13||3|12|8"
+
+def test_fill_missing_snapshots():
+    jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
+    jack.snapshots[2017] = {}
+    jack.snapshots[2017][52] = Snapshot()
+    jack.snapshots[2019] = {}
+    jack.snapshots[2019][1] = Snapshot()
+    jack.snapshots[2019][3] = Snapshot()
+
+    jack.snapshots[2017][52].world_quests = 10
+    jack.snapshots[2019][1].world_quests = 100
+    jack.snapshots[2019][3].world_quests = 110
+
+    jack.snapshots[2017][52].dungeons = 5
+    jack.snapshots[2019][1].dungeons = 45
+    jack.snapshots[2019][3].dungeons = 50
+
+    jack.snapshots[2017][52].highest_mplus = 3
+    # jack.snapshots[2019][1].highest_mplus = None
+    jack.snapshots[2019][3].highest_mplus = 10
+
+    _fill_missing_snapshots(jack)
+
+    assert 2018 in jack.snapshots
+    assert 52 == len(jack.snapshots[2018])
+
+    for week,snapshot in jack.snapshots[2018].items():
+        assert snapshot.world_quests == 10, "World Quests wrong on week {}".format(week)
+        assert snapshot.dungeons == 5, "Dungeons wrong on week {}".format(week)
+        assert snapshot.highest_mplus == None, "Mplus wrong on week {}".format(week)
+
+    assert jack.snapshots[2019][2].world_quests == 100
+    assert jack.snapshots[2019][2].dungeons == 45
+    assert jack.snapshots[2019][2].highest_mplus == None
+
 def test_serialzie(mocker):
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
     mock_serialize_azerite = mocker.patch('altaudit.processing._serialize_azerite')
     mock_serialize_gems = mocker.patch('altaudit.processing._serialize_gems')
     mock_get_snapshots = mocker.patch('altaudit.processing._get_snapshots')
+    mock_get_historical_data = mocker.patch('altaudit.processing._get_historical_data')
 
     altaudit.processing.HEADERS = [ 'name', 'region_name', 'realm_slug' ]
 
@@ -368,3 +472,4 @@ def test_serialzie(mocker):
     mock_serialize_azerite.assert_called_once_with(jack)
     mock_serialize_gems.assert_called_once_with(jack)
     mock_get_snapshots.assert_called_once_with(jack)
+    mock_get_historical_data.assert_called_once_with(jack)

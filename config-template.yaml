@@ -1,3 +1,4 @@
+# THIS IS A TEMPLATE PLEASE FILL IN DATA AND RENAME TO config.yaml
 api:
   blizzard:
     client_id: your_id_here
