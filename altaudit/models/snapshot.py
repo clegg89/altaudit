@@ -57,3 +57,4 @@ class Snapshot(Base):
     week_id = Column(Integer, ForeignKey('weeks.id'), nullable=False, unique=True)
     world_quests = Column(Integer, default=0)
     dungeons = Column(Integer, default=0)
+    highest_mplus = Column(Integer)

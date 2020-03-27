@@ -81,3 +81,48 @@ def test_utility_refresh_time():
     Utility.set_refresh_timestamp(now)
 
     assert Utility.refresh_time == now
+
+def test_utility_region_prev_week_times_simple():
+    now = datetime.datetime(2019, 8, 5, 20, 32, 34, 85)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Utility.prev_week_year['us'] == 2019
+    assert Utility.prev_week_year['eu'] == 2019
+    assert Utility.prev_week_year['kr'] == 2019
+    assert Utility.prev_week_year['tw'] == 2019
+
+    assert Utility.prev_week_week['us'] == 30
+    assert Utility.prev_week_week['eu'] == 30
+    assert Utility.prev_week_week['kr'] == 30
+    assert Utility.prev_week_week['tw'] == 30
+
+def test_utility_region_prev_week_times_last_year():
+    now = datetime.datetime(2020, 1, 1, 20, 32, 34, 85)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Utility.prev_week_year['us'] == 2019
+    assert Utility.prev_week_year['eu'] == 2019
+    assert Utility.prev_week_year['kr'] == 2019
+    assert Utility.prev_week_year['tw'] == 2019
+
+    assert Utility.prev_week_week['us'] == 52
+    assert Utility.prev_week_week['eu'] == 52
+    assert Utility.prev_week_week['kr'] == 52
+    assert Utility.prev_week_week['tw'] == 52
+
+def test_utility_region_prev_week_times_between_resets():
+    now = datetime.datetime(2020, 1, 1, 0, 32, 34, 85)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Utility.prev_week_year['us'] == 2019
+    assert Utility.prev_week_year['eu'] == 2019
+    assert Utility.prev_week_year['kr'] == 2019
+    assert Utility.prev_week_year['tw'] == 2019
+
+    assert Utility.prev_week_week['us'] == 52
+    assert Utility.prev_week_week['eu'] == 51
+    assert Utility.prev_week_week['kr'] == 51
+    assert Utility.prev_week_week['tw'] == 51

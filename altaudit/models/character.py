@@ -154,6 +154,10 @@ CHARACTER_HEADER_FIELDS = {
     'mplus_weekly_highest' : 'Column(Integer)',
     'mplus_season_highest' : 'Column(Integer)',
 
+    'historic_world_quests_done' : 'None', # Obtained from snapshots
+    'historic_dungeons_done' : 'None', # Obtained from snapshots
+    'historic_mplus_done' : 'None', # Obtained from snapshots
+
     **{'raids_{}{}'.format(difficulty,postfix) : 'Column(String)'
             for difficulty in RAID_DIFFICULTIES
             for postfix in ('','_weekly')}
