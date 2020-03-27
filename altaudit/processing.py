@@ -1,9 +1,10 @@
 """Character Processing"""
 import logging
+import datetime
 
 from wowapi import WowApiException
 
-from .utility import Utility
+from .utility import Utility, WEEKLY_RESETS
 from .sections import sections, raiderio
 from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
 from .blizzard import BLIZZARD_LOCALE
@@ -60,33 +61,36 @@ def _fill_missing_snapshots(character):
 
     Good compromise: Run whenever a new snapshot is created (1/week)
     """
-    pass
-    # start_year = min(character.snapshots.keys())
-    # start_year_week = min(character.snapshots[start_year].keys())
-    # stop_year = max(character.snapshots.keys())
-    # stop_year_week = max(character.snapshots.keys())
-    # start_date = datetime.datetime.combine(datetime.date(start_year, start_year_week, WEEKLY_RESETS[character.region_name]['day']), datetime.time(WEEKLY_RESETS[character.region_name]['hour']))
-    # stop_date = datetime.datetime.combine(datetime.date(stop_year, stop_year_week, WEEKLY_RESETS[character.region_name]['day']), datetime.time(WEEKLY_RESETS[character.region_name]['hour']))
+    reset_day = WEEKLY_RESETS[character.region_name]['day']
+    reset_hour = WEEKLY_RESETS[character.region_name]['hour']
+    start_year = min(character.snapshots.keys())
+    start_year_week = min(character.snapshots[start_year].keys())
+    stop_year = max(character.snapshots.keys())
+    stop_year_week = max(character.snapshots[stop_year].keys())
+    start_date = datetime.datetime.combine(datetime.date.fromisocalendar(start_year, start_year_week, reset_day),
+            datetime.time(reset_hour))
+    stop_date = datetime.datetime.combine(datetime.date.fromisocalendar(stop_year, stop_year_week, reset_day),
+            datetime.time(reset_hour))
 
-    # world_quests = character.snapshots[start_year][start_year_week].world_quests
-    # dungeons = character.snapshots[start_year][start_year_week].dungeons
+    world_quests = character.snapshots[start_year][start_year_week].world_quests
+    dungeons = character.snapshots[start_year][start_year_week].dungeons
 
-    # test_date = start_date
-    # while test_date < stop_date:
-    #     year = test_date.isocalendar()[0]
-    #     week = test_date.isocalendar()[1]
-    #     if year not in character.snapshots:
-    #         character.snapshots[year] = {}
+    test_date = start_date
+    while test_date < stop_date:
+        year = test_date.isocalendar()[0]
+        week = test_date.isocalendar()[1]
+        if year not in character.snapshots:
+            character.snapshots[year] = {}
 
-    #     if week not in character.snapshots[year]:
-    #         character.snapshots[year][week] = Snapshot()
-    #         character.snapshots[year][week].world_quests = world_quests
-    #         character.snapshots[year][week].dungeons = dungeons
+        if week not in character.snapshots[year]:
+            character.snapshots[year][week] = Snapshot()
+            character.snapshots[year][week].world_quests = world_quests
+            character.snapshots[year][week].dungeons = dungeons
 
-    #     world_quests = character.snapshots[year][week].world_quests
-    #     dungeons = character.snapshots[year][week].dungeons
+        world_quests = character.snapshots[year][week].world_quests
+        dungeons = character.snapshots[year][week].dungeons
 
-    #     test_date += datetime.timedelta(7)
+        test_date += datetime.timedelta(7)
 
 def _get_historical_data(character):
     world_quests = []
@@ -140,6 +144,8 @@ def update_snapshots(character):
         except KeyError:
             pass
 
+        _fill_missing_snapshots(character)
+
 def process_blizzard(character, profile, db_session, api, force_refresh):
     """
     Processes the response from blizzard's API for this character
@@ -182,4 +188,5 @@ def serialize(character):
     _serialize_azerite(character)
     _serialize_gems(character)
     _get_snapshots(character)
+    _get_historical_data(character)
     return [getattr(character, field) for field in HEADERS]
