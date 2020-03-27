@@ -51,8 +51,6 @@ def _get_snapshots(character):
 
 def _fill_missing_snapshots(character):
     """
-    TODO This should work to fill in missing snapshot weeks
-
     The question is, should we do this EVERY time through the loop?
     Only occasionally? Manually? 99% of the time this will do absolutely
     nothing. But its also hard to tell when snapshots ARE missing from
