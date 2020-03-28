@@ -44,11 +44,35 @@ def test_update_snapshot_add_new_snapshot():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
     Utility.set_refresh_timestamp(now)
+    clegg.world_quests_total = 0
+    clegg.dungeons_total = 0
 
     update_snapshots(clegg)
 
     assert 2019 in clegg.snapshots
     assert 31 in clegg.snapshots[2019]
+
+def test_update_snapshot_do_not_add_on_missing_world_quests():
+    clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 5)
+    Utility.set_refresh_timestamp(now)
+    clegg.dungeons_total = 0
+
+    update_snapshots(clegg)
+
+    assert 2019 in clegg.snapshots
+    assert 31 not in clegg.snapshots[2019]
+
+def test_update_snapshot_do_not_add_on_missing_dungeons():
+    clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
+    now = datetime.datetime(2019, 8, 5)
+    Utility.set_refresh_timestamp(now)
+    clegg.world_quests_total = 0
+
+    update_snapshots(clegg)
+
+    assert 2019 in clegg.snapshots
+    assert 31 not in clegg.snapshots[2019]
 
 def test_update_snapshot_no_overwrite_existing():
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
@@ -89,6 +113,8 @@ def test_update_snapshot_fill_missing_on_new_week(mocker):
     clegg = Character('clegg', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 5)
     clegg.snapshots[2019] = { 30 : Snapshot() }
+    clegg.world_quests_total = 0
+    clegg.dungeons_total = 0
 
     Utility.set_refresh_timestamp(now)
 
