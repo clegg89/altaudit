@@ -126,6 +126,8 @@ def _get_subsections(region, profile, api, sub_section, parent='summary', prefix
             _get_subsections(region, profile, api, v, k, prefix + k + '_')
 
 def update_snapshots(character):
+    logger = logging.getLogger('altaudit')
+
     year = Utility.year[character.region_name]
     week = Utility.week[character.region_name]
     prev_week_year = Utility.prev_week_year[character.region_name]
@@ -133,7 +135,9 @@ def update_snapshots(character):
     if year not in character.snapshots:
         character.snapshots[year] = {}
 
-    if week not in character.snapshots[year]:
+    if week not in character.snapshots[year] and \
+            character.world_quests_total is not None and character.dungeons_total is not None:
+        logger.debug("Week %i of %i not found, setting %i, %i, %i", year, week, character.world_quests_total, character.dungeons_total, character.mplus_weekly_highest)
         character.snapshots[year][week] = Snapshot()
         character.snapshots[year][week].world_quests = character.world_quests_total
         character.snapshots[year][week].dungeons = character.dungeons_total

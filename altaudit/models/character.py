@@ -86,7 +86,7 @@ RAID_DIFFICULTIES = [
 CHARACTER_HEADER_FIELDS = {
     # Basic Info
     'name_api' : 'Column(String)',
-    'realm_name' : "Column(Integer)",
+    'realm_name' : "Column(String)",
     'realm_slug' : "association_proxy('realm', 'name')",
     'region_name' : "association_proxy('realm', 'region_name')",
     'lastmodified' : 'Column(Integer)',

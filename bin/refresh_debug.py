@@ -11,11 +11,17 @@ Run a single refresh with debug logging. Do not upload to server
 """
 import yaml
 import csv
-from datetime import datetime
+import datetime
 import os
 import logging
 
 from altaudit import Audit
+
+class fake_dt:
+    @classmethod
+    def utcnow(cls):
+        # return datetime.datetime.utcnow()
+        return datetime.datetime.utcnow() + datetime.timedelta(7)
 
 if __name__ == '__main__':
 
@@ -45,7 +51,7 @@ if __name__ == '__main__':
 
     try:
         logger.info("Start Refresh")
-        result = audit.refresh(datetime, force_refresh=True)
+        result = audit.refresh(fake_dt, force_refresh=True)
         logger.info("End Refresh")
         with open('characters.csv', 'w', newline='') as f:
             writer = csv.writer(f)

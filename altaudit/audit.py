@@ -94,6 +94,8 @@ class Audit:
                 session.add(g)
 
     def _remove_old_characters(self, session):
+        logger = logging.getLogger('altaudit')
+
         config_characters = [{'name' : character, 'realm' : realm, 'region' : region}
                 for region,realms in self.config_characters.items()
                 for realm,characters in realms.items()
@@ -102,23 +104,29 @@ class Audit:
         stored_characters = session.query(Character).all()
 
         for char in stored_characters:
-            if not {'name' : char.name, 'realm' : char.realm_name, 'region' : char.region_name} in config_characters:
+            if not {'name' : char.name, 'realm' : char.realm_slug, 'region' : char.region_name} in config_characters:
+                logger.debug("Could not find %s:%s:%s in config, delete", char.region_name, char.realm_slug, char.name)
                 session.delete(char)
 
     def _add_missing_characters(self, session):
+        logger = logging.getLogger('altaudit')
+
         for region,realms in self.config_characters.items():
             region_model = session.query(Region).filter_by(name=region).first()
             if not region_model:
+                logger.debug("Add region %s", region)
                 region_model = Region(region)
                 session.add(region_model)
 
             for realm,characters in realms.items():
                 realm_model = session.query(Realm).filter_by(name=realm).join(Region).filter_by(name=region).first()
                 if not realm_model:
+                    logger.debug("Add realm %s:%s", region, realm)
                     realm_model = Realm(realm, region_model)
                     session.add(realm_model)
 
                 for character in characters:
+                    logger.debug("Add character %s:%s:%s", region, realm, character)
                     character_model = session.query(Character).\
                             filter_by(name=character).join(Realm).\
                             filter_by(name=realm).join(Region).\
@@ -162,9 +170,9 @@ class Audit:
                         locale=BLIZZARD_LOCALE) }
                     rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
 
+                    update_snapshots(character)
                     process_blizzard(character, profile, session, self.blizzard_api, force_refresh)
                     process_raiderio(character, rio_resp)
-                    update_snapshots(character)
                     session.commit()
                 except:
                     logger.exception("%s Failed", character.name)

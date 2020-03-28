@@ -2,8 +2,6 @@
 import datetime
 
 # TODO Repeated functionality:
-# Calling get_data_resource with locale=en_US appended
-# Missing offhand only if mainhand is two-handed and not a fury warrior
 # Get item by slot
 
 """
@@ -39,7 +37,7 @@ class Utility:
         @note We can still get some odd behavior as some of the API
         requests may occur before the reset and others after the reset.
         This will make some things (like the island weekly) seem off.
-        Luckily it should all work out on the next refresh, and working
+        Luckily it should all work out on the next refresh, and
         trying to work around it is too complicated for the pay off
         """
         # Store the actual refresh timestamp
