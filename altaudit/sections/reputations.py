@@ -11,7 +11,9 @@ REPUTATION_FACTION_ID = {
         2164, # Champions of Azeroth
         2163, # Tortollan Seekers
         2400, # Waveblade Ankoan
-        2391  # Rustbolt Resistance
+        2391, # Rustbolt Resistance
+        2415, # Rajani
+        2417  # Uldum Accord
     ],
     'horde' : [
         2103, # Zandalari Empire
@@ -21,7 +23,9 @@ REPUTATION_FACTION_ID = {
         2164, # Champions of Azeroth
         2163, # Tortollan Seekers
         2373, # The Unshackled
-        2391  # Rustbolt Resistance
+        2391, # Rustbolt Resistance
+        2415, # Rajani
+        2417  # Uldum Accord
     ]
 }
 
