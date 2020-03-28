@@ -13,7 +13,7 @@ def test_pve_quests_missing():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : None,
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -24,7 +24,7 @@ def test_pve_quests_key_missing():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'garbage' : 'More garbage' },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -35,7 +35,7 @@ def test_pve_quests_missing_id():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [{'garbage' : 53436}] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -59,7 +59,7 @@ def test_pve_achievements_key_missing():
     jack = Character('jack')
     response = { 'achievements' : {'garbage' : 'some more garbage'},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 20
     jack.world_quests_total = 30
 
@@ -75,7 +75,7 @@ def test_pve_achievements_missing_id():
                 {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
                 {'criteria' : {'child_criteria' : [{'amount' : 40}]}}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 20
     jack.world_quests_total = 30
 
@@ -91,7 +91,7 @@ def test_pve_achievements_missing_id_old_value_greater_than_new():
                 {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
                 {'criteria' : {'child_criteria' : [{'amount' : 40}]}}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 40
     jack.world_quests_total = 30
 
@@ -107,7 +107,7 @@ def test_pve_achivements_missing_criteria_islands_value_is_lower():
                 {'id' : 12597},
                 {'id' : 11127}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 20
     jack.world_quests_total = 30
 
@@ -123,7 +123,7 @@ def test_pve_achivements_missing_criteria_islands_value_is_greater():
                 {'id' : 12597},
                 {'id' : 11127}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 20
     jack.world_quests_total = 30
 
@@ -139,7 +139,7 @@ def test_pve_achievements_criteria_missing_child_criteria_islands_value_is_lesse
                 {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
                 {'id' : 11127, 'criteria' : {'garbage' : 123}}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 20
     jack.world_quests_total = 30
 
@@ -155,7 +155,7 @@ def test_pve_achievements_criteria_missing_child_criteria_islands_value_is_great
                 {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
                 {'id' : 11127, 'criteria' : {'garbage' : 123}}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 20
     jack.world_quests_total = 30
 
@@ -171,7 +171,7 @@ def test_pve_achievements_criteria_missing_amount_islands_value_is_lesser():
                 {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
                 {'id' : 11127, 'criteria' : {'child_criteria' : [{'garbage' : 20}]}}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 20
     jack.world_quests_total = 30
 
@@ -187,7 +187,7 @@ def test_pve_achievements_criteria_missing_amount_islands_value_is_greater():
                 {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
                 {'id' : 11127, 'criteria' : {'child_criteria' : [{'garbage' : 20}]}}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.islands_total = 20
     jack.world_quests_total = 30
 
@@ -200,7 +200,7 @@ def test_islands_weekly_quest_done():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [{'id' : 53435}] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -210,7 +210,7 @@ def test_islands_weekly_quest_done_other_id():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [{'id' : 53436}] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -220,7 +220,7 @@ def test_islands_weekly_quest_not_done():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -232,7 +232,7 @@ def test_islands_total_sum_of_two_criteria():
                 {'id' : 12596, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
                 {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -243,7 +243,7 @@ def test_world_quests_total():
     response = { 'achievements' : { 'achievements' : [
                 {'id' : 11127, 'criteria' : {'child_criteria' : [{'amount' : 20}]}}]},
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -254,7 +254,7 @@ def test_world_quests_not_present_zero():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -276,7 +276,7 @@ def test_weekly_event_done(event_id):
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [{'id' : event_id}] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -286,7 +286,7 @@ def test_weekly_event_not_done():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
+            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
     Section.pve(jack, response, None, None)
 
@@ -296,7 +296,7 @@ def test_dungeons():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409, 'statistics' : [
                         {'id' : 12749, 'quantity' : 4},
@@ -472,7 +472,7 @@ def test_raids_all_boss_difficulties(bfa_raids):
     now = datetime.datetime(2019, 8, 8)
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409, 'statistics' : bfa_raids}]}]}}
 
@@ -492,7 +492,7 @@ def test_dungeons_and_raids_expac_missing():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : []}]}}
 
     Section.pve(jack, response, None, None)
@@ -508,11 +508,11 @@ def test_dungeons_and_raids_expac_missing():
     assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
 
-def test_dungeons_and_raids_category_missing():
+def test_dungeons_and_raids_categories_missing():
     jack = Character('jack')
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : []}}
+            'achievements_statistics' : { 'categories' : []}}
 
     Section.pve(jack, response, None, None)
 
@@ -546,12 +546,12 @@ def test_dungeons_and_raids_statistics_missing():
     assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
 
-def test_dungeons_and_raids_missing_sub_category():
+def test_dungeons_and_raids_missing_sub_categories():
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 8)
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807}]}}
 
     Utility.set_refresh_timestamp(now)
@@ -568,12 +568,12 @@ def test_dungeons_and_raids_missing_sub_category():
     assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
 
-def test_dungeons_and_raids_missing_category_id(bfa_raids):
+def test_dungeons_and_raids_missing_categories_id(bfa_raids):
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 8)
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'sub_categories' : [
                     {'id' : 15409, 'statistics' : [
                         {'id' : 12749, 'quantity' : 4},
@@ -603,12 +603,12 @@ def test_dungeons_and_raids_missing_category_id(bfa_raids):
     assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
 
-def test_dungeons_and_raids_missing_sub_category_id(bfa_raids):
+def test_dungeons_and_raids_missing_sub_categories_id(bfa_raids):
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 8)
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'statistics' : [
                         {'id' : 12749, 'quantity' : 4},
@@ -638,12 +638,12 @@ def test_dungeons_and_raids_missing_sub_category_id(bfa_raids):
     assert jack.raids_mythic == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_mythic_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
 
-def test_dungeons_and_raids_missing_sub_category_stats():
+def test_dungeons_and_raids_missing_sub_categories_stats():
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
     now = datetime.datetime(2019, 8, 8)
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409}]}]}}
 
@@ -668,7 +668,7 @@ def test_dungeons_and_raids_missing_stat_id(bfa_raids):
     del bad_bfa_raids[1]['id']
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409, 'statistics' : [
                         {'quantity' : 4},
@@ -705,7 +705,7 @@ def test_dungeons_and_raids_missing_stat_quantity(bfa_raids):
     del bad_bfa_raids[1]['quantity']
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409, 'statistics' : [
                         {'id' : 12749},
@@ -743,7 +743,7 @@ def test_raids_missing_last_updated_timestamp(bfa_raids):
     del entry_to_alter['last_updated_timestamp']
     response = { 'achievements' : { 'achievements' : [] },
             'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'statistics' : [
+            'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}}
 

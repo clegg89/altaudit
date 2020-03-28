@@ -57,7 +57,7 @@ def pve(character, profile, db_session, api):
     # Is that okay? Does it matter? It shouldn't ever happen...
     # Leave it this way for now. If we start seeing errors here we can change it
     try:
-        statistics = profile['achievements_statistics']['statistics']
+        statistics = profile['achievements_statistics']['categories']
         dungeon_and_raids = next((category['sub_categories']
             for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID), [])
         bfa_instances = next((sub['statistics']

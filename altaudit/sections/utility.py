@@ -10,8 +10,11 @@ def is_off_hand_weapon(profile):
             profile['summary']['active_spec']['name'] == 'Fury'
     except KeyError:
         is_fury_warrior = False
-    # If mainhand is a two handed weapon, set offhand ilvl to main ilvl for equipped ilvl calculation
-    if not is_fury_warrior and mainhand and mainhand['inventory_type']['type'] == 'TWOHWEAPON':
+    # If mainhand is a two handed weapon (or hunter ranged weapon),
+    # set offhand ilvl to main ilvl for equipped ilvl calculation
+    if not is_fury_warrior and mainhand and \
+            (mainhand['inventory_type']['type'] == 'TWOHWEAPON' or
+                    mainhand['item_subclass']['name'] in ('Bow', 'Crossbow', 'Gun')):
         return False
     else:
         return True
