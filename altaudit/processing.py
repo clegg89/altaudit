@@ -105,7 +105,7 @@ def _get_historical_data(character):
 
     character.historic_world_quests_done = '|'.join([str(wq) for  wq in world_quests])
     character.historic_dungeons_done = '|'.join([str(d) for d in dungeons])
-    character.historic_mplus_done = '|'.join([str(mp) if mp else '' for mp in mplus])
+    character.historic_mplus_done = '|'.join([str(mp) if mp else ' ' for mp in mplus])
 
 def _get_subsections(region, profile, api, sub_section, parent='summary', prefix=''):
     if type(sub_section) is str:
