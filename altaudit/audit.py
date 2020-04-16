@@ -20,6 +20,11 @@ from . import sections as Section
 RAIDERIO_URL="https://raider.io/api/v1/characters/profile?region={region}&realm={realm_slug}&name={character_name}&fields=mythic_plus_scores_by_season:current,mythic_plus_highest_level_runs,mythic_plus_weekly_highest_level_runs"
 
 def _character_as_dict(character):
+    return {'character_name' : character.name.lower(),
+            'realm_slug' : character.realm_slug,
+            'region' : character.region_name}
+
+def _character_as_dict_rio(character):
     return {'character_name' : character.name,
             'realm_slug' : character.realm_slug,
             'region' : character.region_name}
@@ -168,7 +173,7 @@ class Audit:
                     profile = { 'summary' : self.blizzard_api.get_character_profile_summary(**_character_as_dict(character),
                         namespace="profile-{}".format(character.region_name),
                         locale=BLIZZARD_LOCALE) }
-                    rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict(character)))
+                    rio_resp = self.request_session.get(RAIDERIO_URL.format(**_character_as_dict_rio(character)))
 
                     update_snapshots(character)
                     process_blizzard(character, profile, session, self.blizzard_api, force_refresh)
