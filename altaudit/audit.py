@@ -131,13 +131,13 @@ class Audit:
                     session.add(realm_model)
 
                 for character in characters:
-                    logger.debug("Add character %s:%s:%s", region, realm, character)
                     character_model = session.query(Character).\
                             filter_by(name=character).join(Realm).\
                             filter_by(name=realm).join(Region).\
                             filter_by(name=region).first()
 
                     if not character_model:
+                        logger.debug("Add character %s:%s:%s", region, realm, character)
                         character_model = Character(character, realm=realm_model)
                         session.add(character_model)
 
