@@ -137,7 +137,15 @@ def update_snapshots(character):
 
     if week not in character.snapshots[year] and \
             character.world_quests_total is not None and character.dungeons_total is not None:
-        logger.debug("Week %i of %i not found, setting %i, %i, %i", year, week, character.world_quests_total, character.dungeons_total, character.mplus_weekly_highest)
+        logger.info("%s:%s:%s: Week %i of %i not found, setting %i, %i, %i",
+                character.region_name, character.realm_slug, character.name,
+                week, year, character.world_quests_total, character.dungeons_total,
+                character.mplus_weekly_highest)
+        logger.info("%s:%s:%s: Latest timestamp is %s, refresh time is %s",
+                character.region_name, character.realm_slug, character.name,
+                datetime.datetime.utcfromtimestamp(Utility.timestamp[character.region_name]).strftime("%Y-%m-%d %H:%M:%S"),
+                Utility.refresh_time.strftime("%Y-%m-%d %H:%M:%S"))
+
         character.snapshots[year][week] = Snapshot()
         character.snapshots[year][week].world_quests = character.world_quests_total
         character.snapshots[year][week].dungeons = character.dungeons_total

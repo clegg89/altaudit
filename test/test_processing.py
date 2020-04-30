@@ -447,7 +447,7 @@ def test_get_historical_data():
 
     assert jack.historic_world_quests_done == "25|25|10|15|5"
     assert jack.historic_dungeons_done == "30|10|10|10|10"
-    assert jack.historic_mplus_done == "13||3|12|8"
+    assert jack.historic_mplus_done == "13|0|3|12|8"
 
 def test_fill_missing_snapshots():
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))

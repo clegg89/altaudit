@@ -44,17 +44,17 @@ if __name__ == '__main__':
 
     while True:
         try:
-            logger.info("Start Refresh")
+            logger.debug("Start Refresh")
             result = audit.refresh(datetime.datetime, force_refresh=force_refresh)
-            logger.info("End Refresh")
+            logger.debug("End Refresh")
             with open('characters.csv', 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerows(result)
 
-            logger.info("Upload...")
+            logger.debug("Upload...")
             os.system('rsync -razq characters.csv {}'.format(config['server']))
 
-            logger.info("Sleep")
+            logger.debug("Sleep")
             force_refresh=False
             time.sleep(20)
 

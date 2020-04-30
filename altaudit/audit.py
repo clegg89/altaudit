@@ -110,7 +110,7 @@ class Audit:
 
         for char in stored_characters:
             if not {'name' : char.name, 'realm' : char.realm_slug, 'region' : char.region_name} in config_characters:
-                logger.debug("Could not find %s:%s:%s in config, delete", char.region_name, char.realm_slug, char.name)
+                logger.info("Could not find %s:%s:%s in config, delete", char.region_name, char.realm_slug, char.name)
                 session.delete(char)
 
     def _add_missing_characters(self, session):
@@ -119,14 +119,14 @@ class Audit:
         for region,realms in self.config_characters.items():
             region_model = session.query(Region).filter_by(name=region).first()
             if not region_model:
-                logger.debug("Add region %s", region)
+                logger.info("Add region %s", region)
                 region_model = Region(region)
                 session.add(region_model)
 
             for realm,characters in realms.items():
                 realm_model = session.query(Realm).filter_by(name=realm).join(Region).filter_by(name=region).first()
                 if not realm_model:
-                    logger.debug("Add realm %s:%s", region, realm)
+                    logger.info("Add realm %s:%s", region, realm)
                     realm_model = Realm(realm, region_model)
                     session.add(realm_model)
 
@@ -137,7 +137,7 @@ class Audit:
                             filter_by(name=region).first()
 
                     if not character_model:
-                        logger.debug("Add character %s:%s:%s", region, realm, character)
+                        logger.info("Add character %s:%s:%s", region, realm, character)
                         character_model = Character(character, realm=realm_model)
                         session.add(character_model)
 
