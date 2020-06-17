@@ -166,7 +166,7 @@ class Audit:
         try:
             characters = session.query(Character).all()
 
-            output = [Section.metadata()]
+            output = [Section.metadata(characters[0].region_name)]
             for character in characters:
                 logger.debug("%s:%s:%s", character.region_name, character.realm_slug, character.name)
                 try:
