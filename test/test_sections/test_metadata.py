@@ -13,13 +13,34 @@ def test_metadata_timestamp():
 
     Utility.set_refresh_timestamp(now)
 
-    assert Section.metadata()[0] == now
+    assert Section.metadata('us')[0] == now
 
 def test_metadata_software_version():
-    assert Section.metadata()[1] == VERSION
+    assert Section.metadata('us')[1] == VERSION
 
 def test_metadata_wow_patch():
-    assert Section.metadata()[2] == WOW_PATCH
+    assert Section.metadata('us')[2] == WOW_PATCH
 
 def test_metadata_raids():
-    assert Section.metadata()[3] == "Uldir+Taloc_MOTHER_Fetid Devourer_Zek'voz, Herald of N'zoth_Vectis_Zul, Reborn_Mythrax the Unraveler_G'huun|Battle of Dazar'alor+Champion of the Light_Grong_Jadefire Masters_Opulence_Conclave of the Chosen_King Rastakhan_Mekkatorque_Stormwall Blockade_Lady Jaina Proudmoore|Crucible of Storms+The Restless Cabal_Uu'nat, Harbinger of the Void|The Eternal Palace+Abyssal Commander Sivara_Radiance of Azshara_Blackwater Behemoth_Lady Ashvane_Orgozoa_The Queen's Court_Za'qul_Queen Azshara|Ny'alotha, the Waking City+Wrathion_Maut_The Prophet Skitra_Dark Inquisitor Xanesh_The Hivemind_Shad'har the Insatiable_Drest'agath_Vexiona_Ra-den the Despoiled_Il'gynoth, Corruption Reborn_Carapace of N'Zoth_N'Zoth the Corruptor"
+    assert Section.metadata('us')[3] == "Uldir+Taloc_MOTHER_Fetid Devourer_Zek'voz, Herald of N'zoth_Vectis_Zul, Reborn_Mythrax the Unraveler_G'huun|Battle of Dazar'alor+Champion of the Light_Grong_Jadefire Masters_Opulence_Conclave of the Chosen_King Rastakhan_Mekkatorque_Stormwall Blockade_Lady Jaina Proudmoore|Crucible of Storms+The Restless Cabal_Uu'nat, Harbinger of the Void|The Eternal Palace+Abyssal Commander Sivara_Radiance of Azshara_Blackwater Behemoth_Lady Ashvane_Orgozoa_The Queen's Court_Za'qul_Queen Azshara|Ny'alotha, the Waking City+Wrathion_Maut_The Prophet Skitra_Dark Inquisitor Xanesh_The Hivemind_Shad'har the Insatiable_Drest'agath_Vexiona_Ra-den the Despoiled_Il'gynoth, Corruption Reborn_Carapace of N'Zoth_N'Zoth the Corruptor"
+
+def test_metadata_corruption_resist_basic():
+    now = datetime.datetime(2020, 6, 17, 16)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Section.metadata('us')[4] == 89
+
+def test_metadata_corruption_resist_same_year_after_max():
+    now = datetime.datetime(2020, 10, 17, 16)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Section.metadata('us')[4] == 125
+
+def test_metadata_corruption_resist_next_year():
+    now = datetime.datetime(2021, 10, 17, 16)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Section.metadata('us')[4] == 125
