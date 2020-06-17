@@ -30,3 +30,17 @@ def test_metadata_corruption_resist_basic():
     Utility.set_refresh_timestamp(now)
 
     assert Section.metadata('us')[4] == 89
+
+def test_metadata_corruption_resist_same_year_after_max():
+    now = datetime.datetime(2020, 10, 17, 16)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Section.metadata('us')[4] == 125
+
+def test_metadata_corruption_resist_next_year():
+    now = datetime.datetime(2021, 10, 17, 16)
+
+    Utility.set_refresh_timestamp(now)
+
+    assert Section.metadata('us')[4] == 125
