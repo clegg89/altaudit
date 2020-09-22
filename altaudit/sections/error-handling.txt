@@ -20,11 +20,6 @@ should also thrown an exception. A missing ['level']['value'] key should result 
 exception should happen. Missing items should count as 0 in estimated ilvl, but should otherwise be None in
 the various item fields.
 
-Azerite
-
-Similar to Items, only missing 'equipped_items' or missing slot should trigger an exception. Any issues should
-result in values of None being placed in the respective field.
-
 Audit
 
 Missing items, missing slot, or missing inventory type will trigger error. Other systems try to recover as much as

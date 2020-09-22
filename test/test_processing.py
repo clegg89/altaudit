@@ -6,8 +6,8 @@ import datetime
 from wowapi import WowApiException
 
 import altaudit
-from altaudit.processing import update_snapshots, _get_subsections, _serialize_azerite, _serialize_gems, _fill_missing_snapshots,  _get_historical_data, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
-from altaudit.models import Region, Realm, Character, Snapshot, AzeriteTrait, Gem, GemSlotAssociation
+from altaudit.processing import update_snapshots, _get_subsections, _serialize_gems, _fill_missing_snapshots,  _get_historical_data, _get_snapshots, process_blizzard, process_raiderio, serialize, PROFILE_API_SECTIONS
+from altaudit.models import Region, Realm, Character, Snapshot, Gem, GemSlotAssociation
 from altaudit.utility import Utility
 
 @pytest.fixture
@@ -268,40 +268,6 @@ def test_process_raiderio_bad_response(mock_raiderio, mocker):
     assert jack.mplus_weekly_highest == 0
     assert jack.mplus_season_highest == 0
 
-def test_serialize_azerite():
-    jack = Character('jack')
-    jack._head_tier0_selected = AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard')
-    jack._head_tier0_available = [
-            AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'),
-            AzeriteTrait(12, 234444, 'Made Up Trait', 'inv_fakeicon')]
-
-    _serialize_azerite(jack)
-
-    assert jack.head_tier0_selected == '13+263978+Azerite Empowered+inv_smallazeriteshard'
-    assert jack.head_tier0_available == '13+263978+Azerite Empowered+inv_smallazeriteshard|12+234444+Made Up Trait+inv_fakeicon'
-
-def test_serialize_azerite_no_selected():
-    jack = Character('jack')
-    jack._head_tier0_selected = None
-    jack._head_tier0_available = []
-
-    _serialize_azerite(jack)
-
-    assert jack.head_tier0_selected == None
-    assert jack.head_tier0_available == None
-
-def test_serialize_azerite_no_available():
-    jack = Character('jack')
-    jack._head_tier0_selected = None
-    jack._head_tier0_available = [
-            AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'),
-            AzeriteTrait(12, 234444, 'Made Up Trait', 'inv_fakeicon')]
-
-    _serialize_azerite(jack)
-
-    assert jack.head_tier0_selected == None
-    assert jack.head_tier0_available == '13+263978+Azerite Empowered+inv_smallazeriteshard|12+234444+Made Up Trait+inv_fakeicon'
-
 def test_serialize_gems():
     jack = Character('jack')
     jack.gems = [
@@ -485,7 +451,6 @@ def test_fill_missing_snapshots():
 
 def test_serialzie(mocker):
     jack = Character('jack', realm=Realm('kiljaeden', Region('us')))
-    mock_serialize_azerite = mocker.patch('altaudit.processing._serialize_azerite')
     mock_serialize_gems = mocker.patch('altaudit.processing._serialize_gems')
     mock_get_snapshots = mocker.patch('altaudit.processing._get_snapshots')
     mock_get_historical_data = mocker.patch('altaudit.processing._get_historical_data')
@@ -495,7 +460,6 @@ def test_serialzie(mocker):
     result = serialize(jack)
 
     assert result == ['jack', 'us', 'kiljaeden']
-    mock_serialize_azerite.assert_called_once_with(jack)
     mock_serialize_gems.assert_called_once_with(jack)
     mock_get_snapshots.assert_called_once_with(jack)
     mock_get_historical_data.assert_called_once_with(jack)

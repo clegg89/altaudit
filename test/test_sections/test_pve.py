@@ -17,7 +17,6 @@ def test_pve_quests_missing():
 
     Section.pve(jack, response, None, None)
 
-    assert jack.island_weekly_done == 'FALSE'
     assert jack.weekly_event_done == 'FALSE'
 
 def test_pve_quests_key_missing():
@@ -28,7 +27,6 @@ def test_pve_quests_key_missing():
 
     Section.pve(jack, response, None, None)
 
-    assert jack.island_weekly_done == 'FALSE'
     assert jack.weekly_event_done == 'FALSE'
 
 def test_pve_quests_missing_id():
@@ -39,7 +37,6 @@ def test_pve_quests_missing_id():
 
     Section.pve(jack, response, None, None)
 
-    assert jack.island_weekly_done == 'FALSE'
     assert jack.weekly_event_done == 'FALSE'
 
 def test_pve_empty_achievements():
@@ -47,12 +44,10 @@ def test_pve_empty_achievements():
     response = { 'achievements' : None,
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : None}
-    jack.islands_total = 20
     jack.world_quests_total = 30
 
     Section.pve(jack, response, None, None)
 
-    assert jack.islands_total == 20
     assert jack.world_quests_total == 30
 
 def test_pve_achievements_key_missing():
@@ -60,12 +55,10 @@ def test_pve_achievements_key_missing():
     response = { 'achievements' : {'garbage' : 'some more garbage'},
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 20
     jack.world_quests_total = 30
 
     Section.pve(jack, response, None, None)
 
-    assert jack.islands_total == 20
     assert jack.world_quests_total == 30
 
 def test_pve_achievements_missing_id():
@@ -76,12 +69,10 @@ def test_pve_achievements_missing_id():
                 {'criteria' : {'child_criteria' : [{'amount' : 40}]}}]},
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 20
     jack.world_quests_total = 30
 
     Section.pve(jack, response, None, None)
 
-    assert jack.islands_total == 30
     assert jack.world_quests_total == 30
 
 def test_pve_achievements_missing_id_old_value_greater_than_new():
@@ -92,151 +83,11 @@ def test_pve_achievements_missing_id_old_value_greater_than_new():
                 {'criteria' : {'child_criteria' : [{'amount' : 40}]}}]},
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 40
     jack.world_quests_total = 30
 
     Section.pve(jack, response, None, None)
 
-    assert jack.islands_total == 40
     assert jack.world_quests_total == 30
-
-def test_pve_achivements_missing_criteria_islands_value_is_lower():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [
-                {'id' : 12596, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
-                {'id' : 12597},
-                {'id' : 11127}]},
-            'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 20
-    jack.world_quests_total = 30
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.islands_total == 30
-    assert jack.world_quests_total == 30
-
-def test_pve_achivements_missing_criteria_islands_value_is_greater():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [
-                {'id' : 12596, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
-                {'id' : 12597},
-                {'id' : 11127}]},
-            'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 20
-    jack.world_quests_total = 30
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.islands_total == 20
-    assert jack.world_quests_total == 30
-
-def test_pve_achievements_criteria_missing_child_criteria_islands_value_is_lesser():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [
-                {'id' : 12596, 'criteria' : None},
-                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
-                {'id' : 11127, 'criteria' : {'garbage' : 123}}]},
-            'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 20
-    jack.world_quests_total = 30
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.islands_total == 30
-    assert jack.world_quests_total == 30
-
-def test_pve_achievements_criteria_missing_child_criteria_islands_value_is_greater():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [
-                {'id' : 12596, 'criteria' : None},
-                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
-                {'id' : 11127, 'criteria' : {'garbage' : 123}}]},
-            'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 20
-    jack.world_quests_total = 30
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.islands_total == 20
-    assert jack.world_quests_total == 30
-
-def test_pve_achievements_criteria_missing_amount_islands_value_is_lesser():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [
-                {'id' : 12596, 'criteria' : {'child_criteria' : [{'garbage' : 10}]}},
-                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}},
-                {'id' : 11127, 'criteria' : {'child_criteria' : [{'garbage' : 20}]}}]},
-            'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 20
-    jack.world_quests_total = 30
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.islands_total == 30
-    assert jack.world_quests_total == 30
-
-def test_pve_achievements_criteria_missing_amount_islands_value_is_greater():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [
-                {'id' : 12596, 'criteria' : {'child_criteria' : [{'garbage' : 10}]}},
-                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
-                {'id' : 11127, 'criteria' : {'child_criteria' : [{'garbage' : 20}]}}]},
-            'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-    jack.islands_total = 20
-    jack.world_quests_total = 30
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.islands_total == 20
-    assert jack.world_quests_total == 30
-
-def test_islands_weekly_quest_done():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [{'id' : 53435}] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.island_weekly_done == 'TRUE'
-
-def test_islands_weekly_quest_done_other_id():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [{'id' : 53436}] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.island_weekly_done == 'TRUE'
-
-def test_islands_weekly_quest_not_done():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [] },
-            'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.island_weekly_done == 'FALSE'
-
-def test_islands_total_sum_of_two_criteria():
-    jack = Character('jack')
-    response = { 'achievements' : { 'achievements' : [
-                {'id' : 12596, 'criteria' : {'child_criteria' : [{'amount' : 10}]}},
-                {'id' : 12597, 'criteria' : {'child_criteria' : [{'amount' : 30}]}}]},
-            'quests_completed' : { 'quests' : [] },
-            'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
-
-    Section.pve(jack, response, None, None)
-
-    assert jack.islands_total == 40
 
 def test_world_quests_total():
     jack = Character('jack')

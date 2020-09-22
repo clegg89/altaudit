@@ -3,7 +3,7 @@ import pytest
 
 from sqlalchemy.exc import IntegrityError
 
-from altaudit.models import Faction, Class, Race, Region, Realm, Character, AzeriteTrait, GemSlotAssociation, Gem
+from altaudit.models import Faction, Class, Race, Region, Realm, Character, GemSlotAssociation, Gem
 
 def test_create_character_table(db):
     assert db.has_table('characters')
@@ -162,60 +162,6 @@ def test_delete_region_cascade_characters(db_session):
     db_session.delete(us)
 
     assert [tali] == db_session.query(Character).all()
-
-def test_assign_selected_azerite_trait(db_session):
-    clegg = Character('clegg')
-    clegg._head_tier0_selected = AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard')
-
-    db_session.add(clegg)
-    db_session.flush()
-
-    trait = db_session.query(AzeriteTrait).first()
-
-    assert trait.id ==  13
-    assert trait.spell_id ==  263978
-    assert trait.name ==  'Azerite Empowered'
-    assert trait.icon == 'inv_smallazeriteshard'
-
-def test_update_selected_azerite_trait(db_session):
-    clegg = Character('clegg')
-    clegg._head_tier0_selected = AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard')
-
-    db_session.add(clegg)
-    db_session.flush()
-
-    trait = db_session.query(Character).first()._head_tier0_selected
-
-    trait.name = 'Azerite Empowered 2'
-
-    assert clegg._head_tier0_selected.name == 'Azerite Empowered 2'
-
-def test_no_cascade_delete_azerite_trait(db_session):
-    clegg = Character('clegg')
-    clegg._head_tier0_selected = AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard')
-
-    db_session.add(clegg)
-    db_session.flush()
-
-    db_session.delete(clegg)
-    db_session.flush()
-
-    assert db_session.query(AzeriteTrait).first() != None
-
-def test_assign_available_azerite_traits(db_session):
-    clegg = Character('clegg')
-    clegg._head_tier0_available = [
-            AzeriteTrait(13, 263978, 'Azerite Empowered', 'inv_smallazeriteshard'),
-            AzeriteTrait(12, 234444, 'Made Up Trait', 'inv_fakeicon')]
-
-    db_session.add(clegg)
-    db_session.flush()
-
-    traits = db_session.query(AzeriteTrait).all()
-
-    assert len(traits) == 2
-    assert 'Azerite Empowered' in [t.name for t in traits]
-    assert 'Made Up Trait' in [t.name for t in traits]
 
 def test_add_character_gems(db_session):
     clegg = Character('clegg')
