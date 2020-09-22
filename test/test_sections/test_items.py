@@ -170,15 +170,6 @@ def test_cloak_ashjrakamas_rank(default_items_response):
     Section.items(jack, default_items_response, None, None)
     assert jack.cloak_rank == 12
 
-def test_cloak_ashjrakamas_resistance(default_items_response):
-    jack = Character('jack')
-    cloak = next(item for item in default_items_response['equipment']['equipped_items'] if item['slot']['type'] == 'BACK')
-    cloak['name'] = "Ashjra'kamas, Shroud of Resolve"
-    cloak['name_description'] = { 'display_string' : "Rank 12" }
-    cloak['stats'] = [{'type' : {'type' : 'CORRUPTION_RESISTANCE'}, 'value' : 86}]
-
-    Section.items(jack, default_items_response, None, None)
-
 def test_tabard_ignored(default_items_response):
     jack = Character('jack')
     default_items_response['equipment']['equipped_items'].append({

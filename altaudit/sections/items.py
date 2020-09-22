@@ -35,7 +35,6 @@ def items(character, profile, db_session, api):
     if cloak and cloak['name'] == "Ashjra'kamas, Shroud of Resolve":
         try:
             character.cloak_rank = int(re.match(r'Rank ([0-9]+)', cloak['name_description']['display_string']).group(1))
-            character.cloak_resistance = int(next((stat['value'] for stat in cloak['stats'] if stat['type']['type'] == 'CORRUPTION_RESISTANCE'), 0))
         except (KeyError,TypeError):
             pass
 

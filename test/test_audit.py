@@ -466,7 +466,7 @@ class TestAuditRefresh:
     def test_refresh_returns_list(self, mock_process_blizzard, mock_process_raiderio, mock_update_snapshots, mock_serialize):
         result = self.audit.refresh(datetime.datetime)
 
-        assert result == [Section.metadata('us'), mock_serialize.return_value]
+        assert result == [Section.metadata(), mock_serialize.return_value]
 
     @pytest.mark.skip(reason='TODO')
     def test_refresh_commits_changes(self, mock_process_blizzard, mock_process_raiderio, mock_update_snapshots, mock_serialize):
