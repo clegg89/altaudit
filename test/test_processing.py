@@ -26,15 +26,15 @@ def mock_get_subsections(mocker):
 
 @pytest.fixture
 def mock_api(mocker):
-    def _get_data_resource(url, region):
+    def _get_data_resource(url, region, **filters):
         assert region == 'us'
-        assert url.endswith("&locale=en_US")
-        actual_url = url.replace("&locale=en_US","")
-        if actual_url == 'quests':
+        assert 'locale' in filters
+        assert filters['locale'] == 'en_US'
+        if url == 'quests':
             return {'completed' : {'href' : 'completed'}}
-        elif actual_url == 'fail':
+        elif url == 'fail':
             raise WowApiException
-        return actual_url
+        return url
 
     mock = mocker.MagicMock()
     mock.get_data_resource.side_effect = _get_data_resource
@@ -138,7 +138,7 @@ def test_get_subsections_list_of_strings(mock_api, mocker):
     api_sections = ['media', 'equipment', 'reputations']
     profile = { 'summary' : {
         **{v : {'href' : v} for v in api_sections} } }
-    expected_api_calls = [mocker.call.get_data_resource('{}&locale=en_US'.format(v), 'us')
+    expected_api_calls = [mocker.call.get_data_resource(v, 'us', locale='en_US')
             for v in api_sections]
 
     _get_subsections('us', profile, mock_api, api_sections)
@@ -157,11 +157,11 @@ def test_get_subsections_list_of_strings_and_dictionaries(mock_api, mocker):
         'reputations' : {'href' : 'reputations'},
         'quests' : {'href' : 'quests'}}}
     expected_api_calls = [
-            mocker.call.get_data_resource('{}&locale=en_US'.format('media'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('equipment'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('reputations'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('quests'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('completed'), 'us')]
+            mocker.call.get_data_resource('media', 'us', locale='en_US'),
+            mocker.call.get_data_resource('equipment', 'us', locale='en_US'),
+            mocker.call.get_data_resource('reputations', 'us', locale='en_US'),
+            mocker.call.get_data_resource('quests', 'us', locale='en_US'),
+            mocker.call.get_data_resource('completed', 'us', locale='en_US')]
 
     _get_subsections('us', profile, mock_api, api_sections)
 
@@ -182,12 +182,12 @@ def test_get_subsections_section_missing_from_response(mock_api, mocker):
         'achievements' : {'href' : 'achievements'},
         'quests' : {'href' : 'quests'}}}
     expected_api_calls = [
-            mocker.call.get_data_resource('{}&locale=en_US'.format('media'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('equipment'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('reputations'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('achievements'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('quests'), 'us'),
-            mocker.call.get_data_resource('{}&locale=en_US'.format('completed'), 'us')]
+            mocker.call.get_data_resource('media', 'us', locale='en_US'),
+            mocker.call.get_data_resource('equipment', 'us', locale='en_US'),
+            mocker.call.get_data_resource('reputations', 'us', locale='en_US'),
+            mocker.call.get_data_resource('achievements', 'us', locale='en_US'),
+            mocker.call.get_data_resource('quests', 'us', locale='en_US'),
+            mocker.call.get_data_resource('completed', 'us', locale='en_US')]
 
     _get_subsections('us', profile, mock_api, api_sections)
 
