@@ -112,7 +112,7 @@ def _get_subsections(region, profile, api, sub_section, parent='summary', prefix
         if profile[parent] and sub_section in profile[parent]:
             try:
                 profile[prefix + sub_section] = api.get_data_resource(
-                        '{}&locale={}'.format(profile[parent][sub_section]['href'], BLIZZARD_LOCALE), region)
+                        profile[parent][sub_section]['href'], region, locale=BLIZZARD_LOCALE)
             except WowApiException:
                 profile[prefix + sub_section] = None
         else:

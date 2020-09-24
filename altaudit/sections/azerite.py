@@ -52,7 +52,7 @@ def _azerite_item(character, item, db_session, api):
 
 def _get_all_traits(item, character, api):
     try:
-        return next((traits['powers'] for traits in api.get_data_resource('{}&locale={}'.format(item['item']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)['azerite_class_powers'] if traits['playable_class']['name'] == character.class_name), None)
+        return next((traits['powers'] for traits in api.get_data_resource(item['item']['key']['href'], BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['azerite_class_powers'] if traits['playable_class']['name'] == character.class_name), None)
     except (KeyError, WowApiException):
         return None
 
@@ -71,7 +71,7 @@ def _trait(trait, db_session, spell_lookup):
         if not model:
             # Spell API not working
             # This is only useful to get the icon
-            # spell = api.get_data_resource('{}&locale={}'.format(trait['spell']['key']['href'], BLIZZARD_LOCALE), BLIZZARD_REGION)
+            # spell = api.get_data_resource(trait['spell']['key']['href'], BLIZZARD_REGION, locale=BLIZZARD_LOCALE)
             spell = spell_lookup(trait)
             model = AzeriteTrait(trait['id'], spell['id'], spell['name'], None)
 
