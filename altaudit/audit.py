@@ -71,7 +71,7 @@ class Audit:
 
     def _create_classes(self, session):
         session.query(Class).delete()
-        classes = self.blizzard_api.get_playable_classes(BLIZZARD_REGION,
+        classes = self.blizzard_api.get_playable_class_index(BLIZZARD_REGION,
                 'static-' + BLIZZARD_REGION, locale=BLIZZARD_LOCALE)['classes']
         session.add_all([Class(c['name'], id=c['id']) for c in classes])
 

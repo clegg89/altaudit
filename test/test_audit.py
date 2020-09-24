@@ -145,7 +145,7 @@ class TestAuditInit:
 
             self.mock_wowapi = MockApiClass
             mock_api = MockApiClass.return_value
-            mock_api.get_playable_classes.return_value = wow_classes
+            mock_api.get_playable_class_index.return_value = wow_classes
             mock_api.get_playable_race_index.return_value = wow_races
             mock_api.get_playable_race.side_effect = _get_playable_race
             mock_api.get_data_resource.side_effect = _get_data_resource
@@ -404,7 +404,7 @@ class TestAuditRefresh:
 
                 mock_api = MockApiClass.return_value
                 mock_get = MockSessionClass.return_value.get
-                mock_api.get_playable_classes.return_value = wow_classes
+                mock_api.get_playable_class_index.return_value = wow_classes
                 mock_api.get_playable_race_index.return_value = wow_races
                 mock_api.get_playable_race.side_effect = _get_playable_race
                 mock_api.get_data_resource.side_effect = _get_data_resource
