@@ -202,3 +202,33 @@ def test_basic_info_render(fake_response_maker, db_session):
     response = fake_response_maker(render='realm1/96/184987488-main.jpg')
     Section.basic(jack, response, db_session, None)
     assert jack.render == 'realm1/96/184987488-main.jpg'
+
+def test_basic_info_avatar_old(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(avatar='realm1/96/184987488-avatar.jpg')
+    response['media'] = {
+            'avatar_url' : 'realm1/96/184987488-avatar.jpg',
+            'bust_url' : 'bust_url',
+            'render_url' : 'render_url'}
+    Section.basic(jack, response, db_session, None)
+    assert jack.avatar == 'realm1/96/184987488-avatar.jpg'
+
+def test_basic_info_bust_old(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(bust='realm1/96/184987488-inset.jpg')
+    response['media'] = {
+            'avatar_url' : 'avatar_url',
+            'bust_url' : 'realm1/96/184987488-inset.jpg',
+            'render_url' : 'render_url'}
+    Section.basic(jack, response, db_session, None)
+    assert jack.bust == 'realm1/96/184987488-inset.jpg'
+
+def test_basic_info_render_old(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker(render='realm1/96/184987488-main.jpg')
+    response['media'] = {
+            'avatar_url' : 'avatar_url',
+            'bust_url' : 'bust_url',
+            'render_url' : 'realm1/96/184987488-main.jpg'}
+    Section.basic(jack, response, db_session, None)
+    assert jack.render == 'realm1/96/184987488-main.jpg'
