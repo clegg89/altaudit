@@ -110,9 +110,11 @@ def fake_response_maker():
                 'level' : level,
                 'last_login_timestamp' : timestamp },
             'media' : {
-                'avatar_url' : avatar,
-                'bust_url' : bust,
-                'render_url' : render }}
+                'assets' : [
+                    { 'key' : 'avatar', 'value' : avatar },
+                    { 'key' : 'inset', 'value' : bust },
+                    { 'key' : 'main', 'value' : render }]}
+            }
 
     return _maker
 
