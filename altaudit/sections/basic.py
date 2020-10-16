@@ -18,6 +18,8 @@ def basic(character, profile, db_session, api):
     character.faction = db_session.query(Faction).filter_by(name=profile['summary']['faction']['name']).first()
     character.gender = profile['summary']['gender']['name']
     character.race = db_session.query(Race).filter_by(name=profile['summary']['race']['name']).first()
-    character.avatar = profile['media']['avatar_url']
-    character.bust = profile['media']['bust_url']
-    character.render = profile['media']['render_url']
+
+    assets = profile['media']['assets']
+    character.avatar = next((asset['value'] for asset in assets if asset['key'] == 'avatar'), None)
+    character.bust = next((asset['value'] for asset in assets if asset['key'] == 'inset'), None)
+    character.render = next((asset['value'] for asset in assets if asset['key'] == 'main'), None)

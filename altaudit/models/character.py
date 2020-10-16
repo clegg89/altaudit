@@ -109,7 +109,6 @@ CHARACTER_HEADER_FIELDS = {
 
     # Cloak Rank
     'cloak_rank' : 'Column(Integer)',
-    'cloak_resistance' : 'Column(Integer)',
 
     # Azerite Info
     'hoa_level' : 'Column(Integer)',
