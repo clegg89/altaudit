@@ -37,8 +37,19 @@ DUNGEONS_AND_RAIDS_CATEGORY_ID = 14807
 "Battle for Azeroth Sub-Category ID"
 BATTLE_FOR_AZEROTH_SUBCATEGORY_ID = 15409
 
-"Mythic Dungeon Statistic IDs"
+"""
+Mythic Dungeon Statistic IDs
+
+To find these values, go to Achievement Statistics Profile.
+Find the Dungeons & Raids Category (ID 14807 Name Dungeons & Raids).
+Find the appropriate expansion subcategory (will have that name).
+Expand statistics in subcategory, and look for dungeons in each subcategory.
+"""
 MYTHIC_DUNGEON_STATISTIC_IDS = {
+    'Halls of Atonement'    : 14392,
+    'Mists of Tirna Scithe' : 14395,
+    'The Necrotic Wake'     : 14404,
+    'De Other Side'         :
     "Atal'Dazar"           : 12749,
     'Freehold'             : 12752,
     "King's Rest"          : 12763,
