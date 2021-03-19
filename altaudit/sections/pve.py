@@ -5,37 +5,38 @@ from ..models import RAID_DIFFICULTIES
 from ..utility import Utility
 from .raids import VALID_RAIDS
 
-"Quest IDs for weekly island quest"
-WEEKLY_ISLAND_QUEST_IDS = (53435, 53436)
-
-"Achievement ID for No Tourist (Normal or higher islands)"
-PVE_ISLAND_ACHIEVEMENT_ID = 12596
-
-"Achievement ID for Bayside Brawler (PVP islands)"
-PVP_ISLAND_ACHIEVEMENT_ID = 12597
-
 "Achievement ID for 200 World Quests Completed (WQ count)"
 WORLD_QUESTS_COMPLETED_ACHIEVEMENT_ID = 11127
 
-"Weekly Event Quest IDs"
+"""
+Weekly Event Quest IDs
+
+To find these I think use:
+
+https://www.wowhead.com/quests/world-events/weekend-event
+
+If that fails just copy wowaudit
+
+Use:
+https://www.wowhead.com/quest={id}
+
+To view the quest
+"""
 WEEKLY_EVENT_QUESTS = [
-    53032, # Burning Crusade timewalking
-    53036, # 4 Battleground matches
-    53033, # Lich King timewalking
-    53034, # Cataclysm timewalking
-    53035, # Pandaria timewalking
-    53037, # Emissary of war
-    53039, # Arena calls
-    53038, # Pet battles
-    53030, # World quests
-    54995, # Draenor timewalking
+    62631, # The World Awaits (20 WQ)
+    62635, # A Shrouded Path Through Time (MoP Timewalking)
+    62636, # A Savage Path Through Time (WoD Timewalking)
+    62637, # A Call to Battle (Win 4 BGs)
+    62638, # Emissary of War (4 M0's)
+    62639, # The Very Best (PvP Pet Battles)
+    62640  # The Arena Calls (10 skirmishes)
 ]
 
 "Dungeons and Raids statistics category ID"
 DUNGEONS_AND_RAIDS_CATEGORY_ID = 14807
 
-"Battle for Azeroth Sub-Category ID"
-BATTLE_FOR_AZEROTH_SUBCATEGORY_ID = 15409
+"Current Expac Dungeons & Raids Achievment Statistics Sub-Category ID"
+CURRENT_EXPAC_SUBCATEGORY_ID = 15409
 
 """
 Mythic Dungeon Statistic IDs
@@ -49,18 +50,11 @@ MYTHIC_DUNGEON_STATISTIC_IDS = {
     'Halls of Atonement'    : 14392,
     'Mists of Tirna Scithe' : 14395,
     'The Necrotic Wake'     : 14404,
-    'De Other Side'         :
-    "Atal'Dazar"           : 12749,
-    'Freehold'             : 12752,
-    "King's Rest"          : 12763,
-    'The MOTHERLODE!!'     : 12779,
-    'Shrine of the Storm'  : 12768,
-    'Siege of Boralus'     : 12773,
-    'Temple of Sethraliss' : 12776,
-    'Tol Dagor'            : 12782,
-    'Underrot'             : 12745,
-    'Waycrest Manor'       : 12785,
-    'Operation: Mechagon'  : 13620
+    'De Other Side'         : 14389,
+    'Plaguefall'            : 14398,
+    'Sanguine Depths'       : 14205,
+    'Spires of Ascension'   : 14401,
+    'Theater of Paine'      : 14407
 }
 
 def pve(character, profile, db_session, api):
@@ -72,36 +66,14 @@ def pve(character, profile, db_session, api):
         dungeon_and_raids = next((category['sub_categories']
             for category in statistics if category['id'] == DUNGEONS_AND_RAIDS_CATEGORY_ID), [])
         bfa_instances = next((sub['statistics']
-            for sub in dungeon_and_raids if sub['id'] == BATTLE_FOR_AZEROTH_SUBCATEGORY_ID), [])
+            for sub in dungeon_and_raids if sub['id'] == CURRENT_EXPAC_SUBCATEGORY_ID), [])
     except (TypeError, KeyError):
         bfa_instances = []
 
-    _island_expeditions(character, profile)
     _world_quests(character, profile)
     _weekly_event(character, profile)
     _dungeons(character, bfa_instances)
     _raids(character, bfa_instances)
-
-def _island_expeditions(character, profile):
-    try:
-        weekly_islands = next((quest for quest in profile['quests_completed']['quests']
-            if quest['id'] in WEEKLY_ISLAND_QUEST_IDS), None)
-        character.island_weekly_done = "TRUE" if weekly_islands else "FALSE"
-    except (TypeError, KeyError):
-        character.island_weekly_done = "FALSE"
-
-    if profile['achievements'] and 'achievements' in profile['achievements']:
-        new_total = 0
-        achievements = profile['achievements']['achievements']
-        for achievement_id in (PVE_ISLAND_ACHIEVEMENT_ID, PVP_ISLAND_ACHIEVEMENT_ID):
-            achievement = next((achiev for achiev in achievements if 'id' in achiev and achiev['id'] == achievement_id), None)
-            if achievement:
-                try:
-                    new_total += achievement['criteria']['child_criteria'][0]['amount']
-                except (TypeError, KeyError):
-                    pass
-
-        character.islands_total = max(new_total, character.islands_total) if character.islands_total else new_total
 
 def _world_quests(character, profile):
     if not character.world_quests_total:
