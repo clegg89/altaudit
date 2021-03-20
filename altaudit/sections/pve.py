@@ -54,7 +54,7 @@ MYTHIC_DUNGEON_STATISTIC_IDS = {
     'Plaguefall'            : 14398,
     'Sanguine Depths'       : 14205,
     'Spires of Ascension'   : 14401,
-    'Theater of Paine'      : 14407
+    'Theater of Pain'      : 14407
 }
 
 def pve(character, profile, db_session, api):

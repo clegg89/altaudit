@@ -112,16 +112,13 @@ def test_world_quests_not_present_zero():
     assert jack.world_quests_total == 0
 
 @pytest.mark.parametrize('event_id', [
-      53032, # Burning Crusade timewalking
-      53036, # 4 Battleground matches
-      53033, # Lich King timewalking
-      53034, # Cataclysm timewalking
-      53035, # Pandaria timewalking
-      53037, # Emissary of war
-      53039, # Arena calls
-      53038, # Pet battles
-      53030, # World quests
-      54995, # Draenor timewalking
+    62631, # The World Awaits (20 WQ)
+    62635, # A Shrouded Path Through Time (MoP Timewalking)
+    62636, # A Savage Path Through Time (WoD Timewalking)
+    62637, # A Call to Battle (Win 4 BGs)
+    62638, # Emissary of War (4 M0's)
+    62639, # The Very Best (PvP Pet Battles)
+    62640  # The Arena Calls (10 skirmishes)
     ])
 def test_weekly_event_done(event_id):
     jack = Character('jack')
@@ -150,22 +147,19 @@ def test_dungeons():
             'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409, 'statistics' : [
-                        {'id' : 12749, 'quantity' : 4},
-                        {'id' : 12752, 'quantity' : 5},
-                        {'id' : 12763, 'quantity' : 6},
-                        {'id' : 12779, 'quantity' : 7},
-                        {'id' : 12768, 'quantity' : 8},
-                        {'id' : 12773, 'quantity' : 9},
-                        {'id' : 12776, 'quantity' : 10},
-                        {'id' : 12782, 'quantity' : 11},
-                        {'id' : 12745, 'quantity' : 12},
-                        {'id' : 12785, 'quantity' : 13},
-                        {'id' : 13620, 'quantity' : 14}]}]}]}}
+                        {'id' : 14392, 'quantity' : 7},
+                        {'id' : 14395, 'quantity' : 8},
+                        {'id' : 14404, 'quantity' : 9},
+                        {'id' : 14389, 'quantity' : 10},
+                        {'id' : 14398, 'quantity' : 11},
+                        {'id' : 14205, 'quantity' : 12},
+                        {'id' : 14401, 'quantity' : 13},
+                        {'id' : 14407, 'quantity' : 14}]}]}]}}
 
     Section.pve(jack, response, None, None)
 
-    assert jack.dungeons_total == 99
-    assert jack.dungeons_each_total == "Atal'Dazar+4|Freehold+5|King's Rest+6|The MOTHERLODE!!+7|Shrine of the Storm+8|Siege of Boralus+9|Temple of Sethraliss+10|Tol Dagor+11|Underrot+12|Waycrest Manor+13|Operation: Mechagon+14"
+    assert jack.dungeons_total == 84
+    assert jack.dungeons_each_total == "Halls of Atonement+7|Mists of Tirna Scithe+8|The Necrotic Wake+9|De Other Side+10|Plaguefall+11|Sanguine Depths+12|Spires of Ascension+13|Theater of Pain+14"
 
 
 @pytest.fixture
@@ -409,7 +403,7 @@ def test_dungeons_and_raids_expac_missing():
     Section.pve(jack, response, None, None)
 
     assert jack.dungeons_total == 0
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
@@ -428,7 +422,7 @@ def test_dungeons_and_raids_categories_missing():
     Section.pve(jack, response, None, None)
 
     assert jack.dungeons_total == 0
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
@@ -447,7 +441,7 @@ def test_dungeons_and_raids_statistics_missing():
     Section.pve(jack, response, None, None)
 
     assert jack.dungeons_total == 0
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
@@ -469,7 +463,7 @@ def test_dungeons_and_raids_missing_sub_categories():
     Section.pve(jack, response, None, None)
 
     assert jack.dungeons_total == 0
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
@@ -504,7 +498,7 @@ def test_dungeons_and_raids_missing_categories_id(bfa_raids):
     Section.pve(jack, response, None, None)
 
     assert jack.dungeons_total == 0
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
@@ -539,7 +533,7 @@ def test_dungeons_and_raids_missing_sub_categories_id(bfa_raids):
     Section.pve(jack, response, None, None)
 
     assert jack.dungeons_total == 0
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
@@ -562,7 +556,7 @@ def test_dungeons_and_raids_missing_sub_categories_stats():
     Section.pve(jack, response, None, None)
 
     assert jack.dungeons_total == 0
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+0|King's Rest+0|The MOTHERLODE!!+0|Shrine of the Storm+0|Siege of Boralus+0|Temple of Sethraliss+0|Tol Dagor+0|Underrot+0|Waycrest Manor+0|Operation: Mechagon+0"
+    assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
@@ -583,23 +577,20 @@ def test_dungeons_and_raids_missing_stat_id(bfa_raids):
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409, 'statistics' : [
                         {'quantity' : 4},
-                        {'id' : 12752, 'quantity' : 5},
-                        {'id' : 12763, 'quantity' : 6},
-                        {'id' : 12779, 'quantity' : 7},
-                        {'id' : 12768, 'quantity' : 8},
-                        {'id' : 12773, 'quantity' : 9},
-                        {'id' : 12776, 'quantity' : 10},
-                        {'id' : 12782, 'quantity' : 11},
-                        {'id' : 12745, 'quantity' : 12},
-                        {'id' : 12785, 'quantity' : 13},
-                        {'id' : 13620, 'quantity' : 14},
+                        {'id' : 14395, 'quantity' : 8},
+                        {'id' : 14404, 'quantity' : 9},
+                        {'id' : 14389, 'quantity' : 10},
+                        {'id' : 14398, 'quantity' : 11},
+                        {'id' : 14205, 'quantity' : 12},
+                        {'id' : 14401, 'quantity' : 13},
+                        {'id' : 14407, 'quantity' : 14},
                         *bad_bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
     Section.pve(jack, response, None, None)
 
-    assert jack.dungeons_total == 95
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+5|King's Rest+6|The MOTHERLODE!!+7|Shrine of the Storm+8|Siege of Boralus+9|Temple of Sethraliss+10|Tol Dagor+11|Underrot+12|Waycrest Manor+13|Operation: Mechagon+14"
+    assert jack.dungeons_total == 77
+    assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+8|The Necrotic Wake+9|De Other Side+10|Plaguefall+11|Sanguine Depths+12|Spires of Ascension+13|Theater of Pain+14"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|1|1|1|1|1|1|1|1|1|2|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|0|0|0|0|0|0|0|0|0|0'
@@ -619,24 +610,21 @@ def test_dungeons_and_raids_missing_stat_quantity(bfa_raids):
             'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : [
                     {'id' : 15409, 'statistics' : [
-                        {'id' : 12749},
-                        {'id' : 12752, 'quantity' : 5},
-                        {'id' : 12763, 'quantity' : 6},
-                        {'id' : 12779, 'quantity' : 7},
-                        {'id' : 12768, 'quantity' : 8},
-                        {'id' : 12773, 'quantity' : 9},
-                        {'id' : 12776, 'quantity' : 10},
-                        {'id' : 12782, 'quantity' : 11},
-                        {'id' : 12745, 'quantity' : 12},
-                        {'id' : 12785, 'quantity' : 13},
-                        {'id' : 13620, 'quantity' : 14},
+                        {'id' : 14392},
+                        {'id' : 14395, 'quantity' : 8},
+                        {'id' : 14404, 'quantity' : 9},
+                        {'id' : 14389, 'quantity' : 10},
+                        {'id' : 14398, 'quantity' : 11},
+                        {'id' : 14205, 'quantity' : 12},
+                        {'id' : 14401, 'quantity' : 13},
+                        {'id' : 14407, 'quantity' : 14},
                         *bad_bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
     Section.pve(jack, response, None, None)
 
-    assert jack.dungeons_total == 95
-    assert jack.dungeons_each_total == "Atal'Dazar+0|Freehold+5|King's Rest+6|The MOTHERLODE!!+7|Shrine of the Storm+8|Siege of Boralus+9|Temple of Sethraliss+10|Tol Dagor+11|Underrot+12|Waycrest Manor+13|Operation: Mechagon+14"
+    assert jack.dungeons_total == 84
+    assert jack.dungeons_each_total == "Halls of Atonement+7|Mists of Tirna Scithe+8|The Necrotic Wake+9|De Other Side+10|Plaguefall+11|Sanguine Depths+12|Spires of Ascension+13|Theater of Pain+14"
     assert jack.raids_raid_finder == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_normal == '0|1|1|1|1|1|1|1|1|1|2|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|0|0|0|0|0|0|0|0|0|0'
