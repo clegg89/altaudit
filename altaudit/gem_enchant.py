@@ -16,32 +16,19 @@ Eventually we may to want to legitimately cache gem data in a database.
 """
 gem_lookup = {
     # Old Gems - Not listed. Quality 1
-    # Uncommon Gems
-    153710 : { 'quality' : 2, 'name' : 'Deadly Solstone', 'icon' : 'inv_jewelcrafting_80_cutgem01_orange', 'stat' : '+30 Critical Strike' },
-    153711 : { 'quality' : 2, 'name' : 'Quick Golden Beryl', 'icon' : 'inv_jewelcrafting_80_cutgem01_yellow', 'stat' : '+30 Haste' },
-    153712 : { 'quality' : 2, 'name' : 'Versatile Kyanite', 'icon' : 'inv_jewelcrafting_80_cutgem01_blue', 'stat' : '+30 Versatility' },
-    153713 : { 'quality' : 2, 'name' : 'Masterful Kubline', 'icon' : 'inv_jewelcrafting_80_cutgem01_purple', 'stat' : '+30 Mastery' },
-    153714 : { 'quality' : 2, 'name' : 'Insightful Rubellite', 'icon' : 'inv_jewelcrafting_80_cutgem01_red', 'stat' : '+5% Experience' },
-    153715 : { 'quality' : 2, 'name' : 'Straddling Viridium', 'icon' : 'inv_jewelcrafting_80_cutgem01_green', 'stat' : '+3% Movement Speed' },
-    # Rare Gems
-    154126 : { 'quality' : 3, 'name' : 'Deadly Amberblaze', 'icon' : 'inv_jewelcrafting_80_cutgem02_orange', 'stat' : '+40 Critical Strike' },
-    154127 : { 'quality' : 3, 'name' : 'Quick Owlseye', 'icon' : 'inv_jewelcrafting_80_cutgem02_yellow', 'stat' : '+40 Haste' },
-    154128 : { 'quality' : 3, 'name' : 'Versatile Royal Quartz', 'icon' : 'inv_jewelcrafting_80_cutgem02_blue', 'stat' : '+40 Versatility' },
-    154129 : { 'quality' : 3, 'name' : 'Masterful Tidal Amethyst', 'icon' : 'inv_jewelcrafting_80_cutgem02_purple', 'stat' : '+40 Mastery' },
-    169220 : { 'quality' : 3, 'name' : 'Straddling Sage Agate', 'icon' : 'inv_misc_gem_x4_uncommon_perfectcut_green', 'stat' : '+5% Movement Speed' },
-    # 8.0 Unique Epic Gems
-    153707 : { 'quality' : 4, 'name' : "Kraken's Eye of Strength", 'icon' : 'inv_jewelcrafting_80_specialgemcut01', 'stat' : '+80 Strength' },
-    153708 : { 'quality' : 4, 'name' : "Kraken's Eye of Agility", 'icon' : 'inv_jewelcrafting_80_specialgemcut01', 'stat' : '+80 Agility' },
-    153709 : { 'quality' : 4, 'name' : "Kraken's Eye of Intellect", 'icon' : 'inv_jewelcrafting_80_specialgemcut01', 'stat' : '+80 Intellect' },
-    # Epic Gems
-    168639 : { 'quality' : 5, 'name' : 'Deadly Lava Lazuli', 'icon' : 'inv_misc_gem_x4_uncommon_perfectcut_orange', 'stat' : '+50 Critical Strike' },
-    168640 : { 'quality' : 5, 'name' : 'Masterful Sea Current', 'icon' : 'inv_misc_gem_x4_uncommon_perfectcut_purple', 'stat' : '+50 Mastery' },
-    168641 : { 'quality' : 5, 'name' : 'Quick Sand Spinel', 'icon' : 'inv_misc_gem_x4_uncommon_perfectcut_yellow', 'stat' : '+50 Haste' },
-    168642 : { 'quality' : 5, 'name' : 'Versatile Dark Opal', 'icon' : 'inv_misc_gem_x4_uncommon_perfectcut_blue', 'stat' : '+50 Versatility' },
-    # 8.2 Unique Epic Gems
-    168636 : { 'quality' : 6, 'name' : "Leviathan's Eye of Strength", 'icon' : 'inv_misc_metagem_b', 'stat' : '+120 Strength' },
-    168637 : { 'quality' : 6, 'name' : "Leviathan's Eye of Agility", 'icon' : 'inv_misc_metagem_b', 'stat' : '+120 Agility' },
-    168638 : { 'quality' : 6, 'name' : "Leviathan's Eye of Intellect", 'icon' : 'inv_misc_metagem_b', 'stat' : '+120 Intellect' }}
+    # 9.0 Uncommon Gems
+    173121 : { 'quality' : 2, 'name' : 'Deadly Jewel Doublet', 'icon' : 'inv_jewelcrafting_90_cutuncommon_orange', 'stat' : '+12 Critical Strike' },
+    173122 : { 'quality' : 2, 'name' : 'Quick Jewel Doublet', 'icon' : 'inv_jewelcrafting_90_cutuncommon_yellow', 'stat' : '+12 Haste' },
+    173123 : { 'quality' : 2, 'name' : 'Versatile Jewel Doublet', 'icon' : 'inv_jewelcrafting_90_cutuncommon_blue', 'stat' : '+12 Versatility' },
+    173124 : { 'quality' : 2, 'name' : 'Masterful Jewel Doublet', 'icon' : 'inv_jewelcrafting_90_cutuncommon_purple', 'stat' : '+12 Mastery' },
+    173125 : { 'quality' : 2, 'name' : 'Revitalizing Jewel Doublet', 'icon' : 'inv_jewelcrafting_90_cutuncommon_red', 'stat' : '+133 health every 10 seconds for each gem socketed' },
+    173126 : { 'quality' : 2, 'name' : 'Straddling Jewel Doublet', 'icon' : 'inv_jewelcrafting_90_cutuncommon_green', 'stat' : '+13 speed for each gem socketed' },
+    # 9.0 Rare Gems
+    173127 : { 'quality' : 3, 'name' : 'Deadly Jewel Cluster', 'icon' : 'inv_jewelcrafting_90_rarecut_orange', 'stat' : '+16 Critical Strike' },
+    173128 : { 'quality' : 3, 'name' : 'Quick Jewel Cluster', 'icon' : 'inv_jewelcrafting_90_rarecut_yellow', 'stat' : '+16 Haste' },
+    173129 : { 'quality' : 3, 'name' : 'Versatile Jewel Cluster', 'icon' : 'inv_jewelcrafting_90_rarecut_blue', 'stat' : '+16 Versatility' },
+    173130 : { 'quality' : 3, 'name' : 'Masterful Jewel Cluster', 'icon' : 'inv_jewelcrafting_90_rarecut_purple', 'stat' : '+16 Mastery' }
+    }
 
 """
 There does not seem to be any actual API for looking up enchants by ID. So this is all we have

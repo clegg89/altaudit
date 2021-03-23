@@ -184,17 +184,17 @@ def test_audit_gem_in_db(db_session, mock_is_off_hand_weapon):
             'slot' : { 'type' : 'FINGER_1' },
             'sockets' : [{
                 'item' : {
-                    'name' : 'Deadly Solstone',
-                    'id' : 153710},
-                'display_string' : '+30 Critical Strike'}]}]}}
+                    'name' : 'Deadly Jewel Doublet',
+                    'id' : 173121},
+                'display_string' : '+12 Critical Strike'}]}]}}
 
     Section.audit(jack, response, db_session, None)
 
-    assert jack.gems[0].gem.id == 153710
+    assert jack.gems[0].gem.id == 173121
     assert jack.gems[0].gem.quality == 2
-    assert jack.gems[0].gem.name == 'Deadly Solstone'
-    assert jack.gems[0].gem.icon == 'inv_jewelcrafting_80_cutgem01_orange'
-    assert jack.gems[0].gem.stat == '+30 Critical Strike'
+    assert jack.gems[0].gem.name == 'Deadly Jewel Doublet'
+    assert jack.gems[0].gem.icon == 'inv_jewelcrafting_90_cutuncommon_orange'
+    assert jack.gems[0].gem.stat == '+12 Critical Strike'
     assert jack.gems[0].slot == 'finger_1'
 
 def test_audit_gem_missing_id(db_session, mock_is_off_hand_weapon):
@@ -204,8 +204,8 @@ def test_audit_gem_missing_id(db_session, mock_is_off_hand_weapon):
             'slot' : { 'type' : 'FINGER_1' },
             'sockets' : [{
                 'item' : {
-                    'name' : 'Deadly Solstone'},
-                'display_string' : '+30 Critical Strike'}]}]}}
+                    'name' : 'Deadly Jewel Doublet'},
+                'display_string' : '+12 Critical Strike'}]}]}}
 
     Section.audit(jack, response, db_session, None)
 
