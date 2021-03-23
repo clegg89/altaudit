@@ -6,20 +6,10 @@ from wowapi import WowApiException
 
 from .utility import Utility, WEEKLY_RESETS
 from .sections import sections, raiderio
-from .models import Snapshot, AZERITE_ITEM_SLOTS, AZERITE_TIERS, HEADERS
+from .models import Snapshot, HEADERS
 from .blizzard import BLIZZARD_LOCALE
 
 PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}]
-
-def _serialize_azerite(character):
-    for slot in AZERITE_ITEM_SLOTS:
-        for tier in range(AZERITE_TIERS):
-            selected = getattr(character, '_{}_tier{}_selected'.format(slot, tier))
-            selected = str(selected) if selected else None
-            setattr(character, '{}_tier{}_selected'.format(slot, tier), selected)
-            available = getattr(character, '_{}_tier{}_available'.format(slot, tier))
-            available = '|'.join([str(x) for x in available]) if available else None
-            setattr(character, '{}_tier{}_available'.format(slot, tier), available)
 
 def _serialize_gems(character):
     character.gem_ids = '|'.join([str(g.gem.id) for g in character.gems])
@@ -195,7 +185,6 @@ def process_raiderio(character, response):
         raiderio(character, response.json())
 
 def serialize(character):
-    _serialize_azerite(character)
     _serialize_gems(character)
     _get_snapshots(character)
     _get_historical_data(character)

@@ -30,14 +30,6 @@ def items(character, profile, db_session, api):
 
     character.estimated_ilvl = equipped_ilvl
 
-    # Bolt on cloak data here
-    cloak = next((item for item in equipped_items if item['slot']['type'] == 'BACK'), None)
-    if cloak and cloak['name'] == "Ashjra'kamas, Shroud of Resolve":
-        try:
-            character.cloak_rank = int(re.match(r'Rank ([0-9]+)', cloak['name_description']['display_string']).group(1))
-        except (KeyError,TypeError):
-            pass
-
 def _item(character, slot, item):
     try:
         setattr(character, '{}_itemLevel'.format(slot), item['level']['value'])

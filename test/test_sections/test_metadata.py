@@ -22,4 +22,4 @@ def test_metadata_wow_patch():
     assert Section.metadata()[2] == WOW_PATCH
 
 def test_metadata_raids():
-    assert Section.metadata()[3] == "Uldir+Taloc_MOTHER_Fetid Devourer_Zek'voz, Herald of N'zoth_Vectis_Zul, Reborn_Mythrax the Unraveler_G'huun|Battle of Dazar'alor+Champion of the Light_Grong_Jadefire Masters_Opulence_Conclave of the Chosen_King Rastakhan_Mekkatorque_Stormwall Blockade_Lady Jaina Proudmoore|Crucible of Storms+The Restless Cabal_Uu'nat, Harbinger of the Void|The Eternal Palace+Abyssal Commander Sivara_Radiance of Azshara_Blackwater Behemoth_Lady Ashvane_Orgozoa_The Queen's Court_Za'qul_Queen Azshara|Ny'alotha, the Waking City+Wrathion_Maut_The Prophet Skitra_Dark Inquisitor Xanesh_The Hivemind_Shad'har the Insatiable_Drest'agath_Vexiona_Ra-den the Despoiled_Il'gynoth, Corruption Reborn_Carapace of N'Zoth_N'Zoth the Corruptor"
+    assert Section.metadata()[3] == "Castle Nathria+Shriekwing_Huntsman Altimor_Hungering Destroyer_Sun King's Salvation_Artificer Xy'mox_Lady Inerva Darkvein_The Council of Blood_Sludgefist_Stone Legion Generals_Sire Denathrius"

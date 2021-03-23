@@ -138,38 +138,6 @@ def test_items_missing_quality_value_is_None(default_items_response):
     assert jack.head_name == 'Cowl of Tideborne Omens'
     assert jack.head_quality == None
 
-def test_cloak_missing_name_desc(default_items_response):
-    jack = Character('jack')
-    cloak = next(item for item in default_items_response['equipment']['equipped_items'] if item['slot']['type'] == 'BACK')
-    cloak['name'] = "Ashjra'kamas, Shroud of Resolve"
-
-    Section.items(jack, default_items_response, None, None)
-    assert jack.cloak_rank == None
-
-def test_cloak_missing_display_string(default_items_response):
-    jack = Character('jack')
-    cloak = next(item for item in default_items_response['equipment']['equipped_items'] if item['slot']['type'] == 'BACK')
-    cloak['name'] = "Ashjra'kamas, Shroud of Resolve"
-    cloak['name_description'] = None
-
-    Section.items(jack, default_items_response, None, None)
-    assert jack.cloak_rank == None
-
-def test_cloak_not_ashjrakamas(default_items_response):
-    jack = Character('jack')
-
-    Section.items(jack, default_items_response, None, None)
-    assert jack.cloak_rank == None
-
-def test_cloak_ashjrakamas_rank(default_items_response):
-    jack = Character('jack')
-    cloak = next(item for item in default_items_response['equipment']['equipped_items'] if item['slot']['type'] == 'BACK')
-    cloak['name'] = "Ashjra'kamas, Shroud of Resolve"
-    cloak['name_description'] = { 'display_string' : "Rank 12" }
-
-    Section.items(jack, default_items_response, None, None)
-    assert jack.cloak_rank == 12
-
 def test_tabard_ignored(default_items_response):
     jack = Character('jack')
     default_items_response['equipment']['equipped_items'].append({

@@ -7,7 +7,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from wowapi import WowApiException
 
 from .base import Base
-from .azerite_trait import AzeriteTrait
 from .gem import Gem
 from .gem_slot_association import GemSlotAssociation
 from .snapshot import Year, Snapshot
@@ -30,14 +29,11 @@ ITEM_FIELD_COLUMNS = [
 "Item Fields"
 ITEM_FIELDS = [field[0] for field in ITEM_FIELD_COLUMNS]
 
-"Azerite piece item slots"
-AZERITE_ITEM_SLOTS = [ 'head', 'shoulder', 'chest' ]
-
-"Number of Azerite Tiers"
-AZERITE_TIERS = 5
-
 "Item slots that can be enchanted (for BfA)"
-ENCHANTED_ITEM_SLOTS = [ 'main_hand', 'off_hand', 'finger_1', 'finger_2', 'hands', 'wrist' ]
+ENCHANTED_ITEM_SLOTS = [
+        'cloak', 'chest', 'wrist', 'hands', 'feet',
+        'finger_1', 'finger_2', 'main_hand', 'off_hand'
+]
 
 "Item Enchant filds for use in Character Model"
 ENCHANT_ITEM_FIELD_COLUMNS = [
@@ -107,18 +103,6 @@ CHARACTER_HEADER_FIELDS = {
         for slot in ITEM_SLOTS
         for item in ITEM_FIELD_COLUMNS},
 
-    # Cloak Rank
-    'cloak_rank' : 'Column(Integer)',
-
-    # Azerite Info
-    'hoa_level' : 'Column(Integer)',
-    'azerite_percentage' : 'Column(Float)',
-
-    **{'{}_tier{}_{}'.format(piece, tier, field) : "''" # Composite from azerite_traits table
-        for piece in AZERITE_ITEM_SLOTS
-        for tier in range(AZERITE_TIERS)
-        for field in ['available', 'selected']},
-
     # Gear Audit
     **{'{}_enchant_{}'.format(slot, field[0]) : field[1]
         for slot in ENCHANTED_ITEM_SLOTS
@@ -142,8 +126,6 @@ CHARACTER_HEADER_FIELDS = {
     'reputations' : 'Column(String)',
 
     # PvE and RaiderIO
-    'island_weekly_done' : 'Column(String)',
-    'islands_total' : 'Column(Integer)',
     'world_quests_total' : 'Column(Integer)',
     'world_quests_weekly' : "None", # Obtained from snapshots
     'weekly_event_done' : 'Column(String)',
@@ -165,34 +147,6 @@ CHARACTER_HEADER_FIELDS = {
 
 HEADERS = [k for k in CHARACTER_HEADER_FIELDS.keys()]
 
-"""
-Each Character has multiple AzeriteTraits available for each AZERITE_TIERS within each AZERITE_ITEM_SLOTS.
-
-This leaves us with two options for our model:
-
-    - Create a join table for each slot+tier combo. This will lead to a total of 15 tables. Each table
-    can be referenced via a relationship attribute in Character
-    - Create a single join table that joins a 'slot+tier' table. Character will then contain foreign keys
-    for each slot+tier to the slot+tier table, and can use association_proxy to get to its various traits
-
-I don't actually know enough about relational databases to know what the trade-offs are. You'd assume that
-the former gives better runtime performance but who the hell knows. I'm going to opt for it because it
-seems cleaner: There's not really a reason to avoid a lot of tables and it means I don't have to add even
-more foreign keys to the Character Model.
-
-As a side note: we could potentially have a join table for the other 'foreign key' attributes in Character.
-This would mean removing said keys would mean dropping tables instead of removing fields from Character.
-Probably not worth it since its a bit more verbose, but still worth noting.
-"""
-for slot in AZERITE_ITEM_SLOTS:
-    for tier in range(AZERITE_TIERS):
-        var = '{}_tier{}'.format(slot, tier)
-        var_name = 'character_trait_{}_association'.format(var)
-        table_name = 'characters_traits_{}'.format(var)
-        exec("""{} = Table('{}', Base.metadata,
-    Column('character_id', Integer, ForeignKey('characters.id')),
-    Column('azerite_trait_id', Integer, ForeignKey('azerite_traits.id')))""".format(var_name, table_name))
-
 class Character(Base):
     __tablename__ = 'characters'
 
@@ -204,20 +158,6 @@ class Character(Base):
     character_class = relationship('Class')
     faction = relationship('Faction')
     race = relationship('Race')
-
-    for slot in AZERITE_ITEM_SLOTS:
-        for tier in range(AZERITE_TIERS):
-            # Relationships are _SLOT_tierNUMBER_selected and _SLOT_tierNUMBER_available
-            slot_tier = '{}_tier{}'.format(slot, tier)
-            selected = '{}_selected'.format(slot_tier)
-            selected_fk = '{}_id'.format(selected)
-            selected_rel = '_{}'.format(selected) # Precede with underscore to distinguish from Header
-            available_sec = 'character_trait_{}_association'.format(slot_tier)
-            available_rel = '_{}_available'.format(slot_tier) # Precede with underscore to distinguish from Header
-
-            exec("{} = Column(Integer, ForeignKey('azerite_traits.id'))".format(selected_fk))
-            exec("{} = relationship('AzeriteTrait', foreign_keys=[{}])".format(selected_rel, selected_fk))
-            exec("{} = relationship('AzeriteTrait', secondary={})".format(available_rel, available_sec))
 
     gems = relationship('GemSlotAssociation', cascade='all, delete, delete-orphan')
 
