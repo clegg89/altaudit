@@ -1,31 +1,28 @@
 """Pull Reputation data from API"""
 import logging
 
-"Faction IDs for Reputations"
+"""
+Faction IDs for Reputations
+
+To find these, go to Character Reputations page and find
+relevant expac reputations.
+"""
 REPUTATION_FACTION_ID = {
     'alliance' : [
-        2160, # Proudbmoore Admiralty
-        2162, # Storm's Wake
-        2161, # Order of Embers
-        2159, # 7th Legion
-        2164, # Champions of Azeroth
-        2163, # Tortollan Seekers
-        2400, # Waveblade Ankoan
-        2391, # Rustbolt Resistance
-        2415, # Rajani
-        2417  # Uldum Accord
+        2407, # The Ascended (Bastion)
+        2410, # The Undying Army (Maldraxxus)
+        2413, # Court of Harvesters (Revendreth)
+        2432, # Venari (Maw)
+        2439, # The Avowed (Revendreth 2)
+        2465, # The Wild Hunt (Ardenweald)
     ],
     'horde' : [
-        2103, # Zandalari Empire
-        2156, # Talanji's Expedition
-        2158, # Voldunai
-        2157, # The Honorbound
-        2164, # Champions of Azeroth
-        2163, # Tortollan Seekers
-        2373, # The Unshackled
-        2391, # Rustbolt Resistance
-        2415, # Rajani
-        2417  # Uldum Accord
+        2407, # The Ascended (Bastion)
+        2410, # The Undying Army (Maldraxxus)
+        2413, # Court of Harvesters (Revendreth)
+        2432, # Venari (Maw)
+        2439, # The Avowed (Revendreth 2)
+        2465, # The Wild Hunt (Ardenweald)
     ]
 }
 
