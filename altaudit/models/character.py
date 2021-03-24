@@ -31,7 +31,7 @@ ITEM_FIELDS = [field[0] for field in ITEM_FIELD_COLUMNS]
 
 "Item slots that can be enchanted (for BfA)"
 ENCHANTED_ITEM_SLOTS = [
-        'cloak', 'chest', 'wrist', 'hands', 'feet',
+        'cloak', 'chest', 'primary',
         'finger_1', 'finger_2', 'main_hand', 'off_hand'
 ]
 

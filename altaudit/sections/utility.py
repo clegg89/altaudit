@@ -18,3 +18,42 @@ def is_off_hand_weapon(profile):
         return False
     else:
         return True
+
+def is_primary_enchant_slot(profile, slot):
+    if slot not in ['wrist', 'hands', 'feet']:
+        return False
+
+    if profile['summary']['character_class']['name'] in ['Mage', 'Priest', 'Warlock']:
+        return slot == 'wrist'
+
+    if profile['summary']['character_class']['name'] in ['Demon Hunter', 'Hunter', 'Rogue']:
+        return slot == 'feet'
+
+    if profile['summary']['character_class']['name'] in ['Death Knight', 'Warrior']:
+        return slot == 'hands'
+
+    if profile['summary']['character_class']['name'] == 'Druid':
+        if profile['summary']['active_spec']['name'] in ['Feral', 'Guardian']:
+            return slot == 'feet'
+        if profile['summary']['active_spec']['name'] in ['Balance', 'Restoration']:
+            return slot == 'wrist'
+
+    if profile['summary']['character_class']['name'] == 'Monk':
+        if profile['summary']['active_spec']['name'] in ['Brewmaster', 'Windwalker']:
+            return slot == 'feet'
+        if profile['summary']['active_spec']['name'] == 'Mistweaver':
+            return slot == 'wrist'
+
+    if profile['summary']['character_class']['name'] == 'Shaman':
+        if profile['summary']['active_spec']['name'] == 'Enhancement':
+            return slot == 'feet'
+        if profile['summary']['active_spec']['name'] in ['Elemental', 'Restoration']:
+            return slot == 'wrist'
+
+    if profile['summary']['character_class']['name'] == 'Paladin':
+        if profile['summary']['active_spec']['name'] in ['Protection', 'Retribution']:
+            return slot == 'hands'
+        if profile['summary']['active_spec']['name'] == 'Holy':
+            return slot == 'wrist'
+
+    return False
