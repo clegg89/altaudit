@@ -4,7 +4,7 @@ import re
 from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from ..models import GemSlotAssociation, Gem, ITEM_SLOTS, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELD_COLUMNS
 from ..gem_enchant import enchant_lookup
-from .utility import is_off_hand_weapon
+from .utility import is_off_hand_weapon, is_primary_enchant_slot
 
 "Item Enchant Fields"
 ENCHANT_ITEM_FIELDS = [field[0] for field in ENCHANT_ITEM_FIELD_COLUMNS]
@@ -35,7 +35,10 @@ def audit(character, profile, db_session, api):
                     if gem:
                         character.gems.append(GemSlotAssociation(item['slot']['type'].lower(), _gem(socket, db_session)))
         if slot in ENCHANTED_ITEM_SLOTS:
-            _enchant(character, item)
+            _enchant(character, item, slot)
+
+        if is_primary_enchant_slot(profile, slot):
+            _enchant(character, item, 'primary')
 
     character.empty_socket_slots = '|'.join(str(s) for s in empty_socket_slots)
 
@@ -46,9 +49,7 @@ def audit(character, profile, db_session, api):
         for field in ENCHANT_ITEM_FIELDS:
             setattr(character, 'off_hand_enchant_{}'.format(field), None)
 
-def _enchant(character, item):
-    slot = item['slot']['type'].lower()
-
+def _enchant(character, item, slot):
     # Handle special case of offHand weapon (this will trigger if the item is not a weapon)
     if slot == 'off_hand' and item['inventory_type']['type'] != 'WEAPON':
         for field in ENCHANT_ITEM_FIELDS:

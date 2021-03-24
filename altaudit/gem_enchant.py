@@ -51,13 +51,13 @@ enchant_lookup = {
 
     # Primary
     ## Wrist
-    6219 : { 'quality' : 2, 'name' : "Illuminated Soul", 'description' : "" },
+    6219 : { 'quality' : 2, 'name' : "Illuminated Soul", 'description' : "+10 Intellect" },
     6220 : { 'quality' : 3, 'name' : "Eternal Intellect", 'description' : "+15 Intellect" },
     ## Hands
-    6209 : { 'quality' : 2, 'name' : "Illuminated Soul", 'description' : "" },
+    6209 : { 'quality' : 2, 'name' : "Strength of Soul", 'description' : "+10 Strength" },
     6210 : { 'quality' : 3, 'name' : "Eternal Strength", 'description' : "+15 Strength" },
     ## Feet
-    6212 : { 'quality' : 2, 'name' : "Illuminated Soul", 'description' : "" },
+    6212 : { 'quality' : 2, 'name' : "Agile Soul", 'description' : "+10 Agility" },
     6211 : { 'quality' : 3, 'name' : "Eternal Agility", 'description' : "+15 Agility" },
 
     # Ring
