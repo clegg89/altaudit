@@ -12,7 +12,6 @@ Gem and Enchant Lookup Tables
 
 """
 To save some API calls we're going to keep this data here. It'll cover most gems.
-Eventually we may to want to legitimately cache gem data in a database.
 """
 gem_lookup = {
     # Old Gems - Not listed. Quality 1
@@ -36,52 +35,61 @@ There does not seem to be any actual API for looking up enchants by ID. So this 
 The name is now provided by the Equipment Profile API, so it is unused. Leaving b/c it helps when reading.
 """
 enchant_lookup = {
+    # Cloak
+    6202 : { 'quality' : 3, 'name' : "Fortified Speed", 'description' : "+20 Stamina and +30 Speed" },
+    6203 : { 'quality' : 3, 'name' : "Fortified Avoidance", 'description' : "+20 Stamina and +30 Avoidance" },
+    6204 : { 'quality' : 3, 'name' : "Fortified Leech", 'description' : "+20 Stamina and +30 Leech" },
+    6208 : { 'quality' : 3, 'name' : "Soul Vitality", 'description' : "+30 Stamina" },
+
+    # Chest
+    6216 : { 'quality' : 2, 'name' : "Sacred Stats", 'description' : "+20 Primary Stat" },
+    6213 : { 'quality' : 3, 'name' : "Eternal Bulwark", 'description' : "+25 Armor and +20 Strength/Agility" },
+    6214 : { 'quality' : 3, 'name' : "Eternal Skirmish", 'description' : "+20 Strength/Agility and Shadow Damage Auto-Attack" },
+    6217 : { 'quality' : 3, 'name' : "Eternal Bounds", 'description' : "+20 Intellect and +6% Mana" },
+    6230 : { 'quality' : 3, 'name' : "Eternal Stats", 'description' : "+30 Primary Stat" },
+    6265 : { 'quality' : 3, 'name' : "Eternal Insight", 'description' : "+20 Intellect and Shadow Damage Spells" },
+
+    # Primary
+    ## Wrist
+    6219 : { 'quality' : 2, 'name' : "Illuminated Soul", 'description' : "" },
+    6220 : { 'quality' : 3, 'name' : "Eternal Intellect", 'description' : "+15 Intellect" },
+    ## Hands
+    6209 : { 'quality' : 2, 'name' : "Illuminated Soul", 'description' : "" },
+    6210 : { 'quality' : 3, 'name' : "Eternal Strength", 'description' : "+15 Strength" },
+    ## Feet
+    6212 : { 'quality' : 2, 'name' : "Illuminated Soul", 'description' : "" },
+    6211 : { 'quality' : 3, 'name' : "Eternal Agility", 'description' : "+15 Agility" },
+
     # Ring
-    # Pact
-    5938 : { 'quality' : 2, 'name' : "Seal of Critical Strike", 'description' : "+30 Critical Strike" },
-    5939 : { 'quality' : 2, 'name' : "Seal of Haste", 'description' : "+30 Haste" },
-    5940 : { 'quality' : 2, 'name' : "Seal of Mastery", 'description' : "+30 Mastery" },
-    5941 : { 'quality' : 2, 'name' : "Seal of Versatility", 'description' : "+30 Versatility" },
-    # Seal
-    5942 : { 'quality' : 3, 'name' : "Pact of Critical Strike", 'description' : "+40 Critical Strike" },
-    5943 : { 'quality' : 3, 'name' : "Pact of Haste", 'description' : "+40 Haste" },
-    5944 : { 'quality' : 3, 'name' : "Pact of Mastery", 'description' : "+40 Mastery" },
-    5945 : { 'quality' : 3, 'name' : "Pact of Versatility", 'description' : "+40 Versatility" },
-    # Accord
-    6108 : { 'quality' : 4, 'name' : "Accord of Critical Strike", 'description' : "+60 Critical Strike" },
-    6109 : { 'quality' : 4, 'name' : "Accord of Haste", 'description' : "+60 Haste" },
-    6110 : { 'quality' : 4, 'name' : "Accord of Mastery", 'description' : "+60 Mastery" },
-    6111 : { 'quality' : 4, 'name' : "Accord of Versatilty", 'description' : "+60 Versatility" },
+    # Bargain
+    6163 : { 'quality' : 2, 'name' : "Bargain of Critical Strike", 'description' : "+12 Critical Strike" },
+    6165 : { 'quality' : 2, 'name' : "Bargain of Haste", 'description' : "+12 Haste" },
+    6167 : { 'quality' : 2, 'name' : "Bargain of Mastery", 'description' : "+12 Mastery" },
+    6169 : { 'quality' : 2, 'name' : "Bargain of Versatility", 'description' : "+12 Versatility" },
+    # Tenet
+    6164 : { 'quality' : 3, 'name' : "Tenet of Critical Strike", 'description' : "+16 Critical Strike" },
+    6166 : { 'quality' : 3, 'name' : "Tenet of Haste", 'description' : "+16 Haste" },
+    6168 : { 'quality' : 3, 'name' : "Tenet of Mastery", 'description' : "+16 Mastery" },
+    6170 : { 'quality' : 3, 'name' : "Tenet of Versatility", 'description' : "+16 Versatility" },
 
     # Weapons - All Valid
+    # Engineering
+    6195 : { 'quality' : 3, 'name' : "Infra-green Reflex Sight", 'description' : "Occasionally increase Haste by 303 for 12 sec" },
+    6196 : { 'quality' : 3, 'name' : "Optical Target Embiggener", 'description' : "Occasionally increase Critical Strike by 303 for 12 sec" },
     # Enchant
-    5946 : { 'quality' : 4, 'name' : "Coastal Surge", 'description' : "Sometimes cause helpful spells to put a short heal over time effect on the target for 10 sec." },
-    5948 : { 'quality' : 4, 'name' : "Siphoning", 'description' : "Increase Leech by 100" },
-    5949 : { 'quality' : 4, 'name' : "Torrent of Elements", 'description' : "Sometimes increase elemental spell damage by 10%" },
-    5950 : { 'quality' : 4, 'name' : "Gale-Force Striking", 'description' : "Sometimes increase attack speed by 15% for 15 sec. when using melee or ranged attacks and abilities" },
-    5962 : { 'quality' : 4, 'name' : "Versatile Navigation", 'description' : "Sometimes increase Versatility by 50 for 30 sec., stacking up to 5 times. Upon reaching 5 stacks, all stacks are consumed to grant you 600 Versatility for 10 sec." },
-    5963 : { 'quality' : 4, 'name' : "Quick Navigation", 'description' : "Sometimes increase Haste by 50 for 30 sec., stacking up to 5 times. Upon reaching 5 stacks, all stacks are consumed to grant you 600 Haste for 10 sec." },
-    5964 : { 'quality' : 4, 'name' : "Masterful Navigation", 'description' : "Sometimes increase Mastery by 50 for 30 sec., stacking up to 5 times. Upon reaching 5 stacks, all stacks are consumed to grant you 600 Mastery for 10 sec." },
-    5965 : { 'quality' : 4, 'name' : "Deadly Navigation", 'description' : "Sometimes increase Critical Strike by 50 for 30 sec., stacking up to 5 times. Upon reaching 5 stacks, all stacks are consumed to grant you 600 Critical Strike for 10 sec." },
-    5966 : { 'quality' : 4, 'name' : "Stalwart Navigation", 'description' : "Sometimes increase Armor by 50 for 30 sec., stacking up to 5 times. Upon reaching 5 stacks, all stacks are consumed to grant you 600 Armor for 10 sec." },
-    6148 : { 'quality' : 4, 'name' : "Force Multiplier", 'description' : "Occasionally increase Strength or Agility by 264 and Mastery, Haste, or Critical Strike by 170 for 15 sec. Your highest stat is always chosen" },
-    6112 : { 'quality' : 4, 'name' : "Machinist's Brilliance", 'description' : "Occasionally increase Intellect by 264 and Mastery, Haste, or Critical Strike by 170 for 15 sec. Your highest stat is always chosen" },
-    6150 : { 'quality' : 4, 'name' : "Naga Hide", 'description' : "When you Block, Dodge, or Parry, you have a chance to increase Strength or Agility by 264 for 15 sec. When active, absorb 15,000 damage" },
-    6149 : { 'quality' : 4, 'name' : "Oceanic Restoration", 'description' : "Occasionally increase Intellect by 264 for 15 sec., and restore 400 mana" },
+    6223 : { 'quality' : 3, 'name' : "Lightless Force", 'description' : "Chance to send out a wave of Shadow energy, striking 5 enemies" },
+    6226 : { 'quality' : 3, 'name' : "Eternal Grace", 'description' : "Sometimes cause a burst of healing on the target of your helpful spells and abilities" },
+    6227 : { 'quality' : 3, 'name' : "Ascended Vigor", 'description' : "Sometimes increase your healing received by 12% for 10 sec" },
+    6228 : { 'quality' : 3, 'name' : "Sinful Revelation", 'description' : "Your attacks sometimes cause enemies to suffer an additional 6% damage from you for 10 sec" },
+    6229 : { 'quality' : 3, 'name' : "Celestial Guidance", 'description' : "Sometimes increase your primary stat by 5%" },
 
     # DK Runeforges
+    3370 : { 'quality' : 4, 'name' : "Rune of the Razorice", 'description' : "Causes extra weapon damage as Frost damage and increases enemies' vulnerability to your Frost attacks by 3%, stacking up to 5 times" },
     3847 : { 'quality' : 4, 'name' : "Rune of the Stoneskin Gargoyle", 'description' : "Increase Armor by 5% and all stats by 5%" },
     3368 : { 'quality' : 4, 'name' : "Rune of the Fallen Crusader", 'description' : "Chance to heal for 6% and increases total Strength by 15% for 15 sec." },
-    3370 : { 'quality' : 4, 'name' : "Rune of the Razorice", 'description' : "Causes 74% extra weapon damage as Frost damage and increases enemies' vulnerability to your Frost attacks by 3%, stacking up to 5 times" },
-
-    # Wrist
-    5936 : { 'quality' : 4, 'name' : "Swift Hearthing",  'description' : "Increase the speed of your Hearthstone cast while in Kul Tiras or Zandalar" },
-    5970 : { 'quality' : 4, 'name' : "Safe Hearthing", 'description' : "Create an absorb shield around you while using your Hearthstone on Kul Tiras or Zandalar" },
-    5971 : { 'quality' : 4, 'name' : "Cooled Hearthing", 'description' : "Reduce the cooldown of your Hearthstone by 5 minutes while in Kul Tiras or Zandalar" },
-
-    # Gloves
-    5932 : { 'quality' : 4, 'name' : "Herbalism", 'description' : "Increase the speed of herb gathering on Kul Tiras and Zandalar" },
-    5933 : { 'quality' : 4, 'name' : "Mining", 'description' : "Increase the speed of mining on Kul Tiras and Zandalar" },
-    5934 : { 'quality' : 4, 'name' : "Skinning", 'description' : "Increase the speed of skinning on Kul Tiras and Zandalar" },
-    5935 : { 'quality' : 4, 'name' : "Surveying", 'description' : "Increase the speed of archaeological surveying on Kul Tiras and Zandalar" },
-    5937 : { 'quality' : 4, 'name' : "Crafting", 'description' : "Increase the speed of crafting items from primary professions on Kul Tiras and Zandalar" }}
+    6241 : { 'quality' : 4, 'name' : "Rune of Sanguination", 'description' : "Cuases Death Strike to deal increased the target's missing health. When you fall below 35% health, you heal for 48% of your maximum health over 8 sec" },
+    6242 : { 'quality' : 4, 'name' : "Rune of Spellwarding", 'description' : "Deflect 3% of all spell damage. Taking magic damage has a chance to create a shield that absorbs magic damage equal to 10% of your max health. Damaging the shield causes enemies' cast speed to be reduced by 10% for 6 sec" },
+    6243 : { 'quality' : 4, 'name' : "Rune of Hysteria", 'description' : "Increases maximum Runic Power by 20 and attacks have a chance to increase Runic Power generation by 20% for 8 sec" },
+    6244 : { 'quality' : 4, 'name' : "Rune of Unending Thirst", 'description' : "Increase movement speed by 5%. Killing an enemy causes you to heal for 5% of your max health and gain 10% Haste and movement speed" },
+    6245 : { 'quality' : 4, 'name' : "Rune of the Apocalypse", 'description' : "Your ghoul's attacks have a chance to apply a debuff to the target" }
+    }

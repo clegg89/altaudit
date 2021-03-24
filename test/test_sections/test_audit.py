@@ -50,15 +50,15 @@ def test_audit_regular_item(mock_is_off_hand_weapon):
         'equipped_items' : [{
             'slot' : { 'type' : 'FINGER_1' },
             'enchantments' : [{
-                'enchantment_id' : 6109,
-                'source_item' : { 'name' : 'Enchant Ring - Accord of Haste' }}]}]}}
+                'enchantment_id' : 6166,
+                'source_item' : { 'name' : 'Enchant Ring - Tenet of Haste' }}]}]}}
 
     Section.audit(jack, response, None, None)
 
-    assert jack.finger_1_enchant_id == 6109
-    assert jack.finger_1_enchant_quality == 4
-    assert jack.finger_1_enchant_name == 'Accord of Haste'
-    assert jack.finger_1_enchant_description == '+60 Haste'
+    assert jack.finger_1_enchant_id == 6166
+    assert jack.finger_1_enchant_quality == 3
+    assert jack.finger_1_enchant_name == 'Tenet of Haste'
+    assert jack.finger_1_enchant_description == '+16 Haste'
 
 def test_audit_item_missing(mock_is_off_hand_weapon):
     jack = Character('jack')
@@ -135,15 +135,15 @@ def test_audit_item_enchant_weapon_offhand_is_enchanted(mock_is_off_hand_weapon)
             'slot' : { 'type' : 'OFF_HAND' },
             'inventory_type' : { 'type' : 'WEAPON' },
             'enchantments' : [{
-                'enchantment_id' : 5946,
-                'source_item' : { 'name' : 'Enchant Weapon - Coastal Surge' }}]}]}}
+                'enchantment_id' : 6223,
+                'source_item' : { 'name' : 'Enchant Weapon - Lightless Force' }}]}]}}
 
     Section.audit(jack, response, None, None)
 
-    assert jack.off_hand_enchant_id == 5946
-    assert jack.off_hand_enchant_quality == 4
-    assert jack.off_hand_enchant_name == 'Coastal Surge'
-    assert jack.off_hand_enchant_description == "Sometimes cause helpful spells to put a short heal over time effect on the target for 10 sec."
+    assert jack.off_hand_enchant_id == 6223
+    assert jack.off_hand_enchant_quality == 3
+    assert jack.off_hand_enchant_name == 'Lightless Force'
+    assert jack.off_hand_enchant_description == "Chance to send out a wave of Shadow energy, striking 5 enemies"
 
 def test_audit_empty_sockets(mock_is_off_hand_weapon):
     jack = Character('jack')
@@ -305,14 +305,14 @@ def test_audit_missing_enchant_source_item_and_display_string_in_lookup(mock_is_
         'equipped_items' : [{
             'slot' : { 'type' : 'FINGER_1' },
             'enchantments' : [{
-                'enchantment_id' : 6109}]}]}}
+                'enchantment_id' : 6166}]}]}}
 
     Section.audit(jack, response, None, None)
 
-    assert jack.finger_1_enchant_id == 6109
-    assert jack.finger_1_enchant_quality == 4
-    assert jack.finger_1_enchant_name == "Accord of Haste"
-    assert jack.finger_1_enchant_description == '+60 Haste'
+    assert jack.finger_1_enchant_id == 6166
+    assert jack.finger_1_enchant_quality == 3
+    assert jack.finger_1_enchant_name == "Tenet of Haste"
+    assert jack.finger_1_enchant_description == '+16 Haste'
 
 def test_audit_missing_enchant_source_item_and_display_string_not_in_lookup(mock_is_off_hand_weapon):
     jack = Character('jack')
@@ -328,3 +328,42 @@ def test_audit_missing_enchant_source_item_and_display_string_not_in_lookup(mock
     assert jack.finger_1_enchant_quality == 1
     assert jack.finger_1_enchant_name == "Unknown"
     assert jack.finger_1_enchant_description == None
+
+@pytest.skip
+def test_audit_primary_wrists(mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'WRIST' },
+            'enchantments' : [{
+                'enchantment_id' : 6220,
+                'source_item' : { 'name' : 'Enchant Bracers - Eternal Intellect' }}]}]}}
+
+    Section.audit(jack, response, None, None)
+
+    assert jack.primary_enchant_id == 6220
+    assert jack.primary_enchant_quality = 3
+    assert jack.primary_enchant_name == "Eternal Intellect"
+    assert jack.primary_enchant_description == '+15 Intellect'
+
+@pytest.skip
+def test_audit_primary_wrists_but_wearing_unrelated(mock_is_off_hand_weapon):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'WRIST' },
+            'enchantments' : [{
+                'enchantment_id' : 6220,
+                'source_item' : { 'name' : 'Enchant Bracers - Eternal Intellect' }}]},
+        {
+            'slot' : { 'type' : "FEET" },
+            'enchantments' : [{
+                'enchantment_id' : 6221,
+                'source_item' : { 'name' : 'Enchant Boots - Eternal Agility'}}]}]}}
+
+    Section.audit(jack, response, None, None)
+
+    assert jack.primary_enchant_id == 6220
+    assert jack.primary_enchant_quality = 3
+    assert jack.primary_enchant_name == "Eternal Intellect"
+    assert jack.primary_enchant_description == '+15 Intellect'
