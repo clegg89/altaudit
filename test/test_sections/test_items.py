@@ -33,7 +33,7 @@ def default_items_response(make_fake_item):
 
 def test_items_estimated_ilvl_default(default_items_response):
     jack = Character('jack')
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.estimated_ilvl == 405
 
 def test_items_estimated_ilvl_non_default(default_items_response):
@@ -41,14 +41,14 @@ def test_items_estimated_ilvl_non_default(default_items_response):
     for i,item in enumerate(default_items_response['equipment']['equipped_items']):
         item['level']['value'] = 405+i
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.estimated_ilvl == 412.5
 
 def test_items_estimated_ilvl_missing_is_zero(default_items_response):
     jack = Character('jack')
     del default_items_response['equipment']['equipped_items'][0]
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.estimated_ilvl == 379.6875
 
 def test_items_estimated_ilvl_missing_offhand_is_not_weapon(default_items_response, mock_is_off_hand_weapon):
@@ -56,7 +56,7 @@ def test_items_estimated_ilvl_missing_offhand_is_not_weapon(default_items_respon
     default_items_response['equipment']['equipped_items'].remove(next(item for item in default_items_response['equipment']['equipped_items'] if item['slot']['type'] == 'OFF_HAND'))
     mock_is_off_hand_weapon.return_value = False
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.estimated_ilvl == 405
 
 def test_items_estimated_ilvl_missing_offhand_is_weapon(default_items_response, mock_is_off_hand_weapon):
@@ -64,12 +64,12 @@ def test_items_estimated_ilvl_missing_offhand_is_weapon(default_items_response, 
     default_items_response['equipment']['equipped_items'].remove(next(item for item in default_items_response['equipment']['equipped_items'] if item['slot']['type'] == 'OFF_HAND'))
     mock_is_off_hand_weapon.return_value = True
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.estimated_ilvl == 379.6875
 
 def test_items_all_items(default_items_response):
     jack = Character('jack')
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     for i,slot in enumerate(ITEM_SLOTS):
         assert getattr(jack, '{}_itemLevel'.format(slot)) == 405
         assert getattr(jack, '{}_id'.format(slot)) == 165822+i
@@ -80,7 +80,7 @@ def test_items_missing_item(default_items_response):
     jack = Character('jack')
     default_items_response['equipment']['equipped_items'].remove(next(item for item in default_items_response['equipment']['equipped_items'] if item['slot']['type'] == 'FINGER_1'))
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.finger_1_itemLevel == None
     assert jack.finger_1_id == None
     assert jack.finger_1_name == None
@@ -90,7 +90,7 @@ def test_items_missing_ilevel_is_None(default_items_response):
     jack = Character('jack')
     del default_items_response['equipment']['equipped_items'][0]['level']
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.head_itemLevel == None
     assert jack.head_id == 165822
     assert jack.head_name == 'Cowl of Tideborne Omens'
@@ -101,7 +101,7 @@ def test_items_missing_ilevel_value_is_None(default_items_response):
     jack = Character('jack')
     del default_items_response['equipment']['equipped_items'][0]['level']['value']
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.head_itemLevel == None
     assert jack.head_id == 165822
     assert jack.head_name == 'Cowl of Tideborne Omens'
@@ -112,7 +112,7 @@ def test_items_missing_id_value_is_None(default_items_response):
     jack = Character('jack')
     del default_items_response['equipment']['equipped_items'][0]['item']['id']
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.head_itemLevel == 405
     assert jack.head_id == None
     assert jack.head_name == 'Cowl of Tideborne Omens'
@@ -122,7 +122,7 @@ def test_items_missing_name_value_is_None(default_items_response):
     jack = Character('jack')
     del default_items_response['equipment']['equipped_items'][0]['name']
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.head_itemLevel == 405
     assert jack.head_id == 165822
     assert jack.head_name == None
@@ -132,7 +132,7 @@ def test_items_missing_quality_value_is_None(default_items_response):
     jack = Character('jack')
     del default_items_response['equipment']['equipped_items'][0]['quality']['name']
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.head_itemLevel == 405
     assert jack.head_id == 165822
     assert jack.head_name == 'Cowl of Tideborne Omens'
@@ -147,5 +147,5 @@ def test_tabard_ignored(default_items_response):
         'name' : 'Silvermoon City Tabard',
         'quality' : { 'name' : 'UNCOMMON' } })
 
-    Section.items(jack, default_items_response, None, None)
+    Section.items(jack, default_items_response, None)
     assert jack.estimated_ilvl == 405

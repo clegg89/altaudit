@@ -121,26 +121,26 @@ def fake_response_maker():
 def test_basic_info_name(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(name='Jack')
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.name_api == 'Jack'
 
 def test_basic_info_gender(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(gender='Female')
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.gender == 'Female'
 
 def test_basic_info_faction(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker()
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert type(jack.faction) == Faction
     assert jack.faction.name == 'Horde'
 
 def test_basic_info_race(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(race_name="Undead")
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert type(jack.race) == Race
     assert jack.race.name == "Undead"
     assert jack.race.id == 5
@@ -148,7 +148,7 @@ def test_basic_info_race(fake_response_maker, db_session):
 def test_basic_info_class(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(class_name='Monk')
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert type(jack.character_class) == Class
     assert jack.character_class.name == 'Monk'
     assert jack.character_class.id == 10
@@ -156,51 +156,51 @@ def test_basic_info_class(fake_response_maker, db_session):
 def test_basic_info_mainspec(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(mainspec='Shadow')
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.mainspec == 'Shadow'
 
 def test_basic_info_mainspec_not_present(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker()
     del response['summary']['active_spec']
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.mainspec == None
 
 def test_basic_info_realm(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(realm="Zin'azshara")
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.realm_name == "Zin'azshara"
 
 def test_basic_info_level(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(level=45)
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.level == 45
 
 def test_basic_info_timestamp(fake_response_maker, db_session):
     jack = Character('jack')
     now = datetime.datetime.now().timestamp()*1000
     response = fake_response_maker(timestamp=now)
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.lastmodified == now
 
 def test_basic_info_avatar(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(avatar='realm1/96/184987488-avatar.jpg')
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.avatar == 'realm1/96/184987488-avatar.jpg'
 
 def test_basic_info_bust(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(bust='realm1/96/184987488-inset.jpg')
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.bust == 'realm1/96/184987488-inset.jpg'
 
 def test_basic_info_render(fake_response_maker, db_session):
     jack = Character('jack')
     response = fake_response_maker(render='realm1/96/184987488-main.jpg')
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.render == 'realm1/96/184987488-main.jpg'
 
 def test_basic_info_avatar_old(fake_response_maker, db_session):
@@ -210,7 +210,7 @@ def test_basic_info_avatar_old(fake_response_maker, db_session):
             'avatar_url' : 'realm1/96/184987488-avatar.jpg',
             'bust_url' : 'bust_url',
             'render_url' : 'render_url'}
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.avatar == 'realm1/96/184987488-avatar.jpg'
 
 def test_basic_info_bust_old(fake_response_maker, db_session):
@@ -220,7 +220,7 @@ def test_basic_info_bust_old(fake_response_maker, db_session):
             'avatar_url' : 'avatar_url',
             'bust_url' : 'realm1/96/184987488-inset.jpg',
             'render_url' : 'render_url'}
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.bust == 'realm1/96/184987488-inset.jpg'
 
 def test_basic_info_render_old(fake_response_maker, db_session):
@@ -230,5 +230,5 @@ def test_basic_info_render_old(fake_response_maker, db_session):
             'avatar_url' : 'avatar_url',
             'bust_url' : 'bust_url',
             'render_url' : 'realm1/96/184987488-main.jpg'}
-    Section.basic(jack, response, db_session, None)
+    Section.basic(jack, response, db_session)
     assert jack.render == 'realm1/96/184987488-main.jpg'

@@ -105,8 +105,8 @@ CHARACTER_HEADER_FIELDS = {
     'bust' : 'Column(String)',
     'render' : 'Column(String)',
 
-    # Covenent Data
-    'covenent' : 'Column(String)',
+    # Covenant Data
+    'covenant' : 'Column(String)',
     'renown' : 'Column(Integer)',
     'current_soulbind' : 'Column(String)',
 

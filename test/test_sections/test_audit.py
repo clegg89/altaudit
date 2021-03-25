@@ -39,12 +39,6 @@ def db():
     Base.metadata.drop_all(engine)
 
 @pytest.fixture
-def mock_api(mocker):
-    mock = mocker.MagicMock()
-
-    return mock
-
-@pytest.fixture
 def db_session(db):
     session = sessionmaker(db)()
     yield session
@@ -59,7 +53,7 @@ def test_audit_regular_item(mock_is_off_hand_weapon, mock_is_primary_slot):
                 'enchantment_id' : 6166,
                 'source_item' : { 'name' : 'Enchant Ring - Tenet of Haste' }}]}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.finger_1_enchant_id == 6166
     assert jack.finger_1_enchant_quality == 3
@@ -71,7 +65,7 @@ def test_audit_item_missing(mock_is_off_hand_weapon, mock_is_primary_slot):
     response = { 'equipment' : {
         'equipped_items' : []}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.finger_1_enchant_id == None
     assert jack.finger_1_enchant_quality == 0
@@ -84,7 +78,7 @@ def test_audit_item_no_enchant(mock_is_off_hand_weapon, mock_is_primary_slot):
         'equipped_items' : [{
             'slot' : { 'type' : 'FINGER_1' }}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.finger_1_enchant_id == None
     assert jack.finger_1_enchant_quality == 0
@@ -100,7 +94,7 @@ def test_audit_item_enchant_not_in_lookup(mock_is_off_hand_weapon, mock_is_prima
                 'enchantment_id' : 3000,
                 'source_item' : { 'name' : 'Enchant Ring - Total Garbage' }}]}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.finger_1_enchant_id == 3000
     assert jack.finger_1_enchant_quality == 1
@@ -113,7 +107,7 @@ def test_audit_item_enchant_offhand_missing_not_weapon(mock_is_off_hand_weapon, 
         'equipped_items' : []}}
     mock_is_off_hand_weapon.return_value = False
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.off_hand_enchant_id == None
     assert jack.off_hand_enchant_quality == None
@@ -127,7 +121,7 @@ def test_audit_item_enchant_offhand_not_enchantable(mock_is_off_hand_weapon, moc
             'slot' : { 'type' : 'OFF_HAND' },
             'inventory_type' : { 'type' : 'HOLDABLE' }}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.off_hand_enchant_id == None
     assert jack.off_hand_enchant_quality == None
@@ -144,7 +138,7 @@ def test_audit_item_enchant_weapon_offhand_is_enchanted(mock_is_off_hand_weapon,
                 'enchantment_id' : 6223,
                 'source_item' : { 'name' : 'Enchant Weapon - Lightless Force' }}]}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.off_hand_enchant_id == 6223
     assert jack.off_hand_enchant_quality == 3
@@ -162,7 +156,7 @@ def test_audit_empty_sockets(mock_is_off_hand_weapon, mock_is_primary_slot):
             { 'slot' : { 'type' : 'FINGER_1' }, 'sockets' : [{}]},
             { 'slot' : { 'type' : 'FINGER_2' }, 'sockets' : [{}]}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.empty_sockets == 4
     assert jack.empty_socket_slots == 'waist|wrist|finger_1|finger_2'
@@ -176,7 +170,7 @@ def test_audit_enchant_dk_rune(mock_is_off_hand_weapon, mock_is_primary_slot):
                 'enchantment_id' : 3368,
                 'display_string' : 'Enchanted: Rune of the Fallen Crusader'}]}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.main_hand_enchant_id == 3368
     assert jack.main_hand_enchant_quality == 4
@@ -194,7 +188,7 @@ def test_audit_gem_in_db(db_session, mock_is_off_hand_weapon, mock_is_primary_sl
                     'id' : 173121},
                 'display_string' : '+12 Critical Strike'}]}]}}
 
-    Section.audit(jack, response, db_session, None)
+    Section.audit(jack, response, db_session)
 
     assert jack.gems[0].gem.id == 173121
     assert jack.gems[0].gem.quality == 2
@@ -213,7 +207,7 @@ def test_audit_gem_missing_id(db_session, mock_is_off_hand_weapon, mock_is_prima
                     'name' : 'Deadly Jewel Doublet'},
                 'display_string' : '+12 Critical Strike'}]}]}}
 
-    Section.audit(jack, response, db_session, None)
+    Section.audit(jack, response, db_session)
 
     assert jack.gems == []
 
@@ -227,7 +221,7 @@ def test_audit_gem_missing_name_not_in_db(db_session, mock_is_off_hand_weapon, m
                     'id' : 12390},
                 'display_string' : '+20 Bullshit'}]}]}}
 
-    Section.audit(jack, response, db_session, None)
+    Section.audit(jack, response, db_session)
 
     assert jack.gems[0].gem.id == 12390
     assert jack.gems[0].gem.quality == 1
@@ -246,7 +240,7 @@ def test_audit_gem_missing_display_string_not_in_db(db_session, mock_is_off_hand
                     'name' : 'Deadly Stone',
                     'id' : 12390}}]}]}}
 
-    Section.audit(jack, response, db_session, None)
+    Section.audit(jack, response, db_session)
 
     assert jack.gems[0].gem.id == 12390
     assert jack.gems[0].gem.quality == 1
@@ -266,7 +260,7 @@ def test_audit_gem_not_in_db(db_session, mock_is_off_hand_weapon, mock_is_primar
                     'id' : 12390},
                 'display_string' : '+20 Bullshit'}]}]}}
 
-    Section.audit(jack, response, db_session, mock_api)
+    Section.audit(jack, response, db_session)
 
     assert jack.gems[0].gem.id == 12390
     assert jack.gems[0].gem.quality == 1
@@ -275,7 +269,7 @@ def test_audit_gem_not_in_db(db_session, mock_is_off_hand_weapon, mock_is_primar
     assert jack.gems[0].gem.stat == '+20 Bullshit'
     assert jack.gems[0].slot == 'finger_1'
 
-def test_audit_no_gems(db_session, mock_api, mock_is_off_hand_weapon, mock_is_primary_slot):
+def test_audit_no_gems(db_session, mock_is_off_hand_weapon, mock_is_primary_slot):
     jack = Character('jack')
     response = { 'equipment' : {
         'equipped_items' : [
@@ -286,7 +280,7 @@ def test_audit_no_gems(db_session, mock_api, mock_is_off_hand_weapon, mock_is_pr
             { 'slot' : { 'type' : 'FINGER_1' }, 'sockets' : [{}]},
             { 'slot' : { 'type' : 'FINGER_2' }, 'sockets' : [{}]}]}}
 
-    Section.audit(jack, response, db_session, mock_api)
+    Section.audit(jack, response, db_session)
 
     assert jack.gems == []
 
@@ -298,7 +292,7 @@ def test_audit_missing_enchant_id(mock_is_off_hand_weapon, mock_is_primary_slot)
             'enchantments' : [{
                 'source_item' : { 'name' : 'Enchant Ring - Accord of Haste' }}]}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.finger_1_enchant_id == None
     assert jack.finger_1_enchant_quality == 1
@@ -313,7 +307,7 @@ def test_audit_missing_enchant_source_item_and_display_string_in_lookup(mock_is_
             'enchantments' : [{
                 'enchantment_id' : 6166}]}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.finger_1_enchant_id == 6166
     assert jack.finger_1_enchant_quality == 3
@@ -328,7 +322,7 @@ def test_audit_missing_enchant_source_item_and_display_string_not_in_lookup(mock
             'enchantments' : [{
                 'enchantment_id' : 3000}]}]}}
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.finger_1_enchant_id == 3000
     assert jack.finger_1_enchant_quality == 1
@@ -345,7 +339,7 @@ def test_audit_primary_wrists(mock_is_off_hand_weapon, mock_is_primary_slot):
                 'source_item' : { 'name' : 'Enchant Bracers - Eternal Intellect' }}]}]}}
     mock_is_primary_slot.return_value = True
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.primary_enchant_id == 6220
     assert jack.primary_enchant_quality == 3
@@ -373,7 +367,7 @@ def test_audit_primary_wrists_but_wearing_unrelated(mock_is_off_hand_weapon, moc
                 'source_item' : { 'name' : 'Enchant Boots - Eternal Agility'}}]}]}}
     mock_is_primary_slot.side_effect = _is_primary_slot
 
-    Section.audit(jack, response, None, None)
+    Section.audit(jack, response, None)
 
     assert jack.primary_enchant_id == 6220
     assert jack.primary_enchant_quality == 3

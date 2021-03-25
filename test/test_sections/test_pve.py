@@ -15,7 +15,7 @@ def test_pve_quests_missing():
             'quests_completed' : None,
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.weekly_event_done == 'FALSE'
 
@@ -25,7 +25,7 @@ def test_pve_quests_key_missing():
             'quests_completed' : { 'garbage' : 'More garbage' },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.weekly_event_done == 'FALSE'
 
@@ -35,7 +35,7 @@ def test_pve_quests_missing_id():
             'quests_completed' : { 'quests' : [{'garbage' : 53436}] },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.weekly_event_done == 'FALSE'
 
@@ -46,7 +46,7 @@ def test_pve_empty_achievements():
             'achievements_statistics' : None}
     jack.world_quests_total = 30
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.world_quests_total == 30
 
@@ -57,7 +57,7 @@ def test_pve_achievements_key_missing():
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.world_quests_total = 30
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.world_quests_total == 30
 
@@ -71,7 +71,7 @@ def test_pve_achievements_missing_id():
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.world_quests_total = 30
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.world_quests_total == 30
 
@@ -85,7 +85,7 @@ def test_pve_achievements_missing_id_old_value_greater_than_new():
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
     jack.world_quests_total = 30
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.world_quests_total == 30
 
@@ -96,7 +96,7 @@ def test_world_quests_total():
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.world_quests_total == 20
 
@@ -107,7 +107,7 @@ def test_world_quests_not_present_zero():
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.world_quests_total == 0
 
@@ -126,7 +126,7 @@ def test_weekly_event_done(event_id):
             'quests_completed' : { 'quests' : [{'id' : event_id}] },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.weekly_event_done == 'TRUE'
 
@@ -136,7 +136,7 @@ def test_weekly_event_not_done():
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'categories' : [ {'id' : 14807, 'sub_categories' : [ {'id' : 15409, 'statistics' : []}]}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.weekly_event_done == 'FALSE'
 
@@ -156,7 +156,7 @@ def test_dungeons():
                         {'id' : 14401, 'quantity' : 13},
                         {'id' : 14407, 'quantity' : 14}]}]}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 84
     assert jack.dungeons_each_total == "Halls of Atonement+7|Mists of Tirna Scithe+8|The Necrotic Wake+9|De Other Side+10|Plaguefall+11|Sanguine Depths+12|Spires of Ascension+13|Theater of Pain+14"
@@ -229,7 +229,7 @@ def test_raids_all_boss_difficulties(bfa_raids):
                     {'id' : 15409, 'statistics' : bfa_raids}]}]}}
 
     Utility.set_refresh_timestamp(now)
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.raids_raid_finder        == '0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0'
@@ -247,7 +247,7 @@ def test_dungeons_and_raids_expac_missing():
             'achievements_statistics' : { 'categories' : [
                 {'id' : 14807, 'sub_categories' : []}]}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 0
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
@@ -266,7 +266,7 @@ def test_dungeons_and_raids_categories_missing():
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : { 'categories' : []}}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 0
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
@@ -285,7 +285,7 @@ def test_dungeons_and_raids_statistics_missing():
             'quests_completed' : { 'quests' : [] },
             'achievements_statistics' : None}
 
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 0
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
@@ -307,7 +307,7 @@ def test_dungeons_and_raids_missing_sub_categories():
                 {'id' : 14807}]}}
 
     Utility.set_refresh_timestamp(now)
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 0
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
@@ -342,7 +342,7 @@ def test_dungeons_and_raids_missing_categories_id(bfa_raids):
                         *bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 0
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
@@ -377,7 +377,7 @@ def test_dungeons_and_raids_missing_sub_categories_id(bfa_raids):
                         *bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 0
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
@@ -400,7 +400,7 @@ def test_dungeons_and_raids_missing_sub_categories_stats():
                     {'id' : 15409}]}]}}
 
     Utility.set_refresh_timestamp(now)
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 0
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+0|The Necrotic Wake+0|De Other Side+0|Plaguefall+0|Sanguine Depths+0|Spires of Ascension+0|Theater of Pain+0"
@@ -434,7 +434,7 @@ def test_dungeons_and_raids_missing_stat_id(bfa_raids):
                         *bad_bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 77
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+8|The Necrotic Wake+9|De Other Side+10|Plaguefall+11|Sanguine Depths+12|Spires of Ascension+13|Theater of Pain+14"
@@ -468,7 +468,7 @@ def test_dungeons_and_raids_missing_stat_quantity(bfa_raids):
                         *bad_bfa_raids]}]}]}}
 
     Utility.set_refresh_timestamp(now)
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.dungeons_total == 77
     assert jack.dungeons_each_total == "Halls of Atonement+0|Mists of Tirna Scithe+8|The Necrotic Wake+9|De Other Side+10|Plaguefall+11|Sanguine Depths+12|Spires of Ascension+13|Theater of Pain+14"
@@ -494,7 +494,7 @@ def test_raids_missing_last_updated_timestamp(bfa_raids):
                     {'id' : 15409, 'statistics' : bad_bfa_raids}]}]}}
 
     Utility.set_refresh_timestamp(now)
-    Section.pve(jack, response, None, None)
+    Section.pve(jack, response, None)
 
     assert jack.raids_raid_finder        == '0|0|0|0|0|0|0|0|0|0'
     assert jack.raids_raid_finder_weekly == '0|0|0|0|0|0|0|0|0|0'

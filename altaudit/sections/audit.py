@@ -1,7 +1,6 @@
 """Pull Gear Audit Data from API Response"""
 import re
 
-from ..blizzard import BLIZZARD_REGION, BLIZZARD_LOCALE
 from ..models import GemSlotAssociation, Gem, ITEM_SLOTS, ENCHANTED_ITEM_SLOTS, ENCHANT_ITEM_FIELD_COLUMNS
 from ..gem_enchant import enchant_lookup
 from .utility import is_off_hand_weapon, is_primary_enchant_slot
@@ -9,7 +8,7 @@ from .utility import is_off_hand_weapon, is_primary_enchant_slot
 "Item Enchant Fields"
 ENCHANT_ITEM_FIELDS = [field[0] for field in ENCHANT_ITEM_FIELD_COLUMNS]
 
-def audit(character, profile, db_session, api):
+def audit(character, profile, db_session):
     equipped_items = profile['equipment']['equipped_items']
 
     character.empty_sockets = 0

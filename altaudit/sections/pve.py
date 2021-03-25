@@ -1,6 +1,5 @@
 """Pull PvE Data from API"""
 
-from ..blizzard import BLIZZARD_LOCALE
 from ..models import RAID_DIFFICULTIES
 from ..utility import Utility
 from .raids import VALID_RAIDS
@@ -54,10 +53,10 @@ MYTHIC_DUNGEON_STATISTIC_IDS = {
     'Plaguefall'            : 14398,
     'Sanguine Depths'       : 14205,
     'Spires of Ascension'   : 14401,
-    'Theater of Pain'      : 14407
+    'Theater of Pain'       : 14407
 }
 
-def pve(character, profile, db_session, api):
+def pve(character, profile, db_session):
     # This will throw an exception if the category/subcategory is not found.
     # Is that okay? Does it matter? It shouldn't ever happen...
     # Leave it this way for now. If we start seeing errors here we can change it

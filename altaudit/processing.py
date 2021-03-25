@@ -9,7 +9,7 @@ from .sections import sections, raiderio
 from .models import Snapshot, HEADERS
 from .blizzard import BLIZZARD_LOCALE
 
-PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}]
+PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}, 'soulbinds']
 
 def _serialize_gems(character):
     character.gem_ids = '|'.join([str(g.gem.id) for g in character.gems])
@@ -169,7 +169,7 @@ def process_blizzard(character, profile, db_session, api, force_refresh):
 
         # call each section, should loop like a pro
         for section in sections:
-            section(character, profile, db_session, api)
+            section(character, profile, db_session)
 
 def process_raiderio(character, response):
     """

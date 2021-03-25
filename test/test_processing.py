@@ -235,7 +235,7 @@ def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, 
 
     process_blizzard(jack, fake_response, None, None, True)
 
-    mock_section.assert_called_once_with(jack, fake_response, None, None)
+    mock_section.assert_called_once_with(jack, fake_response, None)
     mock_get_subsections.assert_called_once_with(None, fake_response, None, PROFILE_API_SECTIONS)
 
 def test_process_blizzard_always_raise_exception(mock_section, mock_get_subsections):
