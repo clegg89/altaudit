@@ -42,8 +42,8 @@ ENCHANT_ITEM_FIELD_COLUMNS = [
         ('name', 'Column(String)'),
         ('description', 'Column(String)')]
 
-"Number of conduits. Each Soulbind has up to 3"
-CONDUITS_PER_SOULBIND = 3
+"Number of conduits. Each Soulbind has up to 4"
+CONDUITS_PER_SOULBIND = 4
 
 "Conduit information for each conduit"
 CONDUIT_FIELD_COLUMNS = [
