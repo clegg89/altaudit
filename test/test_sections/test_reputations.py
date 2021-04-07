@@ -16,7 +16,7 @@ def test_reputation_the_ascended_alliance():
                 'max' : 12000,
                 'name' : 'Honored'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[0] == "2407+The Ascended+Honored+7897+12000"
 
@@ -31,7 +31,7 @@ def test_reputation_the_ascended_horde():
                 'max' : 12000,
                 'name' : 'Honored'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[0] == "2407+The Ascended+Honored+3275+12000"
 
@@ -46,7 +46,7 @@ def test_reputation_the_undying_army_alliance():
                 'max' : 6000,
                 'name' : 'Friendly'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[1] == "2410+The Undying Army+Friendly+162+6000"
 
@@ -61,7 +61,7 @@ def test_reputation_the_undying_army_horde():
                 'max' : 6000,
                 'name' : 'Friendly'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[1] == "2410+The Undying Army+Friendly+4592+6000"
 
@@ -76,7 +76,7 @@ def test_reputation_court_of_harvesters_alliance():
                 'max' : 3000,
                 'name' : 'Friendly'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[2] == "2413+Court of Harvesters+Friendly+100+3000"
 
@@ -91,7 +91,7 @@ def test_reputation_court_of_harvesters_horde():
                 'max' : 21000,
                 'name' : 'Revered'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[2] == "2413+Court of Harvesters+Revered+57+21000"
 
@@ -106,7 +106,7 @@ def test_reputation_venari_alliance():
                 'max' : 3000,
                 'name' : 'Friendly'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[3] == "2432+Venari+Friendly+100+3000"
 
@@ -121,7 +121,7 @@ def test_reputation_venari_horde():
                 'max' : 21000,
                 'name' : 'Revered'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[3] == "2432+Venari+Revered+57+21000"
 
@@ -136,7 +136,7 @@ def test_reputation_the_avowed_alliance():
                 'max' : 3000,
                 'name' : 'Friendly'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[4] == "2439+The Avowed+Friendly+100+3000"
 
@@ -151,7 +151,7 @@ def test_reputation_the_avowed_horde():
                 'max' : 21000,
                 'name' : 'Revered'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[4] == "2439+The Avowed+Revered+57+21000"
 
@@ -166,7 +166,7 @@ def test_reputation_the_wild_hunt_alliance():
                 'max' : 3000,
                 'name' : 'Friendly'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[5] == "2465+The Wild Hunt+Friendly+100+3000"
 
@@ -181,7 +181,7 @@ def test_reputation_the_wild_hunt_horde():
                 'max' : 21000,
                 'name' : 'Revered'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations.split('|')[5] == "2465+The Wild Hunt+Revered+57+21000"
 
@@ -189,7 +189,7 @@ def test_reputation_no_dictionary():
     jack = Character('jack', faction_name='Horde')
     response = { 'reputations' : None }
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations == None
 
@@ -203,6 +203,6 @@ def test_reputation_missing_key():
                 'max' : 21000,
                 'name' : 'Revered'}}]}}
 
-    Section.reputations(jack, response, None, None)
+    Section.reputations(jack, response, None)
 
     assert jack.reputations == None

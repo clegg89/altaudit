@@ -1,9 +1,8 @@
 """Pull Basic Character Data from API Response"""
 
-from ..blizzard import BLIZZARD_LOCALE
 from ..models import Class, Faction, Race
 
-def basic(character, profile, db_session, api):
+def basic(character, profile, db_session):
     """
     Basic character information. If some of these fields are not
     present, we will just fail, as we don't want to update the character

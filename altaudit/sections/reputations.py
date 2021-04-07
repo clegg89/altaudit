@@ -27,7 +27,7 @@ REPUTATION_FACTION_ID = {
 }
 
 # TODO Possible to get paragon now if we want
-def reputations(character, profile, db_session, api):
+def reputations(character, profile, db_session):
     """
     Get reputation data relevant to current expac.
     Don't fail in here

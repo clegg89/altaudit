@@ -4,6 +4,7 @@ from . import audit
 from . import professions
 from . import reputations
 from . import pve
+from . import covenant
 from .raiderio import raiderio
 from .metadata import metadata
 
@@ -13,4 +14,5 @@ sections = [
         audit.audit,
         # professions, Not yet available in Profile API
         reputations.reputations,
-        pve.pve ]
+        pve.pve,
+        covenant.covenant ]

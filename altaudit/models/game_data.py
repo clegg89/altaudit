@@ -40,3 +40,4 @@ class Race(Base):
         for k,v in kwargs.items():
             if hasattr(self, k):
                 self.__setattr__(k, v)
+

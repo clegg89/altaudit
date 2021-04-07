@@ -173,6 +173,56 @@ def test_get_subsections_list_of_strings_and_dictionaries(mock_api, mocker):
     assert profile['quests'] == {'completed' : {'href' : 'completed'}}
     assert profile['quests_completed'] == 'completed'
 
+def test_get_subsections_nested_keys(mock_api, mocker):
+    api_sections = ['media', 'equipment', 'covenant_progress|other_key|soulbinds']
+    profile = { 'summary' : {
+        'media' : {'href' : 'media'},
+        'equipment' : {'href' : 'equipment'},
+        'covenant_progress' : { 'other_key' : { 'soulbinds' : { 'href' : 'soulbinds' }}}}}
+
+    expected_api_calls = [
+            mocker.call.get_data_resource('media', 'us', locale='en_US'),
+            mocker.call.get_data_resource('equipment', 'us', locale='en_US'),
+            mocker.call.get_data_resource('soulbinds', 'us', locale='en_US')]
+
+    _get_subsections('us', profile, mock_api, api_sections)
+    mock_api.get_data_resource.assert_called()
+    assert all([expected == actual for expected, actual in zip(expected_api_calls, mock_api.method_calls)]), "Expected {} got {}".format(expected_api_calls, mock_api.method_calls)
+    assert profile['media'] == 'media'
+    assert profile['equipment'] == 'equipment'
+    assert profile['soulbinds'] == 'soulbinds'
+
+def test_get_subsections_nested_keys_key_not_found(mock_api, mocker):
+    api_sections = ['media', 'equipment', 'covenant_progress|other_key|soulbinds']
+    profile = { 'summary' : {
+        'media' : {'href' : 'media'},
+        'equipment' : {'href' : 'equipment'},
+        'covenant_progress' : {}}}
+
+    expected_api_calls = [
+            mocker.call.get_data_resource('media', 'us', locale='en_US'),
+            mocker.call.get_data_resource('equipment', 'us', locale='en_US')]
+
+    _get_subsections('us', profile, mock_api, api_sections)
+    mock_api.get_data_resource.assert_called()
+    assert all([expected == actual for expected, actual in zip(expected_api_calls, mock_api.method_calls)]), "Expected {} got {}".format(expected_api_calls, mock_api.method_calls)
+    assert profile['media'] == 'media'
+    assert profile['equipment'] == 'equipment'
+    assert profile['soulbinds'] == None
+
+def test_get_subsections_nested_keys_api_error(mock_api, mocker):
+    api_sections = ['media', 'equipment', 'covenant_progress|other_key|soulbinds']
+    profile = { 'summary' : {
+        'media' : {'href' : 'media'},
+        'equipment' : {'href' : 'equipment'},
+        'covenant_progress' : { 'other_key' : { 'soulbinds' : { 'href' : 'fail' }}}}}
+
+    _get_subsections('us', profile, mock_api, api_sections)
+    mock_api.get_data_resource.assert_called()
+    assert profile['media'] == 'media'
+    assert profile['equipment'] == 'equipment'
+    assert profile['soulbinds'] == None
+
 def test_get_subsections_section_missing_from_response(mock_api, mocker):
     api_sections = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}]
     profile = { 'summary' : {
@@ -235,7 +285,7 @@ def test_process_blizzard_last_modified_not_changed_force_refresh(mock_section, 
 
     process_blizzard(jack, fake_response, None, None, True)
 
-    mock_section.assert_called_once_with(jack, fake_response, None, None)
+    mock_section.assert_called_once_with(jack, fake_response, None)
     mock_get_subsections.assert_called_once_with(None, fake_response, None, PROFILE_API_SECTIONS)
 
 def test_process_blizzard_always_raise_exception(mock_section, mock_get_subsections):

@@ -42,6 +42,15 @@ ENCHANT_ITEM_FIELD_COLUMNS = [
         ('name', 'Column(String)'),
         ('description', 'Column(String)')]
 
+"Number of conduits. Each Soulbind has up to 4"
+CONDUITS_PER_SOULBIND = 4
+
+"Conduit information for each conduit"
+CONDUIT_FIELD_COLUMNS = [
+        ('ilvl', 'Column(Integer)'),
+        ('id', 'Column(Integer)'),
+        ('name', 'Column(String)')]
+
 "Professions, excluding Archaeology"
 PROFESSIONS = ['primary1', 'primary2', 'cooking', 'fishing']
 
@@ -96,6 +105,11 @@ CHARACTER_HEADER_FIELDS = {
     'bust' : 'Column(String)',
     'render' : 'Column(String)',
 
+    # Covenant Data
+    'covenant' : 'Column(String)',
+    'renown' : 'Column(Integer)',
+    'current_soulbind' : 'Column(String)',
+
     # Item Info
     'estimated_ilvl' : 'Column(Float)',
 
@@ -113,6 +127,11 @@ CHARACTER_HEADER_FIELDS = {
 
     **{'gem_{}'.format(field) : "''" # Composite from gems table
         for field in ['ids', 'qualities', 'names', 'icons', 'stats', 'slots']},
+
+    # Conduit Info
+    **{'conduit_{}_{}'.format(num+1, field[0]) : field[1]
+        for num in range(CONDUITS_PER_SOULBIND)
+        for field in CONDUIT_FIELD_COLUMNS},
 
     # Profession Info
     **{'{}_{}'.format(prof, field[0]) : field[1]

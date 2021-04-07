@@ -9,7 +9,7 @@ from .sections import sections, raiderio
 from .models import Snapshot, HEADERS
 from .blizzard import BLIZZARD_LOCALE
 
-PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}]
+PROFILE_API_SECTIONS = ['media', 'equipment', 'reputations', {'achievements' : 'statistics'}, {'quests' : 'completed'}, 'covenant_progress|soulbinds']
 
 def _serialize_gems(character):
     character.gem_ids = '|'.join([str(g.gem.id) for g in character.gems])
@@ -99,14 +99,37 @@ def _get_historical_data(character):
 
 def _get_subsections(region, profile, api, sub_section, parent='summary', prefix=''):
     if type(sub_section) is str:
-        if profile[parent] and sub_section in profile[parent]:
+        # Default profile key is just the name of the string
+        profile_key = prefix + sub_section
+        href = None
+        if sub_section.count('|') > 0:
+            # | is a delimiter denoting a list of keys
+            keys = sub_section.split('|')
+            actual_section = profile[parent]
+
+            # The last key in the list is used as the key in profile
+            profile_key = prefix + keys[-1]
+
+            for key in keys:
+                actual_section = actual_section.get(key, None)
+                if not actual_section:
+                    break
+
+            # Set the href if the nested keys existed
+            if actual_section:
+                href = actual_section['href']
+
+        elif profile[parent] and sub_section in profile[parent]:
+            href = profile[parent][sub_section]['href']
+
+        # If the API call doesn't work or we didn't find href, this will be default
+        profile[profile_key] = None
+        if href:
             try:
-                profile[prefix + sub_section] = api.get_data_resource(
-                        profile[parent][sub_section]['href'], region, locale=BLIZZARD_LOCALE)
+                profile[profile_key] = api.get_data_resource(href, region, locale=BLIZZARD_LOCALE)
             except WowApiException:
-                profile[prefix + sub_section] = None
-        else:
-            profile[prefix + sub_section] = None
+                pass
+
     elif type(sub_section) is list:
         for section in sub_section:
             _get_subsections(region, profile, api, section, parent, prefix)
@@ -169,7 +192,7 @@ def process_blizzard(character, profile, db_session, api, force_refresh):
 
         # call each section, should loop like a pro
         for section in sections:
-            section(character, profile, db_session, api)
+            section(character, profile, db_session)
 
 def process_raiderio(character, response):
     """
