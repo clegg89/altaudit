@@ -35,7 +35,7 @@ WEEKLY_EVENT_QUESTS = [
 DUNGEONS_AND_RAIDS_CATEGORY_ID = 14807
 
 "Current Expac Dungeons & Raids Achievment Statistics Sub-Category ID"
-CURRENT_EXPAC_SUBCATEGORY_ID = 15409
+CURRENT_EXPAC_SUBCATEGORY_ID = 15430
 
 """
 Mythic Dungeon Statistic IDs
