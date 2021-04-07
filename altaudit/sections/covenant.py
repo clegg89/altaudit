@@ -54,5 +54,5 @@ def covenant(character, profile, db_session):
                 setattr(character, 'conduit_{}_id'.format(conduits_found), socket['conduit']['id'])
                 setattr(character, 'conduit_{}_ilvl'.format(conduits_found), CONDUIT_RANK_TO_ILVL[socket['rank']])
 
-    except KeyError:
+    except (KeyError,TypeError):
         character.current_soulbind = None
