@@ -232,3 +232,12 @@ def test_basic_info_render_old(fake_response_maker, db_session):
             'render_url' : 'realm1/96/184987488-main.jpg'}
     Section.basic(jack, response, db_session)
     assert jack.render == 'realm1/96/184987488-main.jpg'
+
+def test_basic_info_no_media(fake_response_maker, db_session):
+    jack = Character('jack')
+    response = fake_response_maker()
+    response['media'] = None
+    Section.basic(jack, response, db_session)
+    assert jack.avatar == None
+    assert jack.bust == None
+    assert jack.render == None

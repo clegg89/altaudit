@@ -18,12 +18,17 @@ def basic(character, profile, db_session):
     character.gender = profile['summary']['gender']['name']
     character.race = db_session.query(Race).filter_by(name=profile['summary']['race']['name']).first()
 
-    if 'assets' in profile['media']:
-        assets = profile['media']['assets']
-        character.avatar = next((asset['value'] for asset in assets if asset['key'] == 'avatar'), None)
-        character.bust = next((asset['value'] for asset in assets if asset['key'] == 'inset'), None)
-        character.render = next((asset['value'] for asset in assets if asset['key'] == 'main'), None)
-    else:
-        character.avatar = profile['media']['avatar_url']
-        character.bust = profile['media']['bust_url']
-        character.render = profile['media']['render_url']
+    try:
+        if 'assets' in profile['media']:
+            assets = profile['media']['assets']
+            character.avatar = next((asset['value'] for asset in assets if asset['key'] == 'avatar'), None)
+            character.bust = next((asset['value'] for asset in assets if asset['key'] == 'inset'), None)
+            character.render = next((asset['value'] for asset in assets if asset['key'] == 'main'), None)
+        else:
+            character.avatar = profile['media']['avatar_url']
+            character.bust = profile['media']['bust_url']
+            character.render = profile['media']['render_url']
+    except TypeError:
+        character.avatar = None
+        character.bust = None
+        character.render = None
