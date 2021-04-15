@@ -145,6 +145,23 @@ def test_audit_item_enchant_weapon_offhand_is_enchanted(mock_is_off_hand_weapon,
     assert jack.off_hand_enchant_name == 'Lightless Force'
     assert jack.off_hand_enchant_description == "Chance to send out a wave of Shadow energy, striking 5 enemies"
 
+def test_audit_item_enchant_two_handed_offhand_is_enchanted(mock_is_off_hand_weapon, mock_is_primary_slot):
+    jack = Character('jack')
+    response = { 'equipment' : {
+        'equipped_items' : [{
+            'slot' : { 'type' : 'OFF_HAND' },
+            'inventory_type' : { 'type' : 'TWOHWEAPON' },
+            'enchantments' : [{
+                'enchantment_id' : 6223,
+                'source_item' : { 'name' : 'Enchant Weapon - Lightless Force' }}]}]}}
+
+    Section.audit(jack, response, None)
+
+    assert jack.off_hand_enchant_id == 6223
+    assert jack.off_hand_enchant_quality == 3
+    assert jack.off_hand_enchant_name == 'Lightless Force'
+    assert jack.off_hand_enchant_description == "Chance to send out a wave of Shadow energy, striking 5 enemies"
+
 def test_audit_empty_sockets(mock_is_off_hand_weapon, mock_is_primary_slot):
     jack = Character('jack')
     response = { 'equipment' : {

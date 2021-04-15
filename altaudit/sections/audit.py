@@ -50,7 +50,9 @@ def audit(character, profile, db_session):
 
 def _enchant(character, item, slot):
     # Handle special case of offHand weapon (this will trigger if the item is not a weapon)
-    if slot == 'off_hand' and item['inventory_type']['type'] != 'WEAPON':
+    if slot == 'off_hand' and\
+            item['inventory_type']['type'] != 'WEAPON' and\
+            item['inventory_type']['type'] != 'TWOHWEAPON':
         for field in ENCHANT_ITEM_FIELDS:
             setattr(character, 'off_hand_enchant_{}'.format(field), None)
         return
