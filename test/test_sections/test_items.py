@@ -149,3 +149,16 @@ def test_tabard_ignored(default_items_response):
 
     Section.items(jack, default_items_response, None)
     assert jack.estimated_ilvl == 405
+
+def test_item_gets_removed(default_items_response, mock_is_off_hand_weapon):
+    jack = Character('jack')
+
+    Section.items(jack, default_items_response, None)
+    assert jack.off_hand_itemLevel == 405
+
+    off_hand = default_items_response['equipment']['equipped_items'][15]
+    default_items_response['equipment']['equipped_items'].remove(next(item for item in default_items_response['equipment']['equipped_items'] if item['slot']['type'] == 'OFF_HAND'))
+    mock_is_off_hand_weapon.return_value = False
+
+    Section.items(jack, default_items_response, None)
+    assert jack.off_hand_itemLevel == None

@@ -14,6 +14,12 @@ def items(character, profile, db_session):
     equipped_items = profile['equipment']['equipped_items']
     ilevels = {slot : 0 for slot in ITEM_SLOTS}
 
+    for slot in ITEM_SLOTS:
+        setattr(character, '{}_itemLevel'.format(slot), None)
+        setattr(character, '{}_id'.format(slot), None)
+        setattr(character, '{}_name'.format(slot), None)
+        setattr(character, '{}_quality'.format(slot), None)
+
     for item in equipped_items:
         slot = item['slot']['type'].lower()
         try:
