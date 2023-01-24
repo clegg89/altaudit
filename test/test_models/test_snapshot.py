@@ -4,14 +4,16 @@ import pytest
 from altaudit.models import Character, Snapshot
 from altaudit.models.snapshot import Year, Week
 
+from sqlalchemy.inspection import inspect
+
 def test_create_year_table(db):
-    assert db.has_table('years')
+    assert inspect(db).has_table('years')
 
 def test_create_week_table(db):
-    assert db.has_table('weeks')
+    assert inspect(db).has_table('weeks')
 
 def test_create_snapshot_table(db):
-    assert db.has_table('snapshots')
+    assert inspect(db).has_table('snapshots')
 
 def test_no_duplicate_years(db_session_integrityerror):
     clegg = Character('clegg')

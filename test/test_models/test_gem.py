@@ -3,8 +3,10 @@ import pytest
 
 from altaudit.models import Gem
 
+from sqlalchemy.inspection import inspect
+
 def test_create_gem_table(db):
-    assert db.has_table('gems')
+    assert inspect(db).has_table('gems')
 
 def test_add_gem(db_session):
     quick_sand = Gem(168641, 5, 'Quick Sand Spinel', 'inv_misc_gem_x4_uncommon_perfectcut_yellow', '+50 Haste')

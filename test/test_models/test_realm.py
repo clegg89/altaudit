@@ -3,8 +3,10 @@ import pytest
 
 from altaudit.models import Region, Realm
 
+from sqlalchemy.inspection import inspect
+
 def test_create_realm_table(db):
-    assert db.has_table('realms')
+    assert inspect(db).has_table('realms')
 
 def test_add_realm(db_session):
     kj = Realm('kiljaeden')

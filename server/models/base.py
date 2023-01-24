@@ -1,6 +1,6 @@
 """Base model used by other model classes"""
 from sqlalchemy import MetaData, Column, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 meta = MetaData(naming_convention={
     "ix" : "ix_%(column_0_label)s",

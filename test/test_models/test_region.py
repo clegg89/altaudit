@@ -3,8 +3,10 @@ import pytest
 
 from altaudit.models import Region
 
+from sqlalchemy.inspection import inspect
+
 def test_create_region_table(db):
-    assert db.has_table('regions')
+    assert inspect(db).has_table('regions')
 
 def test_add_region(db_session):
     us = Region(name='US')

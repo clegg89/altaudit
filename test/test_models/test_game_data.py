@@ -3,14 +3,16 @@ import pytest
 
 from altaudit.models import Faction, Class, Race
 
+from sqlalchemy.inspection import inspect
+
 def test_create_class_table(db):
-    assert db.has_table('classes')
+    assert inspect(db).has_table('classes')
 
 def test_create_faction_table(db):
-    assert db.has_table('factions')
+    assert inspect(db).has_table('factions')
 
 def test_create_race_table(db):
-    assert db.has_table('races')
+    assert inspect(db).has_table('races')
 
 def test_create_class(db_session):
     warlock = Class('Warlock', id=9)

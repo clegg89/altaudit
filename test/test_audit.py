@@ -12,6 +12,8 @@ from altaudit.blizzard import BLIZZARD_LOCALE
 from altaudit.gem_enchant import gem_lookup
 import altaudit.sections as Section
 
+from sqlalchemy.inspection import inspect
+
 wow_classes = {'classes': [
     {'id': 1, 'name': 'Warrior'},
     {'id': 2, 'name': 'Paladin'},
@@ -170,15 +172,15 @@ class TestAuditInit:
                 retry_conn_failures=True)
 
     def test_has_tables(self):
-        assert self.audit.engine.has_table('classes')
-        assert self.audit.engine.has_table('factions')
-        assert self.audit.engine.has_table('races')
-        assert self.audit.engine.has_table('regions')
-        assert self.audit.engine.has_table('realms')
-        assert self.audit.engine.has_table('characters')
-        assert self.audit.engine.has_table('years')
-        assert self.audit.engine.has_table('weeks')
-        assert self.audit.engine.has_table('snapshots')
+        assert inspect(self.audit.engine).has_table('classes')
+        assert inspect(self.audit.engine).has_table('factions')
+        assert inspect(self.audit.engine).has_table('races')
+        assert inspect(self.audit.engine).has_table('regions')
+        assert inspect(self.audit.engine).has_table('realms')
+        assert inspect(self.audit.engine).has_table('characters')
+        assert inspect(self.audit.engine).has_table('years')
+        assert inspect(self.audit.engine).has_table('weeks')
+        assert inspect(self.audit.engine).has_table('snapshots')
 
     def test_classes_retrieved(self, db_session):
         self.audit._create_classes(db_session)

@@ -5,8 +5,10 @@ from sqlalchemy.exc import IntegrityError
 
 from altaudit.models import Faction, Class, Race, Region, Realm, Character, GemSlotAssociation, Gem
 
+from sqlalchemy.inspection import inspect
+
 def test_create_character_table(db):
-    assert db.has_table('characters')
+    assert inspect(db).has_table('characters')
 
 def test_add_character(db_session):
     clegg = Character(name='clegg')
